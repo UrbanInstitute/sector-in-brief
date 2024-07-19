@@ -3,5 +3,5 @@ state_ls = setNames(as.list(as.character(usdata::state_stats$abbr)), usdata::sta
 state_ls[["All States"]] = "all_states"
 # Create org_ls
 org_ls <- as.list(sprintf("501(c)(%s)", c(1:10, "d", "e", "f", "k")))
-org_ls[["All Organizations"]] = "All Organizations"
+org_ls[["All Organizations"]] = "all_orgs"
 setNames(org_ls, unlist(org_ls))
