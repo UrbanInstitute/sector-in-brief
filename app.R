@@ -11,8 +11,8 @@ library(shiny)
 library(bslib)
 library(ggplot2)
 library(urbnthemes)
-set_urbn_defaults(style = "print")
 library(plotly)
+set_urbn_defaults(style = "print")
 
 # Scripts
 source("R/config.R")
@@ -32,13 +32,6 @@ sibtheme <- bslib::bs_theme(
 )
 
 # Data Sets
-num_nonprofits_by_year <- data.table::fread(
-  "data/num_nonprofits_by_year.csv"
-)
-num_nonprofits_dt <- data.table::fread(
-  "data/num_nonprofits_full.csv"
-)
-
 geo_dt <- data.table::fread(
   "data/nested_geographies.csv"
 )
@@ -51,40 +44,40 @@ fiscal_full_dt <- data.table::fread(
 cards_sector_size <- list(
   card(
     full_screen = TRUE,
-    card_header("Number of Nonprofits"),
-    plotOutput("npnum")
+    card_header("Total Number of Nonprofits"),
+    plotly::plotlyOutput("npnum")
   ),
   card(
     full_screen = TRUE,
-    card_header("Revenues ($)"),
-    plotOutput("nprev")
+    card_header("Total Revenues ($)"),
+    plotly::plotlyOutput("nprev")
   ),
   card(
     full_screen = TRUE,
-    card_header("Expenses ($)"),
-    plotOutput("npexp")
+    card_header("Total Expenses ($)"),
+    plotly::plotlyOutput("npexp")
   ),
   card(
     full_screen = TRUE,
-    card_header("Assets ($)"),
-    plotOutput("npass")
+    card_header("Total Assets ($)"),
+    plotly::plotlyOutput("npass")
   )  
 )
 
 # Filters
 org_filter <- selectizeInput(
   "org_type_selector",
-  NULL,
+  label = "Select a 501(c) type",
   choices = org_ls,
   options = list(
-    placeholder = 'Select a 501(c) type...',
+    placeholder = '501(c) type...',
     onInitialize = I('function() { this.setValue(""); }')
   )
 )
 
 state_filter <- div(selectizeInput(
   "state_selector",
-  NULL,
+  label = "Select a State",
   choices = state_ls,
   selected = state_ls$`All States`
 ))
@@ -92,7 +85,7 @@ state_filter <- div(selectizeInput(
 nested_geo_filter <- div(
   shiny::radioButtons(
     "geo_selector",
-    label = "Select Additional Geographic Units",
+    label = "Additional Geographic Units",
     choices = list(
       "Counties" = "county",
       "Metro / Micro Areas" = "cbsa",
@@ -104,14 +97,14 @@ nested_geo_filter <- div(
 county_cbsa_filter <- div(
   selectizeInput(
     "county_cbsa_selector", 
-    NULL, 
+    label = "Select County/Metro", 
     choices = NULL
   )
 )
 
 industry_group_filter <- div(selectizeInput(
   "industry_group_selector",
-  NULL,
+  label = "Select an Industry",
   choices = list(
     "Arts, Culture, and Humanities" = "ART", 
     "Education (minus Universities)" = "EDU",
@@ -126,14 +119,14 @@ industry_group_filter <- div(selectizeInput(
     "All Groups" = "all_groups"
   ),
   options = list(
-    placeholder = "Select an industry...",
+    placeholder = "Industry Groups",
     onInitialize = I('function() { this.setValue(""); }')
   )
 ))
 
 size_filter <- div(selectizeInput(
   "size_selector",
-  label = "Size of Assets",
+  label = "Select an Asset Size",
   choices = list(
     "All Sizes" = 0, 
     "Under $100,000" = 1,
@@ -163,7 +156,7 @@ ui <- bslib::page_navbar(
         org_filter
       ),
       bslib::accordion_panel(
-        "State",
+        "Geography",
         state_filter,
         shiny::conditionalPanel(
           nested_geo_filter,
@@ -175,7 +168,7 @@ ui <- bslib::page_navbar(
         )
       ),
       bslib::accordion_panel(
-        "Industry Groups",
+        "Industry Group",
         industry_group_filter
       ),
       bslib::accordion_panel(
@@ -229,13 +222,14 @@ server <- function(input, output, session) {
   )
   
   data <- shiny::eventReactive(input$update_plot, ignoreNULL = FALSE, {
-    # Update Data
+    # Get Inputs
     org_type <- input$org_type_selector
     state <- input$state_selector
     industry_group <- input$industry_group_selector
     geo_level <- input$geo_selector
     county_cbsa <- input$county_cbsa_selector
     size <- input$size_selector
+    # Filter data set
     dt <- fiscal_full_dt
     if (!grepl("all", org_type) & org_type != "") {
       dt <- dt[CTYPE == org_type, ]
@@ -263,13 +257,13 @@ server <- function(input, output, session) {
   }
   )
   # Make Plots
-  output$npnum <- renderPlot({
-    shiny::req(data())
-    ggplot(data(), aes(x= YEAR, y= COUNT)) +
-      geom_line(group = 1, size=2, color="#1696d2") +
-      geom_point(size=5) +
-      ggplot2::xlim(1989, 2024) +
+  output$npnum <- plotly::renderPlotly({
+    dt <- data()[YEAR >= 1995, .(YEAR, COUNT)]
+    p <- ggplot(dt, aes(x= YEAR, y= COUNT)) +
+      geom_line(group = 1, size=1, color="#1696d2") +
+      geom_point(size=2) +
       scale_y_continuous(
+        expand = expansion(mult = 0.5),
         labels = scales::unit_format(unit = "thousand", scale=1e-3)
       ) +
       labs(
@@ -282,15 +276,16 @@ server <- function(input, output, session) {
         axis.title.y = element_text(size = 14),
         axis.text = element_text(size=12)
       )
+    plotly::ggplotly(p)
   })
   
-  output$nprev <- renderPlot({
-    shiny::req(data())
-    ggplot(data(), aes(x= YEAR, y= REVENUES)) +
-      ggplot2::xlim(1989, 2021) +
-      geom_line(group = 1, size=2, color="#55b748") +
-      geom_point(size=5, color="#55b748") +
+  output$nprev <- plotly::renderPlotly({
+    dt <- data()[YEAR <= 2021, .(YEAR, REVENUES)]
+    p <- ggplot(dt, aes(x= YEAR, y= REVENUES)) +
+      geom_line(group = 1, size=1, color="#55b748") +
+      geom_point(size=2, color="#55b748") +
       scale_y_continuous(
+        expand = expansion(mult = 0.5),
         labels = scales::unit_format(unit = "m", scale=1e-6)
       ) +
       labs(
@@ -303,15 +298,16 @@ server <- function(input, output, session) {
         axis.title.y = element_text(size = 14),
         axis.text = element_text(size=12)
       )
+    plotly::ggplotly(p)
   })
   
-  output$npexp <- renderPlot({
-    shiny::req(data())
-    ggplot(data(), aes(x= YEAR, y= EXPENSES)) +    
-    geom_line(group = 1, size=2, color="#fdbf11") +
-      geom_point(size=5, color = "#fdbf11") +
-      ggplot2::xlim(1989, 2021) +
+  output$npexp <- plotly::renderPlotly({
+    dt <- data()[YEAR <= 2021, .(YEAR, EXPENSES)]
+    p <- ggplot(dt, aes(x= YEAR, y= EXPENSES)) +    
+    geom_line(group = 1, size=1, color="#fdbf11") +
+      geom_point(size=2, color = "#fdbf11") +
       scale_y_continuous(
+        expand = expansion(mult = 0.5),
         labels = scales::unit_format(unit = "m", scale=1e-6)
       ) +
       labs(
@@ -324,15 +320,16 @@ server <- function(input, output, session) {
         axis.title.y = element_text(size = 14),
         axis.text = element_text(size=12)
       )
+    plotly::ggplotly(p)
   })
   
-  output$npass <- renderPlot({
-    shiny::req(data())
-    ggplot(data(), aes(x= YEAR, y= ASSETS)) +
-      geom_line(group = 1, size=2, color = "#ec008b") +
-      geom_point(size=5, color = "#ec008b") +
-      ggplot2::xlim(1989, 2021) +
+  output$npass <- plotly::renderPlotly({
+    dt <- data()[YEAR <= 2021, .(YEAR, ASSETS)]
+    p <- ggplot(dt, aes(x= YEAR, y= ASSETS)) +
+      geom_line(group = 1, size=1, color = "#ec008b") +
+      geom_point(size=2, color = "#ec008b") +
       scale_y_continuous(
+        expand = expansion(mult = 0.5),
         labels = scales::unit_format(unit = "m", scale=1e-6)
       ) +
       labs(
@@ -345,6 +342,7 @@ server <- function(input, output, session) {
         axis.title.y = element_text(size = 14),
         axis.text = element_text(size=12)
       )
+    plotly::ggplotly(p)
   })
   
 }
