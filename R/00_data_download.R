@@ -10,9 +10,13 @@
 # (3) - Wrangle CORE Data to get Assets, Revenues, Expenses, Employment Numbers
 # (4) - PF Data for Grant Information
 # (5) - Efile Data for DAF information from 2021
+# (6) - Save files as parquet format with arrow
 
 
 # Packages
+library(data.table)
+library(tidyverse)
+library(arrow)
 
 # Scripts
 source("R/utils.R")
@@ -335,16 +339,73 @@ data.table::fwrite(
 )
 
 # (5) Efile Data - Donor Advised Funds (2021)
-
+daf_cols <- c(
+  "ORG_EIN",
+  "TAX_YEAR",
+  "SD_01_TOT_NUM_EOY_DAF",
+  "SD_01_TOT_NUM_EOY_OTH",
+  "SD_01_AGGREGATE_CONTR_DAF",
+  "SD_01_AGGREGATE_CONTR_OTH",
+  "SD_01_AGGREGATE_GRANT_DAF",
+  "SD_01_AGGREGATE_GRANT_OTH",
+  "SD_01_AGGREGATE_VALUE_EOY_DAF",
+  "SD_01_AGGREGATE_VALUE_EOY_OTH"
+)
 # (5.1) Download Efile Data and process
 efile_daf <- data.table::fread(
-  "https://nccs-efile.s3.us-east-1.amazonaws.com/parsed/SD-P01-T00-ORGS-DONOR-ADVISED-FUNDS-OTH-2021.csv"
+  "https://nccs-efile.s3.us-east-1.amazonaws.com/parsed/SD-P01-T00-ORGS-DONOR-ADVISED-FUNDS-OTH-2021.csv",
+  select = daf_cols
 )
-
 # Add EIN2
+efile_daf <- efile_daf[, EIN2 := derive_ein2(ORG_EIN), by = 1:nrow(efile_daf)]
+# Perform summations
+efile_daf <- efile_daf[,
+                       .(
+                         EIN2 = EIN2,
+                         NUM_DAFS = sum(SD_01_TOT_NUM_EOY_DAF, SD_01_TOT_NUM_EOY_OTH),
+                         TOTAL_CONTRIBUTIONS = sum(SD_01_AGGREGATE_CONTR_DAF, SD_01_AGGREGATE_CONTR_OTH),
+                         TOTAL_GRANTS = sum(SD_01_AGGREGATE_GRANT_DAF, SD_01_AGGREGATE_GRANT_OTH),
+                         TOTAL_VALUE = sum(SD_01_AGGREGATE_VALUE_EOY_DAF, SD_01_AGGREGATE_VALUE_EOY_OTH)
+                       ),
+                       by = 1:nrow(efile_daf)]
 
 # (5.2) Append BMF Metadata
 
 # (5.3) Append CORE Asset Data
 
 # (5.4) Process Data and summarize for point estimates
+
+# •	Percentage of organizations that maintained any donor advised funds or any 
+# similar funds or accounts for which donors have the right to provide advice 
+# on the distribution or investment of amounts in such funds or accounts 
+library(blscrapeR)
+
+cpi <- blscrapeR::inflation_adjust(base_date = "1989-01-01")
+cpi <- cpi %>% 
+  dplyr::group_by(year) %>% 
+  dplyr::summarise(inf_adj = mean(adj_dollar_value))
+cpi.2021 <- cpi %>% 
+  dplyr::filter(year == 2021) %>% 
+  dplyr::pull("inf_adj")
+cpi <- cpi %>% 
+  dplyr::rename("YEAR" = year) %>% 
+  dplyr::mutate(YEAR = as.integer(YEAR)) %>% 
+  dplyr::mutate(inf_adj = cpi.2021 / inf_adj)
+cpi <- data.table::as.data.table(cpi)
+
+fiscal_full_dt <- cpi[fiscal_full_dt, on = "YEAR"]
+fiscal_full_dt
+
+fiscal_cols <- c(
+  "total_assets",
+  "total_revenues",
+  "total_expenses"
+)
+
+fiscal_full_dt <- fiscal_full_dt[, total_assets := total_assets * inf_adj, by = 1:nrow(fiscal_full_dt)]
+fiscal_full_dt <- fiscal_full_dt[, total_revenues := total_revenues * inf_adj, by = 1:nrow(fiscal_full_dt)]
+
+# (6) Write files in parquet format
+fiscal <- arrow::read_csv_arrow("data/full_fiscal_metrics.csv")
+arrow::write_parquet(fiscal, "data/full_fiscal_metrics.parquet")
+
