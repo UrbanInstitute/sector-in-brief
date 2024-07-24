@@ -12,10 +12,14 @@ library(bslib)
 library(ggplot2)
 library(urbnthemes)
 library(plotly)
+library(dplyr)
+library(arrow)
+library(data.table)
 set_urbn_defaults(style = "print")
 
 # Scripts
 source("R/config.R")
+source("R/utils.R")
 
 # Shiny Theme
 sibtheme <- bslib::bs_theme(
@@ -36,9 +40,7 @@ geo_dt <- data.table::fread(
   "data/nested_geographies.csv"
 )
 
-fiscal_full_dt <- data.table::fread(
-  "data/full_fiscal_metrics.csv"
-)
+fiscal <- arrow::read_parquet("data/full_fiscal_metrics.parquet")
 
 # Cards
 cards_sector_size <- list(
@@ -69,10 +71,7 @@ org_filter <- selectizeInput(
   "org_type_selector",
   label = "Select a 501(c) type",
   choices = org_ls,
-  options = list(
-    placeholder = '501(c) type...',
-    onInitialize = I('function() { this.setValue(""); }')
-  )
+  selected = org_ls$`All Organizations`
 )
 
 state_filter <- div(selectizeInput(
@@ -90,7 +89,8 @@ nested_geo_filter <- div(
       "Counties" = "county",
       "Metro / Micro Areas" = "cbsa",
       "Entire State" = "state"
-    )
+    ),
+    selected = "state"
   )
 )
 
@@ -118,10 +118,7 @@ industry_group_filter <- div(selectizeInput(
     "Hospitals" = "HOS",
     "All Groups" = "all_groups"
   ),
-  options = list(
-    placeholder = "Industry Groups",
-    onInitialize = I('function() { this.setValue(""); }')
-  )
+  selected = "all_groups"
 ))
 
 size_filter <- div(selectizeInput(
@@ -136,10 +133,7 @@ size_filter <- div(selectizeInput(
     "$5 Million - $9.99 Million" = 5,
     "Above $10 Million" = 6
   ),
-  options = list(
-    placeholder = "Select an asset size...",
-    onInitialize = I('function() { this.setValue(""); }')
-  )
+  selected = 0
 ))
 
 # UI for sector in brief dashboard
@@ -196,8 +190,6 @@ ui <- bslib::page_navbar(
     ),
   )
  )
-)
-
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
@@ -230,36 +222,24 @@ server <- function(input, output, session) {
     county_cbsa <- input$county_cbsa_selector
     size <- input$size_selector
     # Filter data set
-    dt <- fiscal_full_dt
-    if (!grepl("all", org_type) & org_type != "") {
-      dt <- dt[CTYPE == org_type, ]
-    }
-    if (!grepl("all", state) & state != "") {
-      dt <- dt[CENSUS_STATE_ABBR == state, ]
-      if (geo_level == "county"){
-        dt <- dt[CENSUS_COUNTY_NAME == county_cbsa,]
-      } else if (geo_level == "cbsa") {
-        dt <- dt[CENSUS_CBSA_NAME == county_cbsa,]
-      }
-    }
-    if (!grepl("all", industry_group) & industry_group != "") {
-      dt <- dt[NTEE_INDUSTRY_GROUP == industry_group, ]
-    }
-    if (size  > 0){
-      dt <- dt[SIZE == size,]
-    }
-    dt <- dt[, .(COUNT = sum(num_nonprofit),
-                 ASSETS = sum(total_assets, na.rm = TRUE),
-                 REVENUES = sum(total_revenues, na.rm = TRUE),
-                 EXPENSES = sum(total_expenses, na.rm = TRUE)), 
-             by = "YEAR"]
-    return(dt)
-  }
-  )
+    filter_parquet(
+      fiscal,
+      org_type,
+      state,
+      industry_group,
+      geo_level,
+      county_cbsa,
+      size
+    )
+  })
   # Make Plots
   output$npnum <- plotly::renderPlotly({
-    dt <- data()[YEAR >= 1995, .(YEAR, COUNT)]
-    p <- ggplot(dt, aes(x= YEAR, y= COUNT)) +
+    plot_data <- data() %>% 
+      dplyr::filter(YEAR >= 1995) %>% 
+      dplyr::select(YEAR, COUNT) %>% 
+      dplyr::collect()
+    p <- ggplot(plot_data, 
+                aes(x= YEAR, y= COUNT)) +
       geom_line(group = 1, size=1, color="#1696d2") +
       geom_point(size=2) +
       scale_y_continuous(
@@ -280,8 +260,12 @@ server <- function(input, output, session) {
   })
   
   output$nprev <- plotly::renderPlotly({
-    dt <- data()[YEAR <= 2021, .(YEAR, REVENUES)]
-    p <- ggplot(dt, aes(x= YEAR, y= REVENUES)) +
+    plot_data <- data() %>% 
+      dplyr::filter(YEAR <= 2021) %>% 
+      dplyr::select(YEAR, REVENUES) %>% 
+      dplyr::collect()
+    p <- ggplot(plot_data, 
+                aes(x= YEAR, y= REVENUES)) +
       geom_line(group = 1, size=1, color="#55b748") +
       geom_point(size=2, color="#55b748") +
       scale_y_continuous(
@@ -302,8 +286,12 @@ server <- function(input, output, session) {
   })
   
   output$npexp <- plotly::renderPlotly({
-    dt <- data()[YEAR <= 2021, .(YEAR, EXPENSES)]
-    p <- ggplot(dt, aes(x= YEAR, y= EXPENSES)) +    
+    plot_data <- data() %>% 
+      dplyr::filter(YEAR <= 2021) %>% 
+      dplyr::select(YEAR, EXPENSES) %>% 
+      dplyr::collect()
+    p <- ggplot(plot_data, 
+                aes(x= YEAR, y= EXPENSES)) +    
     geom_line(group = 1, size=1, color="#fdbf11") +
       geom_point(size=2, color = "#fdbf11") +
       scale_y_continuous(
@@ -324,8 +312,12 @@ server <- function(input, output, session) {
   })
   
   output$npass <- plotly::renderPlotly({
-    dt <- data()[YEAR <= 2021, .(YEAR, ASSETS)]
-    p <- ggplot(dt, aes(x= YEAR, y= ASSETS)) +
+    plot_data <- data() %>% 
+      dplyr::filter(YEAR <= 2021) %>% 
+      dplyr::select(YEAR, ASSETS) %>% 
+      dplyr::collect()
+    p <- ggplot(plot_data,
+                aes(x= YEAR, y= ASSETS)) +
       geom_line(group = 1, size=1, color = "#ec008b") +
       geom_point(size=2, color = "#ec008b") +
       scale_y_continuous(
@@ -344,8 +336,10 @@ server <- function(input, output, session) {
       )
     plotly::ggplotly(p)
   })
-  
 }
 
 # Run the application 
-shinyApp(ui = ui, server = server)
+app <- shinyApp(ui = ui, server = server)
+profvis({
+  runApp(shinyApp(ui = ui, server = server))
+})
