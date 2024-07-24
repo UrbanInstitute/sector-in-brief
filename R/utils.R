@@ -110,3 +110,72 @@ format_ein <- function(ein) {
     }
   }
 }
+
+
+filter_data <- function(fiscal_dat, 
+                        org_type,
+                        state,
+                        industry_group,
+                        geo_level,
+                        county_cbsa,
+                        size){
+  
+  if (org_type != "all_orgs") {
+    fiscal_dat <- fiscal_dat[CTYPE == org_type, ]
+  }
+  if (state != "all_states") {
+    fiscal_dat <- fiscal_dat[CENSUS_STATE_ABBR == state, ]
+    if (geo_level == "county"){
+      fiscal_dat <- fiscal_dat[CENSUS_COUNTY_NAME == county_cbsa,]
+    } else if (geo_level == "cbsa") {
+      fiscal_dat <- fiscal_dat[CENSUS_CBSA_NAME == county_cbsa,]
+    }
+  }
+  if (industry_group != "all_groups") {
+    fiscal_dat <- fiscal_dat[NTEE_INDUSTRY_GROUP == industry_group, ]
+  }
+  if (size  > 0){
+    fiscal_dat <- fiscal_dat[SIZE == size,]
+  }
+  fiscal_dat <- fiscal_dat[, .(COUNT = sum(num_nonprofit),
+               ASSETS = sum(total_assets, na.rm = TRUE),
+               REVENUES = sum(total_revenues, na.rm = TRUE),
+               EXPENSES = sum(total_expenses, na.rm = TRUE)), 
+           by = "YEAR"]
+  return(fiscal_dat)
+}
+
+filter_parquet <- function(pq, 
+                        org_type,
+                        state,
+                        industry_group,
+                        geo_level,
+                        county_cbsa,
+                        size){
+  
+  if (org_type != "all_orgs") {
+    pq <- pq %>% dplyr::filter(CTYPE == org_type)
+  }
+  if (state != "all_states") {
+    pq <- pq %>% dplyr::filter(CENSUS_STATE_ABBR == state)
+    if (geo_level == "county"){
+      pq <- pq %>% dplyr::filter(CENSUS_COUNTY_NAME == county_cbsa)
+    } else if (geo_level == "cbsa") {
+      pq <- pq %>% dplyr::filter(CENSUS_CBSA_NAME == county_cbsa)
+    }
+  }
+  if (industry_group != "all_groups") {
+    pq <- pq %>% dplyr::filter(NTEE_INDUSTRY_GROUP == industry_group)
+  }
+  if (size  > 0){
+    pq <- pq %>% dplyr::filter(SIZE == size)
+  }
+  pq <- pq %>% 
+    dplyr::group_by(YEAR) %>% 
+    dplyr::summarise(COUNT = sum(num_nonprofit, na.rm = TRUE),
+                     ASSETS = sum(total_assets, na.rm = TRUE),
+                     REVENUES = sum(total_revenues, na.rm = TRUE),
+                     EXPENSES = sum(total_expenses, na.rm = TRUE)) %>% 
+    dplyr::collect()
+  return(pq)
+}
