@@ -1,11 +1,14 @@
 # Script Header
 # Description: This script facilitates the processing of the data sets needed for the 
-# nonprofit sector in brief
+# nonprofit sector in brief. All processed data is saved in both .csv and 
+# parquet formats
 # Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
 # Date Created: 2024-07-02
 # Date Last Edited: 2024-07-26
 # Details:
-# (1) CORE and BMF Data for sector size and workforce pages
+# (1) - CORE and BMF Data for sector size and workforce pages
+# (2) - Private Foundation Data
+# (3) - EFile Data
 
 # Packages
 library(blscrapeR)
