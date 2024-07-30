@@ -9,6 +9,7 @@
 # (1) - CORE and BMF Data for sector size and workforce pages
 # (2) - Private Foundation Data
 # (3) - EFile Data
+# (4) - Upload to S3
 
 # Packages
 library(blscrapeR)
@@ -285,3 +286,7 @@ data.table::fwrite(efile_daf, "data/processed/efile_daf_metrics.csv")
 # Save to parquet format
 efile_daf <- arrow::read_csv_arrow("data/processed/efile_daf_metrics.csv")
 arrow::write_parquet(efile_daf, "data/processed/efile_daf_metrics.parquet")
+
+# (4) Upload to S3
+
+# Manual Upload
