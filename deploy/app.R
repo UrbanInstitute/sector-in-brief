@@ -21,7 +21,7 @@ source("deploy/utils.R")
 
 # Datasets
 # List of states mapped to County / CBSA
-geo_df <- read.csv("deploy/nested_geographies.csv")
+geo_df <- read.csv("deploy/data/nested_geographies.csv")
 # Default data sets
 fiscal_agg <- read.csv("deploy/data/fiscal_aggregate.csv")
 efile_agg <- read.csv("deploy/data/efile_aggregate.csv")
