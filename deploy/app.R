@@ -1,11 +1,9 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
+# Script Header
+# Description: This script contains deployment code for shiny prototype
+# Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
+# Date Created: 2024-07-05
+# Date Last Edited: 2024-08-05
+# Details: Change file paths to dpeloy to shiny
 
 library(shiny)
 library(bslib)
@@ -17,9 +15,9 @@ library(dplyr)
 set_urbn_defaults(style = "print")
 
 # Load cards and filter
-source("assets.R")
+source("deploy/assets.R")
 # Load helper functions
-source("utils.R")
+source("deploy/utils.R")
 
 # Datasets
 # List of states mapped to County / CBSA
