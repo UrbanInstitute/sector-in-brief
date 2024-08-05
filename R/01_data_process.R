@@ -192,14 +192,19 @@ pf_grant_data <- bmf_metadata_dat[pf_grant_data, on = "EIN2"]
 pf_grant_data <- unique(pf_grant_data)
 data.table::fwrite(pf_grant_data, "data/intermediate/pf_grant_data.csv")
 # Create final data set grouped by all filter variables
-pf_grant_data <- pf_grant_data[, .(TOTAL_GRANTS = sum(GRANTS, na.rm = TRUE), ), by = list(
+data.table::setnames(pf_grant_data, "TAX_YEAR", "YEAR")
+pf_grant_data <- pf_grant_data[, .(
+  TOTAL_GRANTS = sum(GRANTS, na.rm = TRUE),
+  MEDIAN_GRANT_AMT = median(GRANTS, na.rm = TRUE),
+  NUM_GRANTS = .N
+), by = list(
   CENSUS_STATE_ABBR,
   NTEE_INDUSTRY_GROUP,
   CTYPE,
   SIZE,
   CENSUS_COUNTY_NAME,
   CENSUS_CBSA_NAME,
-  TAX_YEAR
+  YEAR
 )]
 data.table::fwrite(pf_grant_data, "data/processed/pf_grants_data.csv")
 # Read and save to parquet
