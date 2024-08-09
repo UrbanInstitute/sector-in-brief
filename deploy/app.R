@@ -4,7 +4,6 @@
 # Date Created: 2024-07-05
 # Date Last Edited: 2024-08-05
 # Details: Change file paths to dpeloy to shiny
-
 library(shiny)
 library(bslib)
 library(ggplot2)
@@ -15,23 +14,23 @@ library(dplyr)
 set_urbn_defaults(style = "print")
 
 # Load cards and filter
-source("deploy/assets.R")
+source("assets.R")
 # Load helper functions
-source("deploy/utils.R")
+source("utils.R")
 
 # Datasets
 # List of states mapped to County / CBSA
-geo_df <- read.csv("deploy/data/nested_geographies.csv")
+geo_df <- read.csv("data/nested_geographies.csv")
 # Default data sets
-fiscal_agg <- read.csv("deploy/data/fiscal_aggregate.csv")
-efile_agg <- read.csv("deploy/data/efile_aggregate.csv")
-pf_agg <- read.csv("deploy/data/pf_aggregate.csv")
-labor_agg <- read.csv("deploy/data/labor_aggregate.csv")
-# Full Parquet Files
-fiscal <- arrow::open_dataset("s3://nccsdata/sector-in-brief/fiscal_metrics.parquet")
-labor <- arrow::open_dataset("s3://nccsdata/sector-in-brief/labor_metrics.parquet")
-pf <- arrow::open_dataset("s3://nccsdata/sector-in-brief/pf_grants_metrics.parquet")
-efile <- arrow::open_dataset("s3://nccsdata/sector-in-brief/efile_daf_metrics.parquet")
+fiscal_agg <- read.csv("data/fiscal_aggregate.csv")
+efile_agg <- read.csv("data/efile_aggregate.csv")
+pf_agg <- read.csv("data/pf_aggregate.csv")
+labor_agg <- read.csv("data/labor_aggregate.csv")
+# Full Parquet Files s3://nccsdata/sector-in-brief
+fiscal <- arrow::open_dataset("data/fiscal_metrics.parquet")
+labor <- arrow::open_dataset("data/labor_metrics.parquet")
+pf <- arrow::open_dataset("data/pf_grants_metrics.parquet")
+efile <- arrow::open_dataset("data/efile_daf_metrics.parquet")
 
 # Shiny Theme
 sibtheme <- bslib::bs_theme(
@@ -87,7 +86,8 @@ ui <- bslib::page_navbar(
         label_busy = "Updating Plots",
         type = "primary"
       )
-    )
+    ),
+    shiny::img(src="ui-logo-rgb.png")
   ),
   bslib::navset_tab(
     id = "tabs",
@@ -126,10 +126,10 @@ ui <- bslib::page_navbar(
       "Donor Advised Funds (DAF)",
       bslib::layout_columns(
         vbs_daf[[1]],
-        vbs_daf[[2]],
-        vbs_daf[[3]]
+        vbs_daf[[2]]
       ),
       bslib::layout_columns(
+        vbs_daf[[3]],
         vbs_daf[[4]],
         vbs_daf[[5]]
       )
@@ -308,7 +308,7 @@ server <- function(input, output, session) {
           ) +
           labs(caption = "Source: NCCS Core Data",
                y = "",
-               x = "Fiscal Year") +
+               x = "Tax Year") +
           theme(
             axis.title.x = element_text(size = 14),
             axis.title.y = element_text(size = 14),
@@ -332,7 +332,7 @@ server <- function(input, output, session) {
           ) +
           labs(caption = "Source: NCCS Core Data",
                y = "",
-               x = "Fiscal Year") +
+               x = "Tax Year") +
           theme(
             axis.title.x = element_text(size = 14),
             axis.title.y = element_text(size = 14),
@@ -356,7 +356,7 @@ server <- function(input, output, session) {
           ) +
           labs(caption = "Source: NCCS Core Data",
                y = "",
-               x = "Fiscal Year") +
+               x = "Tax Year") +
           theme(
             axis.title.x = element_text(size = 14),
             axis.title.y = element_text(size = 14),
