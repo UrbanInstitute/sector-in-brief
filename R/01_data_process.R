@@ -4,12 +4,13 @@
 # parquet formats
 # Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
 # Date Created: 2024-07-02
-# Date Last Edited: 2024-07-26
+# Date Last Edited: 2024-08-12
 # Details:
 # (1) - CORE and BMF Data for sector size and workforce pages
 # (2) - Private Foundation Data
 # (3) - EFile Data
-# (4) - Upload to S3
+# (4) - Aggregated Data
+# (5) - Upload to S3
 
 # Packages
 library(blscrapeR)
@@ -292,6 +293,59 @@ data.table::fwrite(efile_daf, "data/processed/efile_daf_metrics.csv")
 efile_daf <- arrow::read_csv_arrow("data/processed/efile_daf_metrics.csv")
 arrow::write_parquet(efile_daf, "data/processed/efile_daf_metrics.parquet")
 
-# (4) Upload to S3
+# (4) - Aggregated Data Sets for Default Loading
 
-# Manual Upload
+# Fiscal Metrics
+fiscal <- arrow::read_parquet("data/processed/fiscal_metrics.parquet")
+fiscal_agg <- fiscal |>
+  dplyr::group_by(YEAR) |>
+  dplyr::summarise(
+    `Number of Nonprofits` = sum(num_nonprofit, na.rm = TRUE),
+    `Total Assets` = sum(total_assets, na.rm = TRUE),
+    `Total Revenues` = sum(total_revenues, na.rm = TRUE),
+    `Total Expenses` = sum(total_expenses, na.rm = TRUE)
+  ) |>
+  dplyr::collapse()
+# Write small data sets to csv to avoid parquet overhead
+arrow::write_csv_arrow(fiscal_agg, "data/processed/fiscal_metrics_agg.csv")
+
+# Labor Metrics
+labor <- arrow::read_parquet("data/processed/labor_metrics.parquet")
+labor_agg <- labor |>
+  dplyr::group_by(YEAR) |>
+  dplyr::summarise(
+    `Total Benefits` = sum(total_benefits, na.rm = TRUE),
+    `Total Payroll Taxes` = sum(total_payroll, na.rm = TRUE)
+  ) |>
+  dplyr::collapse()
+arrow::write_csv_arrow(labor_agg, "data/processed/labor_metrics_agg.csv")
+
+# Private Foundation Metrics
+pf_grants <- arrow::read_parquet("data/processed/pf_grants_metrics.parquet")
+pf_grants_agg <- pf_grants |>
+  dplyr::group_by(YEAR) |>
+  dplyr::summarise(
+    `Total Grants` = sum(TOTAL_GRANTS, na.rm = TRUE),
+    `Median Grant Amount` = sum(MEDIAN_GRANT_AMT, na.rm = TRUE),
+    `Number of Grants` = sum(NUM_GRANTS, na.rm = TRUE)
+  ) |>
+  dplyr::collapse()
+arrow::write_csv_arrow(pf_grants_agg, "data/processed/pf_grants_agg.csv")
+
+# efile DAF Metrics
+efile_daf <- arrow::read_parquet("data/processed/efile_daf_metrics.parquet")
+efile_daf_agg <- efile_daf |>
+  dplyr::summarise(
+    TOTAL_NUM_DAFS = sum(NUM_DAFS, na.rm = TRUE),
+    TOTAL_CONTRIBUTIONS = sum(TOTAL_CONTRIBUTIONS, na.rm = TRUE),
+    TOTAL_GRANTS = sum(TOTAL_GRANTS, na.rm = TRUE),
+    TOTAL_VALUE = sum(TOTAL_VALUE, na.rm = TRUE),
+    TOTAL_HAVE_DAFS = sum(HAS_DAF, na.rm = TRUE),
+    MEAN_DAF_PROPORTION = mean(DAF_PROPORTION, na.rm = TRUE)
+  ) |>
+  dplyr::collapse()
+arrow::write_csv_arrow(efile_daf_agg, "data/processed/efile_daf_agg.csv")
+
+# (5) Upload to S3
+
+# Currently Manual Upload: To-do programmatic upload
