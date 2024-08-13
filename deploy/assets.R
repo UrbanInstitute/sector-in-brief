@@ -9,6 +9,9 @@
 # Load Package
 library(usdata)
 
+# Scientific Notation
+options(scipen=999)
+
 # Create state list
 state_ls <- setNames(as.list(as.character(usdata::state_stats$abbr)), usdata::state_stats$state)
 state_ls[["All States"]] = "all_states"
@@ -28,17 +31,17 @@ cards_sector_size <- list(
   ),
   card(
     full_screen = TRUE,
-    card_header("Total Revenues (Real 2021 $)"),
+    card_header("Total Revenues (Real 2021 Million $)"),
     plotly::plotlyOutput("nprev")
   ),
   card(
     full_screen = TRUE,
-    card_header("Total Expenses ( Real 2021 $)"),
+    card_header("Total Expenses ( Real 2021 Million $)"),
     plotly::plotlyOutput("npexp")
   ),
   card(
     full_screen = TRUE,
-    card_header("Total Assets (Real 2021 $)"),
+    card_header("Total Assets (Real 2021 Million $)"),
     plotly::plotlyOutput("npass")
   )  
 )
