@@ -40,7 +40,7 @@ filter_parquet <- function(pq,
     pq <- pq |> dplyr::filter(NTEE_INDUSTRY_GROUP == industry_group)
   }
   if (size  > 0) {
-    pq <- pq |> dplyr::filter(SIZE == size)
+    pq <- pq |> dplyr::filter(SIZE == as.integer(size))
   }
   if (series == "efile") {
     pq <- pq |>
@@ -58,29 +58,74 @@ filter_parquet <- function(pq,
     if (series == "fiscal") {
       pq <- pq |>
         dplyr::summarise(
-          COUNT = sum(num_nonprofit, na.rm = TRUE),
-          ASSETS = sum(total_assets, na.rm = TRUE),
-          REVENUES = sum(total_revenues, na.rm = TRUE),
-          EXPENSES = sum(total_expenses, na.rm = TRUE)
+          `Number of Nonprofits` = sum(num_nonprofit, na.rm = TRUE),
+          `Total Assets` = sum(total_assets, na.rm = TRUE),
+          `Total Revenues` = sum(total_revenues, na.rm = TRUE),
+          `Total Expenses` = sum(total_expenses, na.rm = TRUE)
         ) |>
         dplyr::collapse()
     } else if (series == "pf") {
       pq <- pq |>
         dplyr::summarise(
-          TOTAL_GRANTS = sum(TOTAL_GRANTS, na.rm = TRUE),
-          MEDIAN_GRANT_AMT = sum(MEDIAN_GRANT_AMT, na.rm = TRUE),
-          NUM_GRANTS = sum(NUM_GRANTS, na.rm = TRUE)
+          `Total Grants` = sum(TOTAL_GRANTS, na.rm = TRUE),
+          `Median Grant Amount` = sum(MEDIAN_GRANT_AMT, na.rm = TRUE),
+          `Number of Grants` = sum(NUM_GRANTS, na.rm = TRUE)
         ) |>
         dplyr::collapse()
     } else if (series == "labor") {
       pq <- pq |>
         dplyr::summarise(
-          TOTAL_EMPLOYEES = sum(total_employees, na.rm = TRUE),
-          TOTAL_BENEFITS = sum(total_benefits, na.rm = TRUE),
-          TOTAL_PAYROLL = sum(total_payroll, na.rm = TRUE)
+          `Total Benefits` = sum(total_benefits, na.rm = TRUE),
+          `Total Payroll Taxes` = sum(total_payroll, na.rm = TRUE)
         ) |>
         dplyr::collapse()
     }
   }
   return(pq)
+}
+
+#' @title This function creates the line graph used in the "Sector Summary" tab
+#' @param data data frame. Data to plot
+#' @param xvar character scalar. x-axis variable
+#' @param yvar character scalar. y-axis variable
+#' @param scale_unit character scalar. Unit of scale
+#' @param scale_factor numeric scalar. Scale factor
+#' @param color character scalar. Color of the line
+#' @param xlab character scalar. x-axis label
+#' @returns p ggplot object. Line graph
+create_line_graph <- function(data,
+                              xvar,
+                              yvar,
+                              scale_unit,
+                              scale_factor,
+                              color,
+                              xlab,
+                              missing_data = FALSE) {
+  if (isTRUE(missing_data)) {
+    data <- data |>
+      dplyr::mutate({{yvar}} := ifelse(.data[[xvar]] %in% c(1993, 2016:2018), NA, .data[[yvar]])) |>
+      dplyr::collect()
+  }
+  p <- ggplot(data, aes(x = .data[[xvar]], y = .data[[yvar]])) +
+    geom_line(size = 1,
+              linetype = 1,
+              color = color) +
+    geom_point(size = 2, color = color) +
+    scale_y_continuous(
+      limits = c(0, NA),
+      expand = expansion(mult = 0.1),
+      labels = scales::unit_format(unit = scale_unit, scale = scale_factor)
+    ) +
+    labs(y = "", x = xlab) +
+    theme(axis.title.x = element_text(size = 14),
+          axis.title.y = element_text(size = 14),)
+  if (isTRUE(missing_data)) {
+    p <- p +
+      geom_line(
+        data = filter(data, is.na(.data[[yvar]]) == FALSE),
+        linetype = "dashed",
+        color = color
+      )
+  }
+  return(p)
 }

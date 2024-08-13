@@ -22,10 +22,14 @@ source("utils.R")
 # List of states mapped to County / CBSA
 geo_df <- read.csv("data/nested_geographies.csv")
 # Default data sets
-fiscal_agg <- read.csv("data/fiscal_aggregate.csv")
-efile_agg <- read.csv("data/efile_aggregate.csv")
-pf_agg <- read.csv("data/pf_aggregate.csv")
-labor_agg <- read.csv("data/labor_aggregate.csv")
+fiscal_agg <- read.csv("data/fiscal_metrics_agg.csv") |> 
+  rename_all(list(~ gsub("\\.", " ", .))) 
+efile_agg <- read.csv("data/efile_daf_agg.csv") |> 
+  rename_all(list(~ gsub("\\.", " ", .)))
+pf_agg <- read.csv("data/pf_grants_agg.csv") |> 
+  rename_all(list(~ gsub("\\.", " ", .)))
+labor_agg <- read.csv("data/labor_metrics_agg.csv") |> 
+  rename_all(list(~ gsub("\\.", " ", .)))
 # Full Parquet Files s3://nccsdata/sector-in-brief
 fiscal <- arrow::open_dataset("data/fiscal_metrics.parquet")
 labor <- arrow::open_dataset("data/labor_metrics.parquet")
@@ -95,11 +99,13 @@ ui <- bslib::page_navbar(
       "Sector Summary",
       bslib::layout_columns(
         cards_sector_size[[1]],
-        cards_sector_size[[2]]
+        cards_sector_size[[2]],
+        height = "650px"
       ),
       bslib::layout_columns(
         cards_sector_size[[3]],
-        cards_sector_size[[4]]
+        cards_sector_size[[4]],
+        height = "650px"
       ),
     ),
     bslib::nav_panel(
@@ -115,7 +121,6 @@ ui <- bslib::page_navbar(
     bslib::nav_panel(
       "Employment",
       bslib::layout_columns(
-        cards_labor[[1]],
         cards_labor[[2]]
       ),
       bslib::layout_columns(
@@ -174,7 +179,8 @@ server <- function(input, output, session) {
     if (input$tabs == "Sector Summary") {
       if (all(grepl("all", c(org_type, state, industry_group))) &
           size == 0) {
-        data <- fiscal_agg # Default data set for first page
+        data <- fiscal_agg
+          # Default data set for first page
       } else {
         data <- filter_parquet(fiscal,
                                org_type,
@@ -188,180 +194,135 @@ server <- function(input, output, session) {
         output$npnum <- plotly::renderPlotly({
           plot_data <- data |>
             dplyr::filter(YEAR >= 1995) |>
-            dplyr::select(YEAR, COUNT) |>
+            dplyr::select(YEAR, `Number of Nonprofits`) |>
             dplyr::collect()
-          p <- ggplot(plot_data, aes(x = YEAR, y = COUNT)) +
-            geom_line(group = 1,
-                      size = 1,
-                      color = "#1696d2") +
-            geom_point(size = 2) +
-            scale_y_continuous(
-              expand = expansion(mult = 0.5),
-              labels = scales::unit_format(unit = "", scale = 1)
-            ) +
-            labs(caption = "Source: NCCS Core Data",
-                 y = "",
-                 x = "Fiscal Year") +
-            theme(
-              axis.title.x = element_text(size = 14),
-              axis.title.y = element_text(size = 14),
-              axis.text = element_text(size = 12)
-            )
+          p <- create_line_graph(
+            data = plot_data,
+            xvar = "YEAR",
+            yvar = "Number of Nonprofits",
+            color = "#1696d2",
+            scale_unit = "",
+            scale_factor = 1,
+            xlab = "Fiscal Year"
+          )
           plotly::ggplotly(p)
         })
         
         output$nprev <- plotly::renderPlotly({
           plot_data <- data |>
             dplyr::filter(YEAR <= 2021) |>
-            dplyr::select(YEAR, REVENUES) |>
+            dplyr::select(YEAR, `Total Revenues`) |>
             dplyr::collect()
-          p <- ggplot(plot_data, aes(x = YEAR, y = REVENUES)) +
-            geom_line(group = 1,
-                      size = 1,
-                      color = "#55b748") +
-            geom_point(size = 2, color = "#55b748") +
-            scale_y_continuous(
-              expand = expansion(mult = 0.5),
-              labels = scales::unit_format(unit = "m", scale = 1e-6)
-            ) +
-            labs(caption = "Source: NCCS Core Data",
-                 y = "",
-                 x = "Tax Year") +
-            theme(
-              axis.title.x = element_text(size = 14),
-              axis.title.y = element_text(size = 14),
-              axis.text = element_text(size = 12)
-            )
+          p <- create_line_graph(
+            data = plot_data,
+            xvar = "YEAR",
+            yvar = "Total Revenues",
+            color = "#55b748",
+            scale_unit = "m",
+            scale_factor = 1e-6,
+            xlab = "Tax Year"
+          )
           plotly::ggplotly(p)
         })
         
         output$npexp <- plotly::renderPlotly({
           plot_data <- data |>
             dplyr::filter(YEAR <= 2021) |>
-            dplyr::select(YEAR, EXPENSES) |>
+            dplyr::select(YEAR, `Total Expenses`) |>
             dplyr::collect()
-          p <- ggplot(plot_data, aes(x = YEAR, y = EXPENSES)) +
-            geom_line(group = 1,
-                      size = 1,
-                      color = "#fdbf11") +
-            geom_point(size = 2, color = "#fdbf11") +
-            scale_y_continuous(
-              expand = expansion(mult = 0.5),
-              labels = scales::unit_format(unit = "m", scale = 1e-6)
-            ) +
-            labs(caption = "Source: NCCS Core Data",
-                 y = "",
-                 x = "Tax Year") +
-            theme(
-              axis.title.x = element_text(size = 14),
-              axis.title.y = element_text(size = 14),
-              axis.text = element_text(size = 12)
-            )
+          p <- create_line_graph(
+            data = plot_data,
+            xvar = "YEAR",
+            yvar = "Total Expenses",
+            color = "#fdbf11",
+            scale_unit = "m",
+            scale_factor = 1e-6,
+            xlab = "Tax Year"
+          )
           plotly::ggplotly(p)
         })
         
         output$npass <- plotly::renderPlotly({
           plot_data <- data |>
             dplyr::filter(YEAR <= 2021) |>
-            dplyr::select(YEAR, ASSETS) |>
+            dplyr::select(YEAR, `Total Assets`) |>
             dplyr::collect()
-          p <- ggplot(plot_data, aes(x = YEAR, y = ASSETS)) +
-            geom_line(group = 1,
-                      size = 1,
-                      color = "#ec008b") +
-            geom_point(size = 2, color = "#ec008b") +
-            scale_y_continuous(
-              expand = expansion(mult = 0.5),
-              labels = scales::unit_format(unit = "m", scale = 1e-6)
-            ) +
-            labs(caption = "Source: NCCS Core Data",
-                 y = "",
-                 x = "Tax Year") +
-            theme(
-              axis.title.x = element_text(size = 14),
-              axis.title.y = element_text(size = 14),
-              axis.text = element_text(size = 12)
-            )
+          p <- create_line_graph(
+            data = plot_data,
+            xvar = "YEAR",
+            yvar = "Total Assets",
+            color = "#ec008b",
+            scale_unit = "m",
+            scale_factor = 1e-6,
+            xlab = "Tax Year"
+          )
           plotly::ggplotly(p)
         })
       } else if (input$tabs == "Private Foundations") {
-      data <- filter_parquet(pf,
-                     org_type,
-                     state,
-                     industry_group,
-                     geo_level,
-                     county_cbsa,
-                     size,
-                     series = "pf")
+        if (all(grepl("all", c(org_type, state, industry_group))) &
+            size == 0) {
+          data <- pf_agg |>
+            dplyr::filter(! YEAR %in% c(1987:1988, 2022))
+          # Default data set for first page
+        } else {
+          data <- filter_parquet(pf,
+                                 org_type,
+                                 state,
+                                 industry_group,
+                                 geo_level,
+                                 county_cbsa,
+                                 size,
+                                 series = "pf") |>
+          dplyr::filter(! YEAR %in% c(1987:1988, 2022))
+        }
       output$grantnum <- plotly::renderPlotly({
         plot_data <- data |>
-          dplyr::select(YEAR, NUM_GRANTS) |>
+          dplyr::select(YEAR, `Number of Grants`) |>
           dplyr::collect()
-        p <- ggplot(plot_data, aes(x = YEAR, y = NUM_GRANTS)) +
-          geom_line(group = 1,
-                    size = 1,
-                    color = "#1696d2") +
-          geom_point(size = 2) +
-          scale_y_continuous(
-            expand = expansion(mult = 0.5),
-            labels = scales::unit_format(unit = "", scale = 1)
-          ) +
-          labs(caption = "Source: NCCS Core Data",
-               y = "",
-               x = "Tax Year") +
-          theme(
-            axis.title.x = element_text(size = 14),
-            axis.title.y = element_text(size = 14),
-            axis.text = element_text(size = 12)
-          )
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Number of Grants",
+          color = "#1696d2",
+          scale_unit = "",
+          scale_factor = 1,
+          xlab = "Tax Year",
+          missing_data = TRUE
+        )
         plotly::ggplotly(p)
       })
       
       output$medgrantsize <- plotly::renderPlotly({
         plot_data <- data |>
-          dplyr::select(YEAR, MEDIAN_GRANT_AMT) |>
+          dplyr::select(YEAR, `Median Grant Amount`) |>
           dplyr::collect()
-        p <- ggplot(plot_data, aes(x = YEAR, y = MEDIAN_GRANT_AMT)) +
-          geom_line(group = 1,
-                    size = 1,
-                    color = "#fdbf11") +
-          geom_point(size = 2, color = "#fdbf11") +
-          scale_y_continuous(
-            expand = expansion(mult = 0.5),
-            labels = scales::unit_format(unit = "", scale = 1)
-          ) +
-          labs(caption = "Source: NCCS Core Data",
-               y = "",
-               x = "Tax Year") +
-          theme(
-            axis.title.x = element_text(size = 14),
-            axis.title.y = element_text(size = 14),
-            axis.text = element_text(size = 12)
-          )
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Median Grant Amount",
+          color = "#fdbf11",
+          scale_unit = "",
+          scale_factor = 1,
+          xlab = "Tax Year",
+          missing_data = TRUE
+        )
         plotly::ggplotly(p)
       })
       
       output$grantamt <- plotly::renderPlotly({
         plot_data <- data |>
-          dplyr::select(YEAR, TOTAL_GRANTS) |>
+          dplyr::select(YEAR, `Total Grants`) |>
           dplyr::collect()
-        p <- ggplot(plot_data, aes(x = YEAR, y = TOTAL_GRANTS)) +
-          geom_line(group = 1,
-                    size = 1,
-                    color = "#ec008b") +
-          geom_point(size = 2, color = "#ec008b") +
-          scale_y_continuous(
-            expand = expansion(mult = 0.5),
-            labels = scales::unit_format(unit = "", scale = 1)
-          ) +
-          labs(caption = "Source: NCCS Core Data",
-               y = "",
-               x = "Tax Year") +
-          theme(
-            axis.title.x = element_text(size = 14),
-            axis.title.y = element_text(size = 14),
-            axis.text = element_text(size = 12)
-          )
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Total Grants",
+          color = "#ec008b",
+          scale_unit = "",
+          scale_factor = 1,
+          xlab = "Tax Year",
+          missing_data = TRUE
+        )
         plotly::ggplotly(p)
       })
     } else if (input$tabs == "Donor Advised Funds (DAF)") {
@@ -396,76 +357,39 @@ server <- function(input, output, session) {
                      geo_level,
                      county_cbsa,
                      size,
-                     series = "labor")
-      output$empnum <- plotly::renderPlotly({
-        plot_data <- data |>
-          dplyr::select(YEAR, TOTAL_EMPLOYEES) |>
-          dplyr::collect()
-        p <- ggplot(plot_data, aes(x = YEAR, y = TOTAL_EMPLOYEES)) +
-          geom_line(group = 1,
-                    size = 1,
-                    color = "#1696d2") +
-          geom_point(size = 2) +
-          scale_y_continuous(
-            expand = expansion(mult = 0.5),
-            labels = scales::unit_format(unit = "", scale = 1)
-          ) +
-          labs(caption = "Source: NCCS Core Data",
-               y = "",
-               x = "Fiscal Year") +
-          theme(
-            axis.title.x = element_text(size = 14),
-            axis.title.y = element_text(size = 14),
-            axis.text = element_text(size = 12)
-          )
-        plotly::ggplotly(p)
-      })
-      
+                     series = "labor") |>
+        dplyr::filter(YEAR < 2022)
       output$empbenefits <- plotly::renderPlotly({
         plot_data <- data |>
-          dplyr::select(YEAR, TOTAL_BENEFITS) |>
+          dplyr::select(YEAR, `Total Benefits`) |>
           dplyr::collect()
-        p <- ggplot(plot_data, aes(x = YEAR, y = TOTAL_BENEFITS)) +
-          geom_line(group = 1,
-                    size = 1,
-                    color = "#fdbf11") +
-          geom_point(size = 2, color = "#fdbf11") +
-          scale_y_continuous(
-            expand = expansion(mult = 0.5),
-            labels = scales::unit_format(unit = "", scale = 1)
-          ) +
-          labs(caption = "Source: NCCS Core Data",
-               y = "",
-               x = "Fiscal Year") +
-          theme(
-            axis.title.x = element_text(size = 14),
-            axis.title.y = element_text(size = 14),
-            axis.text = element_text(size = 12)
-          )
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Total Benefits",
+          color = "#fdbf11",
+          scale_unit = "",
+          scale_factor = 1,
+          xlab = "Tax Year",
+          missing_data = FALSE
+        )
         plotly::ggplotly(p)
       })
       
       output$emppayroll <- plotly::renderPlotly({
         plot_data <- data |>
-          dplyr::select(YEAR, TOTAL_PAYROLL) |>
+          dplyr::select(YEAR, `Total Payroll Taxes`) |>
           dplyr::collect()
-        p <- ggplot(plot_data, aes(x = YEAR, y = TOTAL_PAYROLL)) +
-          geom_line(group = 1,
-                    size = 1,
-                    color = "#ec008b") +
-          geom_point(size = 2, color = "#ec008b") +
-          scale_y_continuous(
-            expand = expansion(mult = 0.5),
-            labels = scales::unit_format(unit = "", scale = 1)
-          ) +
-          labs(caption = "Source: NCCS Core Data",
-               y = "",
-               x = "Fiscal Year") +
-          theme(
-            axis.title.x = element_text(size = 14),
-            axis.title.y = element_text(size = 14),
-            axis.text = element_text(size = 12)
-          )
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Total Payroll Taxes",
+          color = "#ec008b",
+          scale_unit = "",
+          scale_factor = 1,
+          xlab = "Tax Year",
+          missing_data = FALSE
+        )
         plotly::ggplotly(p)
       })
       
@@ -476,3 +400,4 @@ server <- function(input, output, session) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
