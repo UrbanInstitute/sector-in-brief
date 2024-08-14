@@ -215,13 +215,16 @@ arrow::write_parquet(pf_grant_data, "data/processed/pf_grants_metrics.parquet")
 # (3) DAF Data
 
 # Read in raw data
-efile_daf <- data.table::fread("data/raw/efile_2021.csv")
+efile_daf <- data.table::fread("data/raw/efile_2021_daf.csv")
 efile_assets_df <- data.table::fread("data/raw/efile_2021_assets.csv")
 # Add EIN2
 efile_daf <- efile_daf[, EIN2 := derive_ein2(ORG_EIN), by = 1:nrow(efile_daf)]
 efile_assets_df <- efile_assets_df[, EIN2 := derive_ein2(ORG_EIN), by = 1:nrow(efile_assets_df)]
 # Subset Tax Year
 efile_daf <- efile_daf[TAX_YEAR == 2021, ]
+# Set NA Values to 0
+# Replace negative values with 0
+core_subset_dt[, (num_cols) := lapply(.SD, function(x){x <- ifelse(x < 0, 0, x)}), .SDcols = num_cols]
 # Perform summations
 efile_daf <- efile_daf[, .(
   EIN2 = EIN2,
