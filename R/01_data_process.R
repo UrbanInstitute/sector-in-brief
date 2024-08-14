@@ -214,6 +214,18 @@ arrow::write_parquet(pf_grant_data, "data/processed/pf_grants_metrics.parquet")
 
 # (3) DAF Data
 
+daf_cols <- c(
+  "SD_01_TOT_NUM_EOY_DAF",
+  "SD_01_TOT_NUM_EOY_OTH",
+  "SD_01_AGGREGATE_CONTR_DAF",
+  "SD_01_AGGREGATE_CONTR_OTH",
+  "SD_01_AGGREGATE_GRANT_DAF",
+  "SD_01_AGGREGATE_GRANT_OTH",
+  "SD_01_AGGREGATE_VALUE_EOY_DAF",
+  "SD_01_AGGREGATE_VALUE_EOY_OTH"
+
+)
+
 # Read in raw data
 efile_daf <- data.table::fread("data/raw/efile_2021_daf.csv")
 efile_assets_df <- data.table::fread("data/raw/efile_2021_assets.csv")
@@ -223,8 +235,11 @@ efile_assets_df <- efile_assets_df[, EIN2 := derive_ein2(ORG_EIN), by = 1:nrow(e
 # Subset Tax Year
 efile_daf <- efile_daf[TAX_YEAR == 2021, ]
 # Set NA Values to 0
+data.table::setnafill(efile_daf, fill = 0, cols = daf_cols)
+data.table::setnafill(efile_assets_df, fill = 0, cols = c("F9_10_ASSET_TOT_EOY"))
 # Replace negative values with 0
-core_subset_dt[, (num_cols) := lapply(.SD, function(x){x <- ifelse(x < 0, 0, x)}), .SDcols = num_cols]
+efile_daf[, (daf_cols) := lapply(.SD, function(x){x <- ifelse(x < 0, 0, x)}), .SDcols = daf_cols]
+efile_assets_df[, F9_10_ASSET_TOT_EOY := ifelse(F9_10_ASSET_TOT_EOY < 0, 0, F9_10_ASSET_TOT_EOY)]
 # Perform summations
 efile_daf <- efile_daf[, .(
   EIN2 = EIN2,
@@ -237,6 +252,8 @@ efile_daf <- efile_daf[, .(
     na.rm = TRUE
   )
 ), by = 1:nrow(efile_daf)]
+#  Compute who Has DAF
+efile_daf <- efile_daf[, HAS_DAF := ifelse(NUM_DAFS > 0, 1, 0), by = 1:nrow(efile_daf)]
 # Merge Asset Data
 efile_daf = efile_assets_df[efile_daf, on = "EIN2"]
 # Merge BMF Data
@@ -249,7 +266,7 @@ efile_daf <- efile_daf[, .(
   TOTAL_CONTRIBUTIONS = sum(TOTAL_CONTRIBUTIONS, na.rm = TRUE),
   TOTAL_GRANTS = sum(TOTAL_GRANTS, na.rm = TRUE),
   TOTAL_VALUE = sum(TOTAL_VALUE, na.rm = TRUE),
-  HAS_DAF = length(unique(EIN2))
+  HAS_DAF = sum(HAS_DAF, na.rm = TRUE)
 ), by = list(
   CENSUS_STATE_ABBR,
   NTEE_INDUSTRY_GROUP,
@@ -259,17 +276,20 @@ efile_daf <- efile_daf[, .(
   CENSUS_CBSA_NAME
 )]
 # Create final variable: Percentage of nonprofits with DAF
-num_nonprofit <- fiscal %>%
-  dplyr::filter(YEAR == 2021) %>%
-  dplyr::select(
-    "CENSUS_STATE_ABBR",
-    "NTEE_INDUSTRY_GROUP",
-    "CTYPE",
-    "SIZE",
-    "CENSUS_COUNTY_NAME",
-    "CENSUS_CBSA_NAME",
-    "num_nonprofit"
-  )
+bmf_metadata_raw <- arrow::read_csv_arrow("data/raw/bmf_metadata.csv")
+num_nonprofit <- bmf_metadata_raw %>%
+  dplyr::group_by(
+    CENSUS_STATE_ABBR,
+    NTEE_INDUSTRY_GROUP,
+    CTYPE,
+    SIZE,
+    CENSUS_COUNTY_NAME,
+    CENSUS_CBSA_NAME
+  ) %>% 
+  dplyr::summarise(
+    num_nonprofit = n()
+  ) %>% 
+  dplyr::collapse()
 # Save intermediate data set
 arrow::write_csv_arrow(num_nonprofit, "data/intermediate/num_nonprofits.csv")
 # Re-read in data.table for efficient merging
