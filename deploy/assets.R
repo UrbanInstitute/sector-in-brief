@@ -89,28 +89,39 @@ vbs_daf <- list(
   bslib::value_box(
     title = "Percentage of Organizations with a DAF",
     value = textOutput("daf_pct"),
-    showcase = bsicons::bs_icon("percent")
+    showcase = bsicons::bs_icon("percent"),
+    theme = "primary"
   ),
   bslib::value_box(
     title = "Total Number of DAFs",
     value = textOutput("daf_num"),
-    showcase = bsicons::bs_icon("building")
+    showcase = bsicons::bs_icon("building"),
+    theme = "secondary"
   ),
   bslib::value_box(
     title = "Total DAF Contributions (Real 2021 $)",
     value = textOutput("daf_cntrb"),
-    showcase = bsicons::bs_icon("currency-dollar")
+    showcase = bsicons::bs_icon("currency-dollar"),
+    theme = "info"
   ),
   bslib::value_box(
     title = "Total DAF Grants (Real 2021 $)",
     value = textOutput("daf_grants"),
-    showcase = bsicons::bs_icon("currency-dollar")
+    showcase = bsicons::bs_icon("currency-dollar"),
+    theme = value_box_theme(bg = "#0a4c6a")
   ),
   bslib::value_box(
     title = "Total DAF Value (Real 2021 $)",
     value = textOutput("daf_value"),
-    showcase = bsicons::bs_icon("currency-dollar")
+    showcase = bsicons::bs_icon("currency-dollar"),
+    theme = value_box_theme(bg = "#000000")
   )
+)
+
+# General
+vbs_general <- bslib::value_box(
+  title = "",
+  value = textOutput("general")
 )
 
 # Filters
