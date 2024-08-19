@@ -2,7 +2,7 @@
 # Description: This script contains deployment code for shiny prototype
 # Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
 # Date Created: 2024-07-05
-# Date Last Edited: 2024-08-05
+# Date Last Edited: 2024-08-19
 # Details: Change file paths to dpeloy to shiny
 library(shiny)
 library(bslib)
@@ -93,19 +93,18 @@ ui <- bslib::page_navbar(
     ),
     shiny::img(src="ui-logo-rgb.png")
   ),
-  bslib::navset_tab(
+  bslib::navset_pill(
     id = "tabs",
+    vbs_general,
     bslib::nav_panel(
       "Sector Summary",
       bslib::layout_columns(
         cards_sector_size[[1]],
-        cards_sector_size[[2]],
-        height = "650px"
+        cards_sector_size[[2]]
       ),
       bslib::layout_columns(
         cards_sector_size[[3]],
-        cards_sector_size[[4]],
-        height = "650px"
+        cards_sector_size[[4]]
       ),
     ),
     bslib::nav_panel(
@@ -131,11 +130,17 @@ ui <- bslib::page_navbar(
       "Donor Advised Funds (DAF)",
       bslib::layout_columns(
         vbs_daf[[1]],
+      ),
+      bslib::layout_columns(
         vbs_daf[[2]]
       ),
       bslib::layout_columns(
-        vbs_daf[[3]],
-        vbs_daf[[4]],
+        vbs_daf[[3]]
+      ),
+      bslib::layout_columns(
+        vbs_daf[[4]]
+      ),
+      bslib::layout_columns(
         vbs_daf[[5]]
       )
     )
@@ -175,6 +180,10 @@ server <- function(input, output, session) {
     geo_level <- input$geo_selector
     county_cbsa <- input$county_cbsa_selector
     size <- input$size_selector
+    statement <- create_header_statement(org_type, state, industry_group, geo_level, county_cbsa, size)
+    output$general <- renderText({
+      statement
+    })
     # Process data based on input tab
     if (input$tabs == "Sector Summary") {
       if (all(grepl("all", c(org_type, state, industry_group))) &
@@ -335,19 +344,25 @@ server <- function(input, output, session) {
                      size,
                      series = "efile")
       output$daf_pct = renderText({
-        data %>% dplyr::pull("MEAN_DAF_PROPORTION")
+        data %>% 
+          dplyr::pull("MEAN_DAF_PROPORTION") %>% 
+          scales::percent(scale = 1e3)
       })
       output$daf_num = renderText({
-        data %>% dplyr::pull("TOTAL_NUM_DAFS")
+        data %>% dplyr::pull("TOTAL_NUM_DAFS") %>% 
+          scales::comma()
       })
       output$daf_cntrb = renderText({
-        data %>% dplyr::pull("TOTAL_CONTRIBUTIONS")
+        data %>% dplyr::pull("TOTAL_CONTRIBUTIONS") %>% 
+          scales::dollar(scale = 1)
       })
       output$daf_grants = renderText({
-        data %>% dplyr::pull("TOTAL_GRANTS")
+        data %>% dplyr::pull("TOTAL_GRANTS") %>% 
+          scales::dollar(scale = 1)
       })
       output$daf_value = renderText({
-        data %>% dplyr::pull("TOTAL_VALUE")
+        data %>% dplyr::pull("TOTAL_VALUE") %>% 
+          scales::dollar(scale = 1)
       })
     } else if (input$tabs == "Employment") {
       data <- filter_parquet(labor,
@@ -362,6 +377,7 @@ server <- function(input, output, session) {
       output$empbenefits <- plotly::renderPlotly({
         plot_data <- data |>
           dplyr::select(YEAR, `Total Benefits`) |>
+          dplyr::filter(YEAR >= 2000) |>
           dplyr::collect()
         p <- create_line_graph(
           data = plot_data,
@@ -379,6 +395,7 @@ server <- function(input, output, session) {
       output$emppayroll <- plotly::renderPlotly({
         plot_data <- data |>
           dplyr::select(YEAR, `Total Payroll Taxes`) |>
+          dplyr::filter(YEAR >= 2000) |>
           dplyr::collect()
         p <- create_line_graph(
           data = plot_data,
