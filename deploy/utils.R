@@ -3,7 +3,33 @@
 # shiny app
 # Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
 # Date Created: 2024-08-05
-# Date Last Edited: 2024-08-05
+# Date Last Edited: 2024-08-19
+
+# Industry list
+industry_list <- list(
+  "ART" = "Arts, Culture, and Humanities", 
+  "EDU" = "Education",
+  "HEL" = "Health (minus Hospitals)",
+  "HMS" = "Human Services",
+  "IFA" = "International, Foreign Affairs" ,
+  "PSB" = "Public, Societal Benefit",
+  "REL" = "Religion Related",
+  "MMB" = "Mutual/Membership Benefit",
+  "UNI" = "Universities",
+  "HOS" = "Hospitals",
+  "all_groups" = "All Groups"
+)
+
+# Asset list
+asset_list <- list(
+  "0" = "All Sizes", 
+  "1" = "Under $100,000",
+  "2" = "$100,000 - $499,999",
+  "3" = "$500,000 - $999,999",
+  "4" = "$1 Million - $4.99 Million",
+  "5" = "$5 Million - $9.99 Million",
+  "6" = "Above $10 Million"
+)
 
 #' @title This function filters a parquet file based on filter inputs
 #' @description It checks if each filter is not the "all" option before filtering
@@ -128,4 +154,31 @@ create_line_graph <- function(data,
       )
   }
   return(p)
+}
+
+create_header_statement <- function(org_type,
+                                    state,
+                                    industry_group,
+                                    geo_level,
+                                    county_cbsa,
+                                    size){
+  base_statement <- "Retrieving data for all 501(c) Organizations in The United States"
+  if (org_type != "all_orgs") {
+    base_statement <- gsub("501\\(c\\)", org_type, base_statement)
+  } 
+  if (state != "all_states") {
+    base_statement <- gsub("The United States", usdata::abbr2state(state), base_statement)
+    if (geo_level == "county") {
+      base_statement <- paste(base_statement, ",", county_cbsa, "county")
+    } else if (geo_level == "cbsa") {
+      base_statement <- paste(base_statement, ",", county_cbsa, "metro area")
+    }
+  }
+  if (industry_group != "all_groups") {
+    base_statement <- paste(base_statement, "in the ", industry_list[[industry_group]], " industry group")
+  }
+  if (size > 0) {
+    base_statement <- paste(base_statement, "with ", asset_list[[size]], " in assets")
+  }
+  return(base_statement)
 }
