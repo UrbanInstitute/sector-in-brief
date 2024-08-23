@@ -31,10 +31,10 @@ pf_agg <- read.csv("data/pf_grants_agg.csv") |>
 labor_agg <- read.csv("data/labor_metrics_agg.csv") |> 
   rename_all(list(~ gsub("\\.", " ", .)))
 # Full Parquet Files s3://nccsdata/sector-in-brief
-fiscal <- arrow::open_dataset("data/fiscal_metrics.parquet")
-labor <- arrow::open_dataset("data/labor_metrics.parquet")
-pf <- arrow::open_dataset("data/pf_grants_metrics.parquet")
-efile <- arrow::open_dataset("data/efile_daf_metrics.parquet")
+fiscal <- arrow::read_parquet("data/fiscal_metrics.parquet")
+labor <- arrow::read_parquet("data/labor_metrics.parquet")
+pf <- arrow::read_parquet("data/pf_grants_metrics.parquet")
+efile <- arrow::read_parquet("data/efile_daf_metrics.parquet")
 
 # Shiny Theme
 sibtheme <- bslib::bs_theme(
@@ -284,7 +284,7 @@ server <- function(input, output, session) {
                                  series = "pf") |>
           dplyr::filter(! YEAR %in% c(1987:1988, 2022))
         }
-      output$grantnum <- plotly::renderPlotly({
+      output$grantnum <- shiny::renderPlot({
         plot_data <- data |>
           dplyr::select(YEAR, `Number of Grants`) |>
           dplyr::collect()
@@ -298,10 +298,10 @@ server <- function(input, output, session) {
           xlab = "Tax Year",
           missing_data = TRUE
         )
-        plotly::ggplotly(p)
+        p
       })
       
-      output$medgrantsize <- plotly::renderPlotly({
+      output$medgrantsize <- shiny::renderPlot({
         plot_data <- data |>
           dplyr::select(YEAR, `Median Grant Amount`) |>
           dplyr::collect()
@@ -315,10 +315,10 @@ server <- function(input, output, session) {
           xlab = "Tax Year",
           missing_data = TRUE
         )
-        plotly::ggplotly(p)
+        p
       })
       
-      output$grantamt <- plotly::renderPlotly({
+      output$grantamt <- shiny::renderPlot({
         plot_data <- data |>
           dplyr::select(YEAR, `Total Grants`) |>
           dplyr::collect()
@@ -332,7 +332,7 @@ server <- function(input, output, session) {
           xlab = "Tax Year",
           missing_data = TRUE
         )
-        plotly::ggplotly(p)
+        p
       })
     } else if (input$tabs == "Donor Advised Funds (DAF)") {
       data <- filter_parquet(efile,
