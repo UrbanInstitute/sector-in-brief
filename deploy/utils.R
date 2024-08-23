@@ -80,9 +80,9 @@ filter_parquet <- function(pq,
       ) |>
       dplyr::collapse()
   } else {
-    pq <- pq |> dplyr::group_by(YEAR)
     if (series == "fiscal") {
       pq <- pq |>
+        dplyr::group_by(YEAR) |>
         dplyr::summarise(
           `Number of Nonprofits` = sum(num_nonprofit, na.rm = TRUE),
           `Total Assets` = sum(total_assets, na.rm = TRUE),
@@ -92,6 +92,7 @@ filter_parquet <- function(pq,
         dplyr::collapse()
     } else if (series == "pf") {
       pq <- pq |>
+        dplyr::group_by(YEAR) |>
         dplyr::summarise(
           `Total Grants` = sum(TOTAL_GRANTS, na.rm = TRUE),
           `Median Grant Amount` = sum(MEDIAN_GRANT_AMT, na.rm = TRUE),
@@ -100,6 +101,7 @@ filter_parquet <- function(pq,
         dplyr::collapse()
     } else if (series == "labor") {
       pq <- pq |>
+        dplyr::group_by(YEAR) |>
         dplyr::summarise(
           `Total Benefits` = sum(total_benefits, na.rm = TRUE),
           `Total Payroll Taxes` = sum(total_payroll, na.rm = TRUE)
