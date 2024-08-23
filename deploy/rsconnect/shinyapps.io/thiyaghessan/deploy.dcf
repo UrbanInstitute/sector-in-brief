@@ -5,6 +5,6 @@ account: thiyaghessan
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12369416
-bundleId: 8945580
+bundleId: 9001503
 url: https://thiyaghessan.shinyapps.io/deploy/
 version: 1
