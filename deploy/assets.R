@@ -51,17 +51,17 @@ cards_private_foundation <- list(
   card(
     full_screen = TRUE,
     card_header("Total Number of Grants"),
-    plotly::plotlyOutput("grantnum")
+    shiny::plotOutput("grantnum")
   ),
   card(
     full_screen = TRUE,
     card_header("Median Grant Size (Real 2021 $)"),
-    plotly::plotlyOutput("medgrantsize")
+    shiny::plotOutput("medgrantsize")
   ),
   card(
     full_screen = TRUE,
     card_header("Total Amount of Grants Paid ( Real 2021 $)"),
-    plotly::plotlyOutput("grantamt")
+    shiny::plotOutput("grantamt")
   )  
 )
 
