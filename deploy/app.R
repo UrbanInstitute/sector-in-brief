@@ -13,8 +13,12 @@ library(arrow)
 library(dplyr)
 set_urbn_defaults(style = "print")
 
-# Load cards and filter
-source("assets.R")
+# Load assets
+source("assets/assets.R")
+source("assets/sidebar.R")
+source("assets/home.R")
+source("assets/about.R")
+source("assets/methodology.R")
 # Load helper functions
 source("utils.R")
 
@@ -53,62 +57,31 @@ sibtheme <- bslib::bs_theme(
 # UI for sector in brief dashboard
 ui <- bslib::page_navbar(
   title = "Nonprofit Sector In Brief",
+  id = "tabs",
   theme = sibtheme,
+  sidebar = sidebar,
   bslib::nav_spacer(),
-  bslib::nav_item(tags$a("NCCS", href = "https://nccs.urban.org")),
-  sidebar = sidebar(
-    title = "Select Data for Nonprofits by:",
-    bslib::accordion(
-      bslib::accordion_panel(
-        "Organization Type",
-        org_filter
-      ),
-      bslib::accordion_panel(
-        "Geography",
-        state_filter,
-        shiny::conditionalPanel(
-          nested_geo_filter,
-          condition = "input.state_selector != 'all_states'"
-        ),
-        shiny::conditionalPanel(
-          county_cbsa_filter,
-          condition = "input.geo_selector != 'state'"
-        )
-      ),
-      bslib::accordion_panel(
-        "Industry Group",
-        industry_group_filter
-      ),
-      bslib::accordion_panel(
-        "Size",
-        size_filter
-      ),
-      bslib::input_task_button(
-        id = "update_plot",
-        style = "margin-top: 32px; margin-left: 32px",
-        label = "Retrieve Data",
-        label_busy = "Updating Plots",
-        type = "primary"
-      )
-    ),
-    shiny::img(src="ui-logo-rgb.png")
-  ),
-  bslib::navset_pill(
-    id = "tabs",
-    vbs_general,
+  page_home,
+  bslib::nav_menu(
+    title = "Explore Data",
     bslib::nav_panel(
       "Sector Summary",
       bslib::layout_columns(
-        cards_sector_size[[1]],
-        cards_sector_size[[2]]
+        vbs_general_ss
       ),
-      bslib::layout_columns(
+      bslib::layout_column_wrap(
+        width = 1/2,
+        cards_sector_size[[1]],
+        cards_sector_size[[2]],
         cards_sector_size[[3]],
         cards_sector_size[[4]]
       ),
     ),
     bslib::nav_panel(
       "Private Foundations",
+      bslib::layout_columns(
+        vbs_general_pf
+      ),
       bslib::layout_columns(
         cards_private_foundation[[1]],
         cards_private_foundation[[2]]
@@ -120,6 +93,9 @@ ui <- bslib::page_navbar(
     bslib::nav_panel(
       "Employment",
       bslib::layout_columns(
+        vbs_general_emp
+      ),
+      bslib::layout_columns(
         cards_labor[[2]]
       ),
       bslib::layout_columns(
@@ -129,26 +105,58 @@ ui <- bslib::page_navbar(
     bslib::nav_panel(
       "Donor Advised Funds (DAF)",
       bslib::layout_columns(
+        vbs_general_daf
+      ),
+      bslib::layout_column_wrap(
+        width = 1/2,
         vbs_daf[[1]],
-      ),
-      bslib::layout_columns(
-        vbs_daf[[2]]
-      ),
-      bslib::layout_columns(
-        vbs_daf[[3]]
-      ),
-      bslib::layout_columns(
-        vbs_daf[[4]]
-      ),
-      bslib::layout_columns(
-        vbs_daf[[5]]
+        vbs_daf[[2]],
+        vbs_daf[[3]],
+        vbs_daf[[4]],
+        vbs_daf[[5]],
+        vbs_daf[[6]],
+        vbs_daf[[7]],
+        vbs_daf[[8]],
+        vbs_daf[[9]],
+        vbs_daf[[10]]
       )
     )
+  ),
+  page_about,
+  page_methodology,
+  bslib::nav_item(tags$a("NCCS Website", href = "https://nccs.urban.org")),
   )
- )
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+  
+  # Toggle Side Bar
+  observe({
+    toggle_sidebar(
+      id = "sidebar",
+      open = input$tabs %in% c(
+        "Sector Summary",
+        "Private Foundations",
+        "Employment",
+        "Donor Advised Funds (DAF)"
+      )
+    )
+  })
+  
+  # Home page buttons
+  observeEvent(input$to_sector, {
+    updateTabsetPanel(session, inputId = "tabs", "Sector Summary")
+  })
+  observeEvent(input$to_pf, {
+    updateTabsetPanel(session, inputId = "tabs", "Private Foundations")
+  })
+  observeEvent(input$to_emp, {
+    updateTabsetPanel(session, inputId = "tabs", "Employment")
+  })
+  observeEvent(input$to_daf, {
+    updateTabsetPanel(session, inputId = "tabs", "Donor Advised Funds (DAF)")
+  })
+  
   
   # Geographic Inputs by user
   geo_filters <- shiny::reactive({
@@ -181,11 +189,11 @@ server <- function(input, output, session) {
     county_cbsa <- input$county_cbsa_selector
     size <- input$size_selector
     statement <- create_header_statement(org_type, state, industry_group, geo_level, county_cbsa, size)
-    output$general <- renderText({
-      statement
-    })
     # Process data based on input tab
     if (input$tabs == "Sector Summary") {
+      output$general_ss <- renderText({
+        statement
+      })
       if (all(grepl("all", c(org_type, state, industry_group))) &
           size == 0) {
         data <- fiscal_agg
@@ -212,7 +220,7 @@ server <- function(input, output, session) {
             color = "#1696d2",
             scale_unit = "",
             scale_factor = 1,
-            xlab = "Fiscal Year"
+            xlab = "Filing Year"
           )
           plotly::ggplotly(p)
         })
@@ -268,6 +276,9 @@ server <- function(input, output, session) {
           plotly::ggplotly(p)
         })
       } else if (input$tabs == "Private Foundations") {
+        output$general_pf <- renderText({
+          statement
+        })
         if (all(grepl("all", c(org_type, state, industry_group))) &
             size == 0) {
           data <- pf_agg |>
@@ -335,6 +346,9 @@ server <- function(input, output, session) {
         p
       })
     } else if (input$tabs == "Donor Advised Funds (DAF)") {
+      output$general_daf <- renderText({
+        statement
+      })
       data <- filter_parquet(efile,
                      org_type,
                      state,
@@ -365,6 +379,9 @@ server <- function(input, output, session) {
           scales::dollar(scale = 1)
       })
     } else if (input$tabs == "Employment") {
+      output$general_emp <- renderText({
+        statement
+      })
       data <- filter_parquet(labor,
                      org_type,
                      state,
