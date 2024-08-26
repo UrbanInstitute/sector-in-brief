@@ -55,7 +55,7 @@ filter_parquet <- function(pq,
     pq <- pq |> dplyr::filter(CTYPE == org_type)
   }
   if (state != "all_states") {
-    pq <- pq |> dplyr::filter(CENSUS_STATE_ABBR == state)
+    pq <- pq |> dplyr::filter(CENSUS_STATE_ABBR %in% state)
     if (geo_level == "county") {
       pq <- pq |> dplyr::filter(CENSUS_COUNTY_NAME == county_cbsa)
     } else if (geo_level == "cbsa") {
