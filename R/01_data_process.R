@@ -243,17 +243,20 @@ efile_assets_df[, F9_10_ASSET_TOT_EOY := ifelse(F9_10_ASSET_TOT_EOY < 0, 0, F9_1
 # Perform summations
 efile_daf <- efile_daf[, .(
   EIN2 = EIN2,
-  NUM_DAFS = sum(SD_01_TOT_NUM_EOY_DAF, SD_01_TOT_NUM_EOY_OTH, na.rm = TRUE),
-  TOTAL_CONTRIBUTIONS = sum(SD_01_AGGREGATE_CONTR_DAF, SD_01_AGGREGATE_CONTR_OTH, na.rm = TRUE),
-  TOTAL_GRANTS = sum(SD_01_AGGREGATE_GRANT_DAF, SD_01_AGGREGATE_GRANT_OTH, na.rm = TRUE),
-  TOTAL_VALUE = sum(
-    SD_01_AGGREGATE_VALUE_EOY_DAF,
-    SD_01_AGGREGATE_VALUE_EOY_OTH,
-    na.rm = TRUE
-  )
+  NUM_DAFS = sum(c(SD_01_TOT_NUM_EOY_DAF + SD_01_TOT_NUM_EOY_OTH)),
+  TOTAL_CONTRIBUTIONS = sum(c(SD_01_AGGREGATE_CONTR_DAF, SD_01_AGGREGATE_CONTR_OTH)),
+  TOTAL_GRANTS = sum(c(SD_01_AGGREGATE_GRANT_DAF, SD_01_AGGREGATE_GRANT_OTH)),
+  TOTAL_VALUE = sum(c(SD_01_AGGREGATE_VALUE_EOY_DAF, SD_01_AGGREGATE_VALUE_EOY_OTH))
 ), by = 1:nrow(efile_daf)]
 #  Compute who Has DAF
 efile_daf <- efile_daf[, HAS_DAF := ifelse(NUM_DAFS > 0, 1, 0), by = 1:nrow(efile_daf)]
+efile_daf <- efile_daf[, .(
+  NUM_DAFS = mean(NUM_DAFS, na.rm = TRUE),
+  TOTAL_CONTRIBUTIONS = mean(TOTAL_CONTRIBUTIONS, na.rm = TRUE),
+  TOTAL_GRANTS = mean(TOTAL_GRANTS, na.rm = TRUE),
+  TOTAL_VALUE = mean(TOTAL_VALUE, na.rm = TRUE),
+  HAS_DAF = mean(HAS_DAF, na.rm = TRUE)
+), by = EIN2]
 # Merge Asset Data
 efile_daf = efile_assets_df[efile_daf, on = "EIN2"]
 # Merge BMF Data
