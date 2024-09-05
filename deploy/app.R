@@ -125,7 +125,7 @@ ui <- bslib::page_navbar(
   page_about,
   page_methodology,
   bslib::nav_item(tags$a("NCCS Website", href = "https://nccs.urban.org")),
-  )
+)
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
@@ -197,7 +197,7 @@ server <- function(input, output, session) {
       if (all(grepl("all", c(org_type, state, industry_group))) &
           size == 0) {
         data <- fiscal_agg
-          # Default data set for first page
+        # Default data set for first page
       } else {
         data <- filter_parquet(fiscal,
                                org_type,
@@ -208,93 +208,93 @@ server <- function(input, output, session) {
                                size,
                                series = "fiscal")
       }
-        output$npnum <- plotly::renderPlotly({
-          plot_data <- data |>
-            dplyr::filter(YEAR >= 1995) |>
-            dplyr::select(YEAR, `Number of Nonprofits`) |>
-            dplyr::collect()
-          p <- create_line_graph(
-            data = plot_data,
-            xvar = "YEAR",
-            yvar = "Number of Nonprofits",
-            color = "#1696d2",
-            scale_unit = "",
-            scale_factor = 1,
-            xlab = "Filing Year"
-          )
-          plotly::ggplotly(p)
-        })
-        
-        output$nprev <- plotly::renderPlotly({
-          plot_data <- data |>
-            dplyr::filter(YEAR <= 2021) |>
-            dplyr::select(YEAR, `Total Revenues`) |>
-            dplyr::collect()
-          p <- create_line_graph(
-            data = plot_data,
-            xvar = "YEAR",
-            yvar = "Total Revenues",
-            color = "#55b748",
-            scale_unit = "m",
-            scale_factor = 1e-6,
-            xlab = "Tax Year"
-          )
-          plotly::ggplotly(p)
-        })
-        
-        output$npexp <- plotly::renderPlotly({
-          plot_data <- data |>
-            dplyr::filter(YEAR <= 2021) |>
-            dplyr::select(YEAR, `Total Expenses`) |>
-            dplyr::collect()
-          p <- create_line_graph(
-            data = plot_data,
-            xvar = "YEAR",
-            yvar = "Total Expenses",
-            color = "#fdbf11",
-            scale_unit = "m",
-            scale_factor = 1e-6,
-            xlab = "Tax Year"
-          )
-          plotly::ggplotly(p)
-        })
-        
-        output$npass <- plotly::renderPlotly({
-          plot_data <- data |>
-            dplyr::filter(YEAR <= 2021) |>
-            dplyr::select(YEAR, `Total Assets`) |>
-            dplyr::collect()
-          p <- create_line_graph(
-            data = plot_data,
-            xvar = "YEAR",
-            yvar = "Total Assets",
-            color = "#ec008b",
-            scale_unit = "m",
-            scale_factor = 1e-6,
-            xlab = "Tax Year"
-          )
-          plotly::ggplotly(p)
-        })
-      } else if (input$tabs == "Private Foundations") {
-        output$general_pf <- renderText({
-          statement
-        })
-        if (all(grepl("all", c(org_type, state, industry_group))) &
-            size == 0) {
-          data <- pf_agg |>
-            dplyr::filter(! YEAR %in% c(1987:1988, 2022))
-          # Default data set for first page
-        } else {
-          data <- filter_parquet(pf,
-                                 org_type,
-                                 state,
-                                 industry_group,
-                                 geo_level,
-                                 county_cbsa,
-                                 size,
-                                 series = "pf") |>
+      output$npnum <- plotly::renderPlotly({
+        plot_data <- data |>
+          dplyr::filter(YEAR >= 1995) |>
+          dplyr::select(YEAR, `Number of Nonprofits`) |>
+          dplyr::collect()
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Number of Nonprofits",
+          color = "#1696d2",
+          scale_unit = "",
+          scale_factor = 1,
+          xlab = "Filing Year"
+        )
+        plotly::ggplotly(p)
+      })
+      
+      output$nprev <- plotly::renderPlotly({
+        plot_data <- data |>
+          dplyr::filter(YEAR <= 2021) |>
+          dplyr::select(YEAR, `Total Revenues`) |>
+          dplyr::collect()
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Total Revenues",
+          color = "#55b748",
+          scale_unit = "m",
+          scale_factor = 1e-6,
+          xlab = "Tax Year"
+        )
+        plotly::ggplotly(p)
+      })
+      
+      output$npexp <- plotly::renderPlotly({
+        plot_data <- data |>
+          dplyr::filter(YEAR <= 2021) |>
+          dplyr::select(YEAR, `Total Expenses`) |>
+          dplyr::collect()
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Total Expenses",
+          color = "#fdbf11",
+          scale_unit = "m",
+          scale_factor = 1e-6,
+          xlab = "Tax Year"
+        )
+        plotly::ggplotly(p)
+      })
+      
+      output$npass <- plotly::renderPlotly({
+        plot_data <- data |>
+          dplyr::filter(YEAR <= 2021) |>
+          dplyr::select(YEAR, `Total Assets`) |>
+          dplyr::collect()
+        p <- create_line_graph(
+          data = plot_data,
+          xvar = "YEAR",
+          yvar = "Total Assets",
+          color = "#ec008b",
+          scale_unit = "m",
+          scale_factor = 1e-6,
+          xlab = "Tax Year"
+        )
+        plotly::ggplotly(p)
+      })
+    } else if (input$tabs == "Private Foundations") {
+      output$general_pf <- renderText({
+        statement
+      })
+      if (all(grepl("all", c(org_type, state, industry_group))) &
+          size == 0) {
+        data <- pf_agg |>
           dplyr::filter(! YEAR %in% c(1987:1988, 2022))
-        }
+        # Default data set for first page
+      } else {
+        data <- filter_parquet(pf,
+                               org_type,
+                               state,
+                               industry_group,
+                               geo_level,
+                               county_cbsa,
+                               size,
+                               series = "pf") |>
+          dplyr::filter(! YEAR %in% c(1987:1988, 2022))
+      }
       output$grantnum <- shiny::renderPlot({
         plot_data <- data |>
           dplyr::select(YEAR, `Number of Grants`) |>
@@ -350,46 +350,49 @@ server <- function(input, output, session) {
         statement
       })
       data <- filter_parquet(efile,
-                     org_type,
-                     state,
-                     industry_group,
-                     geo_level,
-                     county_cbsa,
-                     size,
-                     series = "efile")
+                             org_type,
+                             state,
+                             industry_group,
+                             geo_level,
+                             county_cbsa,
+                             size,
+                             series = "efile")
       output$daf_pct = renderText({
         data %>% 
           dplyr::pull("MEAN_DAF_PROPORTION") %>% 
           scales::percent(scale = 1e3)
       })
       output$daf_num = renderText({
-        data %>% dplyr::pull("TOTAL_NUM_DAFS") %>% 
+        data %>% dplyr::pull("TOTAL_NUM_DAFS") %>%
           scales::comma()
       })
       output$daf_cntrb = renderText({
         data %>% dplyr::pull("TOTAL_CONTRIBUTIONS") %>% 
-          scales::dollar(scale = 1)
+          as.numeric() |>
+          scales::dollar()
       })
       output$daf_grants = renderText({
         data %>% dplyr::pull("TOTAL_GRANTS") %>% 
-          scales::dollar(scale = 1)
+          as.numeric() |>
+          scales::dollar()
       })
       output$daf_value = renderText({
         data %>% dplyr::pull("TOTAL_VALUE") %>% 
-          scales::dollar(scale = 1)
+          as.numeric() |>
+          scales::dollar()
       })
     } else if (input$tabs == "Employment") {
       output$general_emp <- renderText({
         statement
       })
       data <- filter_parquet(labor,
-                     org_type,
-                     state,
-                     industry_group,
-                     geo_level,
-                     county_cbsa,
-                     size,
-                     series = "labor") |>
+                             org_type,
+                             state,
+                             industry_group,
+                             geo_level,
+                             county_cbsa,
+                             size,
+                             series = "labor") |>
         dplyr::filter(YEAR < 2022)
       output$empbenefits <- plotly::renderPlotly({
         plot_data <- data |>
@@ -434,4 +437,3 @@ server <- function(input, output, session) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-
