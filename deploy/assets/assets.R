@@ -349,7 +349,8 @@ industry_group_filter <- div(selectizeInput(
     "Hospitals" = "HOS",
     "All Groups" = "all_groups"
   ),
-  selected = "all_groups"
+  selected = "all_groups",
+  multiple = TRUE
 ))
 
 size_filter <- div(selectizeInput(
@@ -364,5 +365,6 @@ size_filter <- div(selectizeInput(
     "$5 Million - $9.99 Million" = 5,
     "Above $10 Million" = 6
   ),
-  selected = 0
+  selected = 0,
+  multiple = TRUE
 ))
