@@ -223,7 +223,6 @@ daf_cols <- c(
   "SD_01_AGGREGATE_GRANT_OTH",
   "SD_01_AGGREGATE_VALUE_EOY_DAF",
   "SD_01_AGGREGATE_VALUE_EOY_OTH"
-
 )
 
 # Read in raw data
