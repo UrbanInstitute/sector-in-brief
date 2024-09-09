@@ -4,7 +4,7 @@
 # Date Created: 2024-08-23
 # Date Last Edited: 2024-08-23
 
-sidebar = bslib::sidebar(
+sidebar <- bslib::sidebar(
   title = "Select Data for Nonprofits by:",
   id = "sidebar",
   open = FALSE,
