@@ -27,7 +27,7 @@ data <- arrow::read_parquet("data/num_nonprofits_full.parquet")
 # Theme
 # Shiny Theme
 sibtheme <- bslib::bs_theme(
-  bg = "#FFF", 
+  bg = "#ffffff", 
   fg = "#000",
   primary = "#1696d2",
   secondary = "#fdbf11",
@@ -36,7 +36,8 @@ sibtheme <- bslib::bs_theme(
   danger = "#db2b27",
   info = "#d2d2d2",
   base_font = font_google("Lato"),
-  version = 5
+  version = 5,
+  preset = NULL
 )
 
 # Datasets
@@ -81,15 +82,18 @@ ui <- bslib::page_navbar(
           padding-top: 20px;
         }
         .btn-download {
-        color: #000000;
-        background-color: #fdbf11;
-        border-color: #fdbf11;
+        color: #ffffff;
+        background-color: #1696d2;
+        border-color: #1696d2;
         font-size: 18px;
+        font-family: 'Lato';
+        border-radius: 0;
+        margin: auto;
         }
         .btn-download:hover {
-        color: #000000;
-        background-color: #fccb41;
-        border-color: #fccb41;
+        color: #ffffff;
+        background-color: #46abdb;
+        border-color: #46abdb;
         }
         "
       )
@@ -269,9 +273,9 @@ ui <- bslib::page_navbar(
         ),
         bslib::input_task_button(
           id = "update_plot",
-          style = "margin-top: 1px; margin-left: 32px; margin-right: 32px; margin-bottom: 1px; font-size: 16px; padding: 4px; border-radius: 0; font-size: 18px; color: #ffffff; margin: auto;",
-          label = "Retrieve Data",
-          label_busy = "Updating Plots",
+          style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto;",
+          label = "RETRIEVE DATA",
+          label_busy = "UPDATING PLOTS",
           type = "primary"
         )
       ),
@@ -280,23 +284,19 @@ ui <- bslib::page_navbar(
     height = "100%",
     bslib::nav_panel(
       "Overall",
-      bslib::card(
-        bslib::card_body(
-          layout_column_wrap(
-            width = NULL,
-            height = 650,
-            style = htmltools::css(grid_template_columns = "3fr 1fr"),
-            plotOutput("plot"),
-            reactable::reactableOutput("table")
+      layout_column_wrap(
+        width = NULL,
+        height = 650,
+        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        bslib::card(
+          bslib::card_body(plotOutput("plot"))
+        ),
+        bslib::card(
+          bslib::card_body(reactable::reactableOutput("table")),
+          bslib::card_body(
+            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
           )
-        ),
-        div(
-          p(tags$b("Source"), ": IRS Business Master File"),
-          p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
-        ),
-        downloadButton("downloadData", 
-                       "DOWNLOAD",
-                       class = "btn-download")
+        )
       )
     ),
     bslib::nav_panel(
