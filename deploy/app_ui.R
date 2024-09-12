@@ -36,8 +36,7 @@ sibtheme <- bslib::bs_theme(
   danger = "#db2b27",
   info = "#d2d2d2",
   base_font = font_google("Lato"),
-  version = 5,
-  preset = NULL
+  version = 5
 )
 
 # Datasets
@@ -48,7 +47,6 @@ geo_df <- read_csv("data/nested_geographies.csv")
 ui <- bslib::page_navbar(
   title = "Nonprofit Sector In Brief",
   id = "tabs",
-  theme = sibtheme,
   fillable = FALSE,
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "sib_style.css"),
@@ -274,7 +272,7 @@ ui <- bslib::page_navbar(
         ),
         bslib::input_task_button(
           id = "update_plot",
-          style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto;",
+          style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
           label = "RETRIEVE DATA",
           label_busy = "UPDATING PLOTS",
           type = "primary"
