@@ -71,7 +71,7 @@ ui <- bslib::page_navbar(
           font-size: 1em;
           color: black;
           text-align: left;
-          margin-left: 100px;
+          margin-left: 0px;
         }
         .tableheader {
           font-family: 'Lato';
@@ -289,7 +289,13 @@ ui <- bslib::page_navbar(
         height = 650,
         style = htmltools::css(grid_template_columns = "3fr 1fr"),
         bslib::card(
-          bslib::card_body(plotOutput("plot"))
+          bslib::card_body(plotOutput("plot")),
+          bslib::card_footer(
+            div(
+              p(tags$b("Source"), ": IRS Business Master File"),
+              p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
+            )
+          )
         ),
         bslib::card(
           bslib::card_body(reactable::reactableOutput("table")),
