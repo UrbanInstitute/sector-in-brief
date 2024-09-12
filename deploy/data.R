@@ -51,7 +51,7 @@ filter_data <- function(data,
                         subsectors = NULL,
                         asset_size_level = "all",
                         asset_sizes = NULL,
-                        time_series = TRUE,
+                        time_series = FALSE,
                         year_start = NULL,
                         year_end = NULL) {
   if (org_level != "All Nonprofits") {
