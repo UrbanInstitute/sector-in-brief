@@ -27,3 +27,14 @@ geo_query <- function(data, geo_level, region, state_single, state_mult, county,
   }
   return(data)
 }
+
+subsector_query <- function(data, subsector) {
+  data <- filter(data, Subsector %in% subsector)
+  return(data)
+}
+
+filter_asset_size <- function(data, asset_size){
+  data <- filter(data, Asset_Size %in% asset_size)
+  return(data)
+}
+
