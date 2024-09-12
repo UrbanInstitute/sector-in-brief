@@ -17,8 +17,12 @@ library(reactable)
 # Load assets
 source("executive_summary.R")
 source("assets/assets.R")
-source("ui_plots.R")
+source("assets/choices.R")
+source("ui_data.R")
 source("utils.R")
+
+# Load Data
+data <- arrow::read_parquet("data/num_nonprofits_full.parquet")
 
 # Theme
 # Shiny Theme
@@ -36,7 +40,8 @@ sibtheme <- bslib::bs_theme(
 )
 
 # Datasets
-geo_df <- read.csv("data/nested_geographies.csv")
+geo_df <- read_csv("data/nested_geographies.csv")
+#num_nonprofits <- arrow::read_csv("data/num_nonprofits.csv")
 
 # User Interface
 ui <- bslib::page_navbar(
@@ -97,119 +102,72 @@ ui <- bslib::page_navbar(
     h3("The number of organizations that are registered with the Internal Revenue Service (IRS)."),
     br()
   ),
-  bslib::accordion(
-    bslib::accordion_panel(
-      title = "Data Selection",
-      bslib::card(
+  sidebar = bslib::sidebar(
+    open = FALSE
+  ),
+  bslib::card(
+    card_header("Step 1: Filters"),
+        title = "",
         bslib::layout_columns(
           bslib::card(
             card_header("Organization Type"),
             selectizeInput(
-              "org_selector",
+              "org_level",
               label = NULL,
               choices = c("501(c)(3) Public Charities", 
                           "501(c)(3) Private Foundations", 
                           "501(c)(4) Social Welfare Organizations", 
-                          "Other Nonprofits")
+                          "Other Nonprofits",
+                          "All Nonprofits")
             ),
             shiny::conditionalPanel(
               selectizeInput(
-                "501c_selector",
+                "other_orgs",
                 width = "500px",
                 label = "Other 501(c) Types",
-                choices = tax_exempt_orgs <- c(
-                  "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)",
-                  "501(c)(2) - Title Holding Corporations for Exempt Organization",
-                  "501(c)(5) - Labor, Agricultural and Horticultural Organizations",
-                  "501(c)(6) - Business Leagues, etc.",
-                  "501(c)(7) - Social and Recreation Clubs",
-                  "501(c)(8) - Fraternal Beneficiary Societies",
-                  "501(c)(9) - Voluntary Employees' Beneficiary Associations",
-                  "501(c)(10) - Domestic Fraternal Societies",
-                  "501(c)(11) - Teachers' Retirement Fund Associations",
-                  "501(c)(12) - Benevolent Life Insurance Associations, Mutual Ditch or Irrigation Companies, Mutual or Cooperative Telephone Companies, or Like Organizations (if 85 percent or more of the organization's income consists of amounts collected from members for the sole purpose of meeting losses and expenses)",
-                  "501(c)(13) - Cemetery Companies (owned and operated exclusively for the benefit of their members or which are not operated for profit)",
-                  "501(c)(14) - State Chartered Credit Unions, Mutual Reserve Funds",
-                  "501(c)(15) - Mutual Insurance Companies or Associations",
-                  "501(c)(16) - Cooperative Organizations to Finance Crop Operations",
-                  "501(c)(17) - Supplemental Unemployment Benefit Trusts",
-                  "501(c)(18) - Employee Funded Pension Trusts (created before June 25, 1959)",
-                  "501(c)(19) - Veterans' Organizations",
-                  "501(c)(21) - Black Lung Benefit Trusts",
-                  "501(c)(22) - Withdrawal Liability Payment Funds",
-                  "501(c)(25) - Title Holding Corporations or Trusts with Multiple Parents",
-                  "501(c)(26) - State-Sponsored High-Risk Health Coverage Organizations",
-                  "501(c)(27) - State-Sponsored Worker's Compensation Reinsurance Organizations",
-                  "501(c)(28) - National Railroad Retirement Investment Trust (45 U.S.C. 231n(j)",
-                  "501(c)(29) - Qualified Nonprofit Health Insurance Issuers",
-                  "501(d) - Religious and Apostolic Associations",
-                  "501(e) - Cooperative Hospital Service Organizations",
-                  "501(f) - Cooperative Service Organizations of Operating Educational Organizations",
-                  "501(k) - Child Care Organizations",
-                  "521(a) - Farmers' Cooperative Associations"
-                )
+                choices = org_type_choices,
               ),
-              condition = "input.org_selector == 'Other Nonprofits'"
+              condition = "input.org_level == 'Other Nonprofits'"
             )
           ),
           bslib::card(
             card_header("Geography"),
             radioButtons(
-              "geo_selector",
+              "geo_level",
               inline = FALSE,
               "Select Geographic Level",
-              choices = c("Entire USA", "Region", "State", "County", "Metro/Micro Area")
+              choices = list("Entire USA" = "all", 
+                             "Region" = "census_region", 
+                             "State" = "CENSUS_STATE_ABBR", 
+                             "County" = "CENSUS_COUNTY_NAME", 
+                             "Metro/Micro Area" = "CENSUS_CBSA_NAME")
             ),
             shiny::conditionalPanel(
               selectizeInput(
                 "region_selector",
                 label = "Select Region(s)",
-                choices = c("Northeast", "South", "Midwest", "West", "All Regions"),
+                choices = c("Northeast", "South", "Midwest", "West"),
                 multiple = TRUE
               ),
-              condition = "input.geo_selector == 'Region'"
+              condition = "input.geo_level == 'census_region'"
             ),
             shiny::conditionalPanel(
               selectizeInput(
                 "state_selector_multi",
                 label = "Select State(s)",
-                choices = list(
-                  "AL" = "Alabama", "AK" = "Alaska", "AZ" = "Arizona", "AR" = "Arkansas", "CA" = "California",
-                  "CO" = "Colorado", "CT" = "Connecticut", "DE" = "Delaware", "DC" = "District of Columbia", "FL" = "Florida",
-                  "GA" = "Georgia", "HI" = "Hawaii", "ID" = "Idaho", "IL" = "Illinois", "IN" = "Indiana",
-                  "IA" = "Iowa", "KS" = "Kansas", "KY" = "Kentucky", "LA" = "Louisiana", "ME" = "Maine",
-                  "MD" = "Maryland", "MA" = "Massachusetts", "MI" = "Michigan", "MN" = "Minnesota", "MS" = "Mississippi",
-                  "MO" = "Missouri", "MT" = "Montana", "NE" = "Nebraska", "NV" = "Nevada", "NH" = "New Hampshire",
-                  "NJ" = "New Jersey", "NM" = "New Mexico", "NY" = "New York", "NC" = "North Carolina", "ND" = "North Dakota",
-                  "OH" = "Ohio", "OK" = "Oklahoma", "OR" = "Oregon", "PA" = "Pennsylvania", "RI" = "Rhode Island",
-                  "SC" = "South Carolina", "SD" = "South Dakota", "TN" = "Tennessee", "TX" = "Texas", "UT" = "Utah",
-                  "VT" = "Vermont", "VA" = "Virginia", "WA" = "Washington", "WV" = "West Virginia", "WI" = "Wisconsin",
-                  "WY" = "Wyoming", "all" = "All States"
-                ),
+                choices = state_choices,
                 multiple = TRUE
               ),
-              condition = "input.geo_selector == 'State'"
+              condition = "input.geo_level == 'CENSUS_STATE_ABBR'"
             ),
             shiny::conditionalPanel(
               selectizeInput(
                 "state_selector_single",
                 label = "Select State",
-                choices = list(
-                  "Alabama" = "AL", "Alaska" = "AK", "Arizona" = "AZ", "Arkansas" = "AR", "California" = "CA",
-                  "Colorado" = "CO", "Connecticut" = "CT", "Delaware" = "DE", "District of Columbia" = "DC", "Florida" = "FL",
-                  "Georgia" = "GA", "Hawaii" = "HI", "Idaho" = "ID", "Illinois" = "IL", "Indiana" = "IN",
-                  "Iowa" = "IA", "Kansas" = "KS", "Kentucky" = "KY", "Louisiana" = "LA", "Maine" = "ME",
-                  "Maryland" = "MD", "Massachusetts" = "MA", "Michigan" = "MI", "Minnesota" = "MN", "Mississippi" = "MS",
-                  "Missouri" = "MO", "Montana" = "MT", "Nebraska" = "NE", "Nevada" = "NV", "New Hampshire" = "NH",
-                  "New Jersey" = "NJ", "New Mexico" = "NM", "New York" = "NY", "North Carolina" = "NC", "North Dakota" = "ND",
-                  "Ohio" = "OH", "Oklahoma" = "OK", "Oregon" = "OR", "Pennsylvania" = "PA", "Rhode Island" = "RI",
-                  "South Carolina" = "SC", "South Dakota" = "SD", "Tennessee" = "TN", "Texas" = "TX", "Utah" = "UT",
-                  "Vermont" = "VT", "Virginia" = "VA", "Washington" = "WA", "West Virginia" = "WV", "Wisconsin" = "WI",
-                  "Wyoming" = "WY"
-                ),
+                choices = state_choices,
                 multiple = FALSE
               ),
-              condition = "input.geo_selector == 'County' | input.geo_selector == 'Metro/Micro Area'"
+              condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_selector == 'CENSUS_CBSA_NAME'"
             ),
             shiny::conditionalPanel(
               selectizeInput(
@@ -219,7 +177,7 @@ ui <- bslib::page_navbar(
                 multiple = TRUE,
                 options = list(maxItems = 5)
               ),
-              condition = "input.geo_selector == 'County'"
+              condition = "input.geo_level == 'CENSUS_COUNTY_NAME'"
             ),
             shiny::conditionalPanel(
               selectizeInput(
@@ -229,49 +187,70 @@ ui <- bslib::page_navbar(
                 multiple = TRUE,
                 options = list(maxItems = 5)
               ),
-              condition = "input.geo_selector == 'Metro/Micro Area'"
+              condition = "input.geo_level == 'CENSUS_CBSA_NAME'"
             )
           ),
           bslib::card(
-            card_header("Subsector"),
-            selectizeInput(
-              inputId = "subsector_select",
+            bslib::card_header("Subsector"),
+            shiny::radioButtons(
+              inputId = "subsector_level",
               label = NULL,
-              selected = "all_groups",
+              inline = TRUE,
               choices = list(
-                "Arts, Culture, and Humanities" = "ART", 
-                "Education (minus Universities)" = "EDU",
-                "Health (minus Hospitals)" = "HEL",
-                "Human Services" = "HMS",
-                "International, Foreign Affairs" = "IFA",
-                "Public, Societal Benefit" = "PSB",
-                "Religion Related" = "REL",
-                "Mutual/Membership Benefit" = "MMB",
-                "Universities" = "UNI",
-                "Hospitals" = "HOS",
-                "All Groups" = "all_groups"
+                "All Subsectors" = "all", 
+                "Individual Subsectors" = "individual"
+              )
+            ),
+            shiny::conditionalPanel(
+              selectizeInput(
+                inputId = "subsector_select",
+                label = NULL,
+                choices = list(
+                  "Arts, Culture, and Humanities" = "ART", 
+                  "Education (minus Universities)" = "EDU",
+                  "Health (minus Hospitals)" = "HEL",
+                  "Human Services" = "HMS",
+                  "International, Foreign Affairs" = "IFA",
+                  "Public, Societal Benefit" = "PSB",
+                  "Religion Related" = "REL",
+                  "Mutual/Membership Benefit" = "MMB",
+                  "Universities" = "UNI",
+                  "Hospitals" = "HOS"
+                ),
+                multiple = TRUE,
+                options = list(maxItems = 5)
               ),
-              multiple = TRUE,
-              options = list(maxItems = 5)
+              condition = "input.subsector_level == 'individual'"
             )
           ),
           bslib::card(
             card_header("Asset Size"),
-            selectizeInput(
-              inputId = "size_select",
+            shiny::radioButtons(
+              inputId = "size_level",
               label = NULL,
+              inline = TRUE,
               choices = list(
-                "Under $100,000" = 1,
-                "$100,000 - $499,999" = 2,
-                "$500,000 - $999,999" = 3,
-                "$1 Million - $4.99 Million" = 4,
-                "$5 Million - $9.99 Million" = 5,
-                "Above $10 Million" = 6,
-                "All Asset Sizes" = 0
+                "All Asset Sizes" = "all", 
+                "Individual Asset Sizes" = "individual"
               )
             ),
-            multiple = TRUE,
-            options = list(maxItems = 5)
+            shiny::conditionalPanel(
+              selectizeInput(
+                inputId = "size_select",
+                label = NULL,
+                multiple = TRUE,
+                options = list(maxItems = 5),
+                choices = list(
+                  "Under $100,000" = 1,
+                  "$100,000 - $499,999" = 2,
+                  "$500,000 - $999,999" = 3,
+                  "$1 Million - $4.99 Million" = 4,
+                  "$5 Million - $9.99 Million" = 5,
+                  "Above $10 Million" = 6
+                )
+              ),
+              condition = "input.size_level == 'individual'"
+            )
           ),
           bslib::card(
             card_header("Date Range"),
@@ -290,28 +269,24 @@ ui <- bslib::page_navbar(
         ),
         bslib::input_task_button(
           id = "update_plot",
-          style = "margin-top: 1px; margin-left: 32px; margin-right: 32px; margin-bottom: 1px; font-size: 16px; padding: 4px; border-radius: 0; font-size: 18px; color: #ffffff",
-          label = "RETRIEVE DATA",
+          style = "margin-top: 1px; margin-left: 32px; margin-right: 32px; margin-bottom: 1px; font-size: 16px; padding: 4px; border-radius: 0; font-size: 18px; color: #ffffff; margin: auto;",
+          label = "Retrieve Data",
           label_busy = "Updating Plots",
           type = "primary"
         )
-      )
-    )
-  ),
+      ),
   bslib::navset_card_tab(
     title =   "Step 2: Results",
     height = "100%",
     bslib::nav_panel(
       "Overall",
       bslib::card(
-        h3(textOutput("value")),
         layout_column_wrap(
           width = NULL,
           height = 650,
-          style = css(grid_template_columns = "3fr 1fr"),
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
           card_body(plotOutput("plot")),
-          card_body(div(class = "tableheader", "Table"),
-                    reactable::reactableOutput("table"))
+          card_body(reactable::reactableOutput("table"))
         ),
         div(
           p(tags$b("Source"), ": IRS Business Master File"),
@@ -325,14 +300,12 @@ ui <- bslib::page_navbar(
     bslib::nav_panel(
       "By Subsector",
       bslib::card(
-        h3(textOutput("value")),
         layout_column_wrap(
           width = NULL,
           height = 650,
-          style = css(grid_template_columns = "3fr 1fr"),
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
           card_body(plotOutput("plot_subsector")),
-          card_body(div(class = "tableheader", "Table"),
-                    reactable::reactableOutput("table_subsector"))
+          card_body(reactable::reactableOutput("table_subsector"))
         ),
         div(
           p(tags$b("Source"), ": IRS Business Master File"),
@@ -343,8 +316,44 @@ ui <- bslib::page_navbar(
                        class = "btn-download")
       )
     ),
-    bslib::nav_panel("By Asset Size"),
-    bslib::nav_panel("By Geography")
+    bslib::nav_panel(
+      "By Geography",
+      bslib::card(
+        layout_column_wrap(
+          width = NULL,
+          height = 650,
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
+          card_body(plotOutput("plot_geo")),
+          card_body(reactable::reactableOutput("table_geo"))
+        ),
+        div(
+          p(tags$b("Source"), ": IRS Business Master File"),
+          p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
+        ),
+        downloadButton("downloadData", 
+                       "DOWNLOAD",
+                       class = "btn-download")
+      )
+    ),
+    bslib::nav_panel(
+      "By Asset Size",
+      bslib::card(
+        layout_column_wrap(
+          width = NULL,
+          height = 650,
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
+          card_body(plotOutput("plot_size")),
+          card_body(reactable::reactableOutput("table_size"))
+        ),
+        div(
+          p(tags$b("Source"), ": IRS Business Master File"),
+          p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
+        ),
+        downloadButton("downloadData", 
+                       "DOWNLOAD",
+                       class = "btn-download")
+      )
+    )
   )
 )
 
@@ -361,95 +370,147 @@ server <- function(input, output, session) {
                          server = TRUE)
     
   })
-  output$plot <- renderPlot({
-    ggplot(num_nonprofits, aes(x = YEAR, y = `Number of Nonprofits`)) +
-      geom_line(size = 1.5,
-                linetype = 1,
-                color = "#1696d2") +
-      geom_point(size = 3, color = "#1696d2", fill = "white", shape = 21, stroke = 1.2) +
-      scale_y_continuous(
-        limits = c(0, NA),
-        expand = expansion(mult = 0.1),
-        labels = scales::unit_format(unit = "m", scale = 1e-6)
-      ) +
-      labs(subtitle = NULL, 
-           x = "Fiscal Year",
-           title = "Line Chart of Yearly Trends",
-           y = "Number of Nonprofits (millions)") +
-      scale_x_continuous(breaks = seq(1990, 2024, 4)) +
-      theme_classic() +
-      theme(
-        text = element_text(family = "Lato"),
-        plot.title = element_text(size = 20, face = "bold", hjust = 0),
-        plot.subtitle = element_text(size = 16, hjust = 0, margin = margin(b = 20)),
-        axis.text = element_text(size = 12, color = "#000000"),
-        axis.title.y = element_text(size = 12, angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r = 10)),
-        axis.line.y = element_blank(),
-        axis.title.x = element_text(size = 12, margin = margin(t = 10), color = "#000000"),
-        panel.grid.major.y = element_line(color = "#dcdcdc"),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
-        plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
+  # Plot Header
+  plot_title <- reactive({
+    
+    if (input$org_level == "Other Nonprofits") {
+      title <- paste("Number of", input$other_orgs)
+    } else {
+      title <- paste("Number of", input$org_level)
+    }
+    if (input$date_range[1] != input$date_range[2] ) {
+      title <- paste(title, ",", input$date_range[1], "-", input$date_range[2])
+    } else {
+      title <- paste(title, ",", input$date_range[1])
+    }
+  })
+  
+  plot_subtitle <- reactive({
+    subtitle <- ""
+    if (input$geo_level == "census_region"){
+      subtitle <- paste("Region(s):", paste(input$region_selector, collapse = ", "), "\n")
+    }
+    else if (input$geo_level == "CENSUS_STATE_ABBR"){
+      subtitle <- paste("State(s):", paste(input$state_selector_multi, collapse = ", "), "\n")
+    }
+    else if (input$geo_level == "CENSUS_COUNTY_NAME"){
+      subtitle <- paste("State:", input$state_selector_single, "\n",
+                        "County(s):", paste(input$county_selector, collapse = ", "), "\n")
+    }
+    else if (input$geo_level == "CENSUS_CBSA_NAME"){
+      subtitle <- paste("State:", input$state_selector_single, "\n",
+                        "Metro/Micro Area(s):", paste(input$cbsa_selector, collapse = ", "), "\n")
+    }
+    
+    if (input$subsector_level == "individual"){
+      subtitle <- paste(subtitle, "Subsector(s):", paste(input$subsector_select, collapse = ", "), "\n")
+    }
+    if (input$size_level == "individual"){
+      subtitle <- paste(subtitle, "Asset Size(s):", paste(input$size_select, collapse = ", "), "\n")
+    }
+    print(subtitle)
+  })
+  # Data Wrangling
+  shiny::observeEvent(input$update_plot, {
+    # Stage 1 Filtering Data
+    filtered_data <- filter_data(
+      data = data,
+      org_level = input$org_level,
+      other_orgs = input$other_orgs,
+      geo_level = input$geo_level,
+      region = input$region_selector,
+      state_single = input$state_selector_single,
+      state_mult = input$state_selector_multi,
+      county = input$county_selector,
+      cbsa = input$cbsa_selector,
+      subsector_level = input$subsector_level,
+      subsectors = input$subsector_select,
+      asset_size_level = input$size_level,
+      asset_sizes = input$size_select,
+      year_start = input$date_range[1],
+      year_end = input$date_range[2]
+    )
+    # Stage 2 Creating Tables
+    tables <- summarise_data(
+      data = filtered_data,
+      geo_level = input$geo_level,
+      subsector_level = input$subsector_level,
+      asset_size_level = input$size_level
+    )
+    # Stage 3 Creating Plots
+    plots <- create_plots(
+      table_ls = tables,
+      geo_level = input$geo_level,
+      subsector_level = input$subsector_level,
+      asset_size_level = input$size_level,
+      title = plot_title(),
+      subtitle = plot_subtitle()
+    )
+    # Stage 5 Displaying Results - Overall
+    output$plot <- renderPlot({
+      plots[["default"]]
+    })
+    output$table <- renderReactable({
+      reactable(
+        tables[["default"]],
+        outlined = TRUE,
+        defaultPageSize = 10,
+        defaultColDef = colDef(align = "center")
       )
+    })
+    # Stage 5 Displaying Results - By Subsector
+    output$plot_subsector <- renderPlot({
+      plots[["by_subsector"]]
+    })
+    output$table_subsector <- renderReactable({
+      if (input$subsector_level == "individual") {
+        reactable(
+          tables[["by_subsector"]],
+          groupBy = "Subsector",
+          outlined = TRUE,
+          defaultPageSize = 10,
+          defaultColDef = colDef(align = "center")
+        )
+      }
+    })
+    # Stage 5 Displaying Results - Geography
+    output$plot_geo <- renderPlot({
+      plots[["by_geo"]]
+    })
+    output$table_geo <- renderReactable({
+      if (input$geo_level != "all") {
+        reactable(
+          tables[["by_geo"]],
+          groupBy = input$geo_level,
+          outlined = TRUE,
+          defaultPageSize = 10,
+          defaultColDef = colDef(align = "center")
+        )
+      } 
+    })
+    output$plot_size <- renderPlot({
+      plots[["by_asset_size"]]
+    })
+    # Stage 5 Displaying Results - Asset Size
+    output$table_size <- renderReactable({
+      if (input$size_level == "individual") {
+        reactable(
+          tables[["by_asset_size"]],
+          groupBy = "Asset_Size",
+          outlined = TRUE,
+          defaultPageSize = 10,
+          defaultColDef = colDef(align = "center")
+        )
+      }
+    })
   })
-  output$plot_subsector <- renderPlot({
-    ggplot(num_nonprofits_subsector, aes(x = YEAR, y = `Number of Nonprofits`, color = NTEE_INDUSTRY_GROUP)) +
-      geom_line(size = 1.5,
-                linetype = 1) +
-      geom_point(size = 3, fill = "white", shape = 21, stroke = 1.2) +
-      scale_y_continuous(
-        limits = c(0, NA),
-        expand = expansion(mult = 0.1),
-        labels = scales::unit_format(unit = "m", scale = 1e-6)
-      ) +
-      labs(subtitle = NULL, 
-           x = "Fiscal Year",
-           title = "Line Chart of Yearly Trends",
-           y = "Number of Nonprofits (millions)") +
-      scale_x_continuous(breaks = seq(1990, 2024, 4)) +
-      theme_classic() +
-      theme(
-        text = element_text(family = "Lato"),
-        plot.title = element_text(size = 20, face = "bold", hjust = 0),
-        plot.subtitle = element_text(size = 16, hjust = 0, margin = margin(b = 20)),
-        axis.text = element_text(size = 12, color = "#000000"),
-        axis.title.y = element_text(size = 12, angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r = 10)),
-        axis.line.y = element_blank(),
-        axis.title.x = element_text(size = 12, margin = margin(t = 10), color = "#000000"),
-        panel.grid.major.y = element_line(color = "#dcdcdc"),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
-        plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
-      )
-  })
-  output$table <- renderReactable({
-    reactable(num_nonprofits, 
-              outlined = TRUE, 
-              defaultPageSize = 10,
-              defaultColDef = colDef(
-                align = "center"
-              ))
-  })
-  output$table_subsector <- renderReactable({
-    reactable(num_nonprofits_subsector,
-              groupBy = "NTEE_INDUSTRY_GROUP",
-              outlined = TRUE, 
-              defaultPageSize = 10,
-              defaultColDef = colDef(
-                align = "center"
-              ))
-  })
+
   output$downloadData <- downloadHandler(
     filename = "nonprofit.csv",
     content = function(file) {
-      write.csv(num_nonprofits, file)
+      write.csv(tables[["default"]], file)
     }
   )
-  output$value <- renderText({"Number of 501(c)(3) Public Charities, 1989 - 2024"})
 }
 
 shinyApp(ui = ui, server = server)
