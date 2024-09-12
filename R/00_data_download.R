@@ -3,7 +3,7 @@
 # nonprofit sector in brief
 # Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
 # Date Created: 2024-07-02
-# Date Last Edited: 2024-07-26
+# Date Last Edited: 2024-09-10
 # Details:
 # (1) - BMF Data
 # (2) - CORE Data
@@ -26,7 +26,6 @@ PF_YEARS <- 1989:2019
 unified_bmf_url <- "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/BMF_UNIFIED_V1.1.csv"
 
 # (1) Download and save raw BMF Data
-
 unified_bmf <- data.table::fread(unified_bmf_url, key = "EIN2")
 # State - County - CBSA Nested table
 geo_cols <- c("CENSUS_STATE_ABBR",
@@ -47,18 +46,27 @@ metadata_cols <-
     "CENSUS_CBSA_NAME",
     "F990_TOTAL_ASSETS_RECENT",
     "ORG_YEAR_FIRST",
-    "ORG_YEAR_LAST"
+    "ORG_YEAR_LAST",
+    "NCCS_LEVEL_1"
   )
 asset_col <- "F990_TOTAL_ASSETS_RECENT"
 # Subset and create new columns
 bmf_metadata_dat <- unified_bmf[, ..metadata_cols]
-bmf_metadata_dat[, NTEE_INDUSTRY_GROUP := substr(NTEEV2, 1, 3), by = 1:nrow(bmf_metadata_dat)]
-bmf_metadata_dat[, CTYPE := derive_501c_type(BMF_SUBSECTION_CODE), by = 1:nrow(bmf_metadata_dat)]
+bmf_metadata_dat[, Subsector := substr(NTEEV2, 1, 3), by = 1:nrow(bmf_metadata_dat)]
+bmf_metadata_dat[, Organization_Type := derive_501c_type(BMF_SUBSECTION_CODE, NCCS_LEVEL_1), by = 1:nrow(bmf_metadata_dat)]
 bmf_metadata_dat[, (asset_col) := lapply(.SD, function(x) {
   x <- ifelse(x < 0, 0, x)
 }), .SDcols = asset_col]
 data.table::setnafill(bmf_metadata_dat, fill = 0, cols = asset_col)
-bmf_metadata_dat[, SIZE := derive_size_category(F990_TOTAL_ASSETS_RECENT), by = 1:nrow(bmf_metadata_dat)]
+bmf_metadata_dat[, Asset_Size := derive_size_category(F990_TOTAL_ASSETS_RECENT), by = 1:nrow(bmf_metadata_dat)]
+# Add Census Region
+bmf_metadata_dat <- bmf_metadata_dat |>
+  mutate(census_region = case_when(
+    CENSUS_STATE_ABBR %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
+    CENSUS_STATE_ABBR %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
+    CENSUS_STATE_ABBR %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX") ~ "South",
+    CENSUS_STATE_ABBR %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY", "AK", "CA", "HI", "OR", "WA") ~ "West"
+  ))
 data.table::fwrite(bmf_metadata_dat, "data/raw/bmf_metadata.csv")
 # Disaggregate by Tax Year
 yr_dat_ls <- purrr::map(BMF_YEARS,
@@ -68,7 +76,8 @@ yr_dat_ls <- purrr::map(BMF_YEARS,
 num_nonprofits_dt <- purrr::list_rbind(yr_dat_ls)
 data.table::fwrite(num_nonprofits_dt,
                    "data/intermediate/num_nonprofits_full.csv")
-
+arrow::write_parquet(num_nonprofits_dt,
+                     "deploy/data/num_nonprofits_full.parquet")
 # (2) Core Data
 core_cols <- c(
   "EIN2",
