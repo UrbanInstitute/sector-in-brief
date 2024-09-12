@@ -13,7 +13,12 @@ daf <- daf |>
   rename(
     "Asset_Size" = SIZE,
     "Organization_Type" = CTYPE,
-    "Subsector" = NTEE_INDUSTRY_GROUP
+    "Subsector" = NTEE_INDUSTRY_GROUP,
+    "Total Contributions" = TOTAL_CONTRIBUTIONS,
+    "Total Grants" = TOTAL_GRANTS,
+    "Total Value" = TOTAL_VALUE,
+    "Number of DAFs" = NUM_DAFS,
+    "Proportion of Nonprofits with DAFs" = DAF_PROPORTION,
   ) |>
   mutate(
     Organization_Type = ifelse(Organization_Type == "501(c)(3)", "501(c)(3) Public Charities", Organization_Type),
@@ -29,9 +34,9 @@ daf_int64 <- daf |>
     CENSUS_STATE_ABBR,
     CENSUS_COUNTY_NAME,
     CENSUS_CBSA_NAME,
-    TOTAL_CONTRIBUTIONS,
-    TOTAL_GRANTS,
-    TOTAL_VALUE
+    `Total Contributions`,
+    `Total Grants`,
+    `Total Value`
   )
 
 daf_int <- daf |>
@@ -44,27 +49,27 @@ daf_int <- daf |>
     CENSUS_STATE_ABBR,
     CENSUS_COUNTY_NAME,
     CENSUS_CBSA_NAME,
-    NUM_DAFS,
-    DAF_PROPORTION
+    `Number of DAFs`,
+    `Proportion of Nonprofits with DAFs`
   )
 
 daf_int64 <- daf_int64 |>
-  pivot_longer(cols = c("TOTAL_VALUE", 
-                        "TOTAL_GRANTS",
-                        "TOTAL_CONTRIBUTIONS"), 
-               names_to = "Metric", 
-               values_to = "Value")
+  pivot_longer(
+    cols = c("Total Contributions", "Total Grants", "Total Value"),
+    names_to = "Metric",
+    values_to = "Value"
+  )
 
 daf_int <- daf_int |>
-  pivot_longer(cols = c("NUM_DAFS", 
-                        "DAF_PROPORTION"), 
-               names_to = "Metric", 
-               values_to = "Value")
+  pivot_longer(
+    cols = c("Number of DAFs", "Proportion of Nonprofits with DAFs"),
+    names_to = "Metric",
+    values_to = "Value"
+  )
 
 p <- ggplot(daf_int64, aes(x = "Total", y = Value)) +
   geom_col() +
   facet_wrap(~Metric)
-p
 
 # Data Wrangling Functions
 orgtype_query <- function(data, org, other_orgs = NULL) {
@@ -163,7 +168,7 @@ summarise_data <- function(data, geo_level, subsector_level, asset_size_level) {
         Asset_Size == 5 ~ "$5 Million - $9.99 Million",
         Asset_Size == 6 ~ "Above $10 Million",
       )) |>
-      group_by(Year, Asset_Size) |>
+      group_by(Metric, Asset_Size) |>
       summarise("Value" = sum(Value, na.rm = TRUE)) |>
       dplyr::rename_with(~var_rename_ls[["Asset_Size"]], Asset_Size) |>
       dplyr::collapse()
@@ -177,7 +182,6 @@ create_plots <- function(table_ls, geo_level, subsector_level, asset_size_level,
   # Blank Plot
   default_plot <- create_single_plot(table_ls[["default"]], title, subtitle)
   plot_ls[["default"]] <- default_plot
-  print("done")
   if (geo_level != "all") {
     if (geo_level == "census_region"){
       geo_title <- paste(title, ", By Census Region")
@@ -213,7 +217,7 @@ create_plots <- function(table_ls, geo_level, subsector_level, asset_size_level,
 
 # Plotting
 create_single_plot <- function(table, title, subtitle) {
-  p <- ggplot(table, aes(x = "Total", y = `Value`)) +
+  p <- ggplot(table, aes(x = "Total", y = `Value`, fill = Metric)) +
     geom_col() +
     facet_wrap(~Metric) +
     scale_y_continuous(
@@ -222,7 +226,7 @@ create_single_plot <- function(table, title, subtitle) {
       labels = scales::unit_format(unit = "m", scale = 1e-6)
     ) +
     labs(subtitle = subtitle, 
-         x = "Fiscal Year",
+         x = "",
          title = title,
          y = "Number of Nonprofits (millions)") +
     theme_classic() +
@@ -239,7 +243,9 @@ create_single_plot <- function(table, title, subtitle) {
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
       plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
-      plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
+      plot.margin = margin(t = 20, r = 20, b = 20, l = 20),
+      strip.background = element_blank(),
+      strip.text=element_text(size=12, colour="black")
     )
   return(p)
 }
@@ -254,7 +260,7 @@ create_group_plot <- function(table, grouping_var, title, subtitle) {
       labels = scales::unit_format(unit = "m", scale = 1e-6)
     ) +
     labs(subtitle = subtitle, 
-         x = "Fiscal Year",
+         x = var_rename_ls[[grouping_var]],
          title = title,
          y = "Number of Nonprofits (millions)") +
     theme_classic() +
@@ -271,7 +277,9 @@ create_group_plot <- function(table, grouping_var, title, subtitle) {
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
       plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
-      plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
+      plot.margin = margin(t = 20, r = 20, b = 20, l = 20),
+      strip.background = element_blank(),
+      strip.text=element_text(size=12, colour="black")
     )
   return(p)
 }
