@@ -1,6 +1,6 @@
 # Single script for plotting functions
 
-# Create multiple line plots
+# Create multiple plots
 create_plots <- function(table_ls,
                          single_plot_func,
                          group_plot_func,
