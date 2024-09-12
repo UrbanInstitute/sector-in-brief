@@ -12,6 +12,15 @@ library(usdata)
 # Scientific Notation
 options(scipen=999)
 
+# Footers
+plot_footer <- bslib::card_footer(
+  div(
+    p(tags$b("Source"), ": IRS Business Master File"),
+    p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File."),
+    p("Private foundations are charitable organizations that typically receive most of their funding from a single source (e.g. a donor, family, or corporation) and primarily exist to make grants, rather than operate programs. All private foundations are 501(c)(3) organizations, so selecting other 501(c) types will return no data.")
+  )
+)
+
 # Create state list
 state_ls <- setNames(as.list(as.character(usdata::state_stats$abbr)), usdata::state_stats$state)
 state_ls[["All States"]] = "all_states"
