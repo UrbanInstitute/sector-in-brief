@@ -21,6 +21,18 @@ plot_footer <- bslib::card_footer(
   )
 )
 
+daf_footer <- bslib::card_footer(
+  div(
+    p(tags$b("Source"), ": IRS E-filings for Tax Year 2021"),
+    p(tags$b("Notes"), ": The tax year is the 12-month period beginning in a given calendar year that nonprofits use to calculate their annual financial statements. "),
+    p("•	Percentage of organizations that maintain a DAF – The percentage of nonprofits that sponsor a DAF, meaning they hold and operate funds for donors."),
+    p("•	Total number of DAFs – The aggregate number of DAF accounts that nonprofits sponsor. One DAF sponsor can hold multiple DAF accounts. "),
+    p("o	Total DAF contributions – The aggregate value of the money that donors put into the DAFs that nonprofits sponsor."),
+    p("o	Total DAF grants – The aggregate value of the money that DAF sponsors disburse at the recommendation of donors."),
+    p("o	Total DAF value – The aggregate value of the money that nonprofits hold in the DAFs they sponsor.")
+  )
+)
+
 # Create state list
 state_ls <- setNames(as.list(as.character(usdata::state_stats$abbr)), usdata::state_stats$state)
 state_ls[["All States"]] = "all_states"
