@@ -2,20 +2,27 @@
 # Description: This script contains functions used by the R scripts in this folder
 # Programmer(s): Thiyaghessan - tpoongundranar@urban.org
 # Date Created: 06-08-2024
-# Date Last Edited: 06-18-2024
+# Date Last Edited: 09-11-2024
 
 #' @title Function to provide labels to subsection codes
 #' in Unified BMF.
 #' @param subsection_code integer. Subsection code assigned
 #' by IRS
+#' @param level1 character scalar. NCCS Level 1 classification
 #' @returns ctype character scalar. Verbose labels for 
 #' subsection codes.
-derive_501c_type <- function(subsection_code) {
+derive_501c_type <- function(subsection_code, level1) {
   subsection_code <- as.integer(subsection_code)
   if (is.na(subsection_code)) {
-    ctype <- "UNKNOWN"
+    ctype <- "Unknown"
   } else if (any(subsection_code == 0 | subsection_code > 70)) {
-    ctype <- "UNKNOWN"
+    ctype <- "Unknown"
+  } else if (subsection_code == 3) {
+    if (level1 == "501C3 PRIVATE FOUNDATION") {
+      ctype <- "501(c)(3) Private Foundations"
+    } else {
+      ctype <- "501(c)(3) Public Charities"
+    } 
   } else if (subsection_code < 30) {
     ctype <- sprintf("501(c)(%s)", subsection_code)
   } else if (subsection_code ==  40) {
@@ -42,13 +49,13 @@ create_year_table <- function(year, unified) {
   yr_dat <- yr_dat[ORG_YEAR_LAST >= year, ]
   yr_dat <- yr_dat[, .(num_nonprofit = length(unique(EIN2))), by = list(
     CENSUS_STATE_ABBR,
-    NTEE_INDUSTRY_GROUP,
-    CTYPE,
+    Subsector,
+    Organization_Type,
     CENSUS_COUNTY_NAME,
     CENSUS_CBSA_NAME,
-    SIZE
+    Asset_Size
   )]
-  yr_dat <- yr_dat[, YEAR := year]
+  yr_dat <- yr_dat[, Year := year]
   return(yr_dat)
 }
 
