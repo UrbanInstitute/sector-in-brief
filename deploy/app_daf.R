@@ -18,7 +18,7 @@ library(reactable)
 source("executive_summary.R")
 source("assets/assets.R")
 source("assets/choices.R")
-source("ui_data.R")
+source("daf_data.R")
 source("utils.R")
 
 asset_size_ls <- list(
@@ -110,12 +110,12 @@ ui <- bslib::page_navbar(
   ),
   exec_summary,
   bslib::nav_panel(
-    title = "Number",
+    title = "Donor Advised Funds",
     div(
       br(),
-      h2("Total number of nonprofits", class = "pageheader"),
+      h2("Donor Advised Funds", class = "pageheader"),
       br(),
-      h3("The number of organizations that are registered with the Internal Revenue Service (IRS)."),
+      h3("A donor advised fund (DAF) is a tool that allows individuals and organizations to contribute money and non-cash assets to a giving account, receive an immediate tax deduction, and recommend grants to nonprofits at a later time."),
       br()
     ),
     bslib::card(
@@ -127,8 +127,7 @@ ui <- bslib::page_navbar(
           selectizeInput(
             "org_level",
             label = NULL,
-            choices = c("501(c)(3) Public Charities", 
-                        "501(c)(3) Private Foundations", 
+            choices = c("501(c)(3) Public Charities",
                         "501(c)(4) Social Welfare Organizations", 
                         "Other Nonprofits",
                         "All Nonprofits")
@@ -264,20 +263,6 @@ ui <- bslib::page_navbar(
             ),
             condition = "input.size_level == 'individual'"
           )
-        ),
-        bslib::card(
-          card_header("Date Range"),
-          sliderInput(
-            "date_range",
-            label = NULL,
-            min = 1989,
-            max = 2024,
-            value = c(1989, 2024),
-            step = NULL,
-            ticks = FALSE,
-            sep = "",
-            dragRange = TRUE
-          )
         )
       ),
       bslib::input_task_button(
@@ -299,7 +284,7 @@ ui <- bslib::page_navbar(
           style = htmltools::css(grid_template_columns = "3fr 1fr"),
           bslib::card(
             bslib::card_body(plotOutput("plot")),
-            plot_footer
+            daf_footer
           ),
           bslib::card(
             bslib::card_body(reactable::reactableOutput("table")),
@@ -317,7 +302,7 @@ ui <- bslib::page_navbar(
           style = htmltools::css(grid_template_columns = "3fr 1fr"),
           bslib::card(
             bslib::card_body(plotOutput("plot_subsector")),
-            plot_footer
+            daf_footer
           ),
           bslib::card(
             bslib::card_body(reactable::reactableOutput("table_subsector")),
@@ -335,7 +320,7 @@ ui <- bslib::page_navbar(
           style = htmltools::css(grid_template_columns = "3fr 1fr"),
           bslib::card(
             bslib::card_body(plotOutput("plot_geo")),
-            plot_footer
+            daf_footer
           ),
           bslib::card(
             bslib::card_body(reactable::reactableOutput("table_geo")),
@@ -353,7 +338,7 @@ ui <- bslib::page_navbar(
           style = htmltools::css(grid_template_columns = "3fr 1fr"),
           bslib::card(
             bslib::card_body(plotOutput("plot_size")),
-            plot_footer
+            daf_footer
           ),
           bslib::card(
             bslib::card_body(reactable::reactableOutput("table_size")),
@@ -384,14 +369,9 @@ server <- function(input, output, session) {
   plot_title <- reactive({
     
     if (input$org_level == "Other Nonprofits") {
-      title <- paste("Number of", input$other_orgs)
+      title <- paste("Donor Advised Funds For:", input$other_orgs)
     } else {
-      title <- paste("Number of", input$org_level)
-    }
-    if (input$date_range[1] != input$date_range[2] ) {
-      title <- paste(title, ",", input$date_range[1], "-", input$date_range[2])
-    } else {
-      title <- paste(title, ",", input$date_range[1])
+      title <- paste("Donor Advised Funds For:", input$org_level)
     }
   })
   
@@ -429,7 +409,7 @@ server <- function(input, output, session) {
       {
         setProgress(1, message = "Filtering Data...")
         filtered_data <- filter_data(
-          data = data,
+          data = daf_int64,
           org_level = input$org_level,
           other_orgs = input$other_orgs,
           geo_level = input$geo_level,
@@ -441,9 +421,7 @@ server <- function(input, output, session) {
           subsector_level = input$subsector_level,
           subsectors = input$subsector_select,
           asset_size_level = input$size_level,
-          asset_sizes = input$size_select,
-          year_start = input$date_range[1],
-          year_end = input$date_range[2]
+          asset_sizes = input$size_select
         )
         setProgress(2, message = "Creating Tables...")
         tables <- summarise_data(
