@@ -72,6 +72,7 @@ ui <- bslib::page_navbar(
           color: black;
           text-align: left;
           margin-left: 0px;
+          margin:0;
         }
         .tableheader {
           font-family: 'Lato';
@@ -280,7 +281,7 @@ ui <- bslib::page_navbar(
         )
       ),
   bslib::navset_card_tab(
-    title =   "Step 2: Results",
+    title =   "View Results",
     height = "100%",
     bslib::nav_panel(
       "Overall",
@@ -290,12 +291,7 @@ ui <- bslib::page_navbar(
         style = htmltools::css(grid_template_columns = "3fr 1fr"),
         bslib::card(
           bslib::card_body(plotOutput("plot")),
-          bslib::card_footer(
-            div(
-              p(tags$b("Source"), ": IRS Business Master File"),
-              p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
-            )
-          )
+          plot_footer
         ),
         bslib::card(
           bslib::card_body(reactable::reactableOutput("table")),
@@ -307,59 +303,56 @@ ui <- bslib::page_navbar(
     ),
     bslib::nav_panel(
       "By Subsector",
-      bslib::card(
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          plotOutput("plot_subsector"),
-          reactable::reactableOutput("table_subsector")
+      layout_column_wrap(
+        width = NULL,
+        height = 650,
+        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        bslib::card(
+          bslib::card_body(plotOutput("plot_subsector")),
+          plot_footer
         ),
-        div(
-          p(tags$b("Source"), ": IRS Business Master File"),
-          p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
-        ),
-        downloadButton("downloadData", 
-                       "DOWNLOAD",
-                       class = "btn-download")
+        bslib::card(
+          bslib::card_body(reactable::reactableOutput("table_subsector")),
+          bslib::card_body(
+            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+          )
+        )
       )
     ),
     bslib::nav_panel(
       "By Geography",
-      bslib::card(
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          plotOutput("plot_geo"),
-          reactable::reactableOutput("table_geo")
+      layout_column_wrap(
+        width = NULL,
+        height = 650,
+        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        bslib::card(
+          bslib::card_body(plotOutput("plot_geo")),
+          plot_footer
         ),
-        div(
-          p(tags$b("Source"), ": IRS Business Master File"),
-          p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
-        ),
-        downloadButton("downloadData", 
-                       "DOWNLOAD",
-                       class = "btn-download")
+        bslib::card(
+          bslib::card_body(reactable::reactableOutput("table_geo")),
+          bslib::card_body(
+            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+          )
+        )
       )
     ),
     bslib::nav_panel(
       "By Asset Size",
-      bslib::card(
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          plotOutput("plot_size"),
-          reactable::reactableOutput("table_size")
+      layout_column_wrap(
+        width = NULL,
+        height = 650,
+        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        bslib::card(
+          bslib::card_body(plotOutput("plot_size")),
+          plot_footer
         ),
-        div(
-          p(tags$b("Source"), ": IRS Business Master File"),
-          p(tags$b("Notes"), ": Data on the total number of nonprofits are displayed by fiscal year, meaning January through December of a given calendar year. They come from the IRS’s Exempt Organization Business Master File. ")
-        ),
-        downloadButton("downloadData", 
-                       "DOWNLOAD",
-                       class = "btn-download")
+        bslib::card(
+          bslib::card_body(reactable::reactableOutput("table_size")),
+          bslib::card_body(
+            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+          )
+        )
       )
     )
   )
