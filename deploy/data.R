@@ -1,0 +1,15 @@
+# One single script for data wrangling functions
+
+# Single function to query organization types
+orgtype_query <- function(data, org, other_orgs = NULL) {
+  if (org == "501(c)(3) Public Charities"){
+    data <- filter(data, Organization_Type == org)
+  } else if (org == "501(c)(3) Private Foundations"){
+    data <- filter(data, Organization_Type == org)
+  } else if (org == "501(c)(4) Social Welfare Organizations") {
+    data <- filter(data, Organization_Type == "501(c)(4)")
+  } else if (org == "Other Nonprofits") {
+    data <- filter(data, Organization_Type == other_orgs)
+  }
+  return(data)
+}
