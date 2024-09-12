@@ -14,6 +14,7 @@ orgtype_query <- function(data, org, other_orgs = NULL) {
   return(data)
 }
 
+# Single function to query geographic levels
 geo_query <- function(data, geo_level, region, state_single, state_mult, county, cbsa) {
   if (geo_level == "census_region") {
     data <- filter(data, census_region %in% region)
@@ -28,16 +29,19 @@ geo_query <- function(data, geo_level, region, state_single, state_mult, county,
   return(data)
 }
 
+# Function to filter data by subsector
 subsector_query <- function(data, subsector) {
   data <- filter(data, Subsector %in% subsector)
   return(data)
 }
 
+# Function to filter data by asset size
 filter_asset_size <- function(data, asset_size){
   data <- filter(data, Asset_Size %in% asset_size)
   return(data)
 }
 
+# Function to filter data
 filter_data <- function(data,
                         org_level = "All Nonprofits",
                         other_orgs = NULL,
@@ -77,6 +81,7 @@ filter_data <- function(data,
   return(data)
 }
 
+# Function to summarise data
 summarise_data <- function(data, groupby_var, geo_level, subsector_level, asset_size_level) {
   table_default <- data |>
     group_by(!!sym(groupby_var)) |>
