@@ -21,6 +21,15 @@ source("assets/choices.R")
 source("ui_data.R")
 source("utils.R")
 
+asset_size_ls <- list(
+  "1" = "Under $100,000",
+  "2" = "$100,000 - $499,999",
+  "3" = "$500,000 - $999,999",
+  "4" = "$1 Million - $4.99 Million",
+  "5" = "$5 Million - $9.99 Million",
+  "6" = "Above $10 Million"
+)
+
 # Load Data
 data <- arrow::read_parquet("data/num_nonprofits_full.parquet")
 
@@ -48,12 +57,13 @@ ui <- bslib::page_navbar(
   title = "Nonprofit Sector In Brief",
   id = "tabs",
   fillable = FALSE,
+  bg = "#1696d2",
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "sib_style.css"),
     tags$style(
       HTML(
         "
-        h2 {
+        .pageheader {
           font-size: 2em;
           color: black;
           text-decoration: underline;
@@ -98,257 +108,258 @@ ui <- bslib::page_navbar(
       )
     )
   ),
-  div(
-    br(),
-    h2("Total number of nonprofits"),
-    br(),
-    h3("The number of organizations that are registered with the Internal Revenue Service (IRS)."),
-    br()
-  ),
-  sidebar = bslib::sidebar(
-    open = FALSE
-  ),
-  bslib::card(
-    card_header("Step 1: Filters"),
-        title = "",
-        bslib::layout_columns(
-          bslib::card(
-            card_header("Organization Type"),
+  exec_summary,
+  bslib::nav_panel(
+    title = "Number",
+    div(
+      br(),
+      h2("Total number of nonprofits", class = "pageheader"),
+      br(),
+      h3("The number of organizations that are registered with the Internal Revenue Service (IRS)."),
+      br()
+    ),
+    bslib::card(
+      card_header("Step 1: Filters"),
+      title = "",
+      bslib::layout_columns(
+        bslib::card(
+          card_header("Organization Type"),
+          selectizeInput(
+            "org_level",
+            label = NULL,
+            choices = c("501(c)(3) Public Charities", 
+                        "501(c)(3) Private Foundations", 
+                        "501(c)(4) Social Welfare Organizations", 
+                        "Other Nonprofits",
+                        "All Nonprofits")
+          ),
+          shiny::conditionalPanel(
             selectizeInput(
-              "org_level",
-              label = NULL,
-              choices = c("501(c)(3) Public Charities", 
-                          "501(c)(3) Private Foundations", 
-                          "501(c)(4) Social Welfare Organizations", 
-                          "Other Nonprofits",
-                          "All Nonprofits")
+              "other_orgs",
+              width = "500px",
+              label = "Other 501(c) Types",
+              choices = org_type_choices,
             ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                "other_orgs",
-                width = "500px",
-                label = "Other 501(c) Types",
-                choices = org_type_choices,
-              ),
-              condition = "input.org_level == 'Other Nonprofits'"
-            )
-          ),
-          bslib::card(
-            card_header("Geography"),
-            radioButtons(
-              "geo_level",
-              inline = FALSE,
-              "Select Geographic Level",
-              choices = list("Entire USA" = "all", 
-                             "Region" = "census_region", 
-                             "State" = "CENSUS_STATE_ABBR", 
-                             "County" = "CENSUS_COUNTY_NAME", 
-                             "Metro/Micro Area" = "CENSUS_CBSA_NAME")
-            ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                "region_selector",
-                label = "Select Region(s)",
-                choices = c("Northeast", "South", "Midwest", "West"),
-                multiple = TRUE
-              ),
-              condition = "input.geo_level == 'census_region'"
-            ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                "state_selector_multi",
-                label = "Select State(s)",
-                choices = state_choices,
-                multiple = TRUE
-              ),
-              condition = "input.geo_level == 'CENSUS_STATE_ABBR'"
-            ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                "state_selector_single",
-                label = "Select State",
-                choices = state_choices,
-                multiple = FALSE
-              ),
-              condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_selector == 'CENSUS_CBSA_NAME'"
-            ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                "county_selector",
-                label = "Select Counties",
-                choices = NULL,
-                multiple = TRUE,
-                options = list(maxItems = 5)
-              ),
-              condition = "input.geo_level == 'CENSUS_COUNTY_NAME'"
-            ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                "cbsa_selector",
-                label = "Select Metro/Micro Area(s)",
-                choices = NULL,
-                multiple = TRUE,
-                options = list(maxItems = 5)
-              ),
-              condition = "input.geo_level == 'CENSUS_CBSA_NAME'"
-            )
-          ),
-          bslib::card(
-            bslib::card_header("Subsector"),
-            shiny::radioButtons(
-              inputId = "subsector_level",
-              label = NULL,
-              inline = TRUE,
-              choices = list(
-                "All Subsectors" = "all", 
-                "Individual Subsectors" = "individual"
-              )
-            ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                inputId = "subsector_select",
-                label = NULL,
-                choices = list(
-                  "Arts, Culture, and Humanities" = "ART", 
-                  "Education (minus Universities)" = "EDU",
-                  "Health (minus Hospitals)" = "HEL",
-                  "Human Services" = "HMS",
-                  "International, Foreign Affairs" = "IFA",
-                  "Public, Societal Benefit" = "PSB",
-                  "Religion Related" = "REL",
-                  "Mutual/Membership Benefit" = "MMB",
-                  "Universities" = "UNI",
-                  "Hospitals" = "HOS"
-                ),
-                multiple = TRUE,
-                options = list(maxItems = 5)
-              ),
-              condition = "input.subsector_level == 'individual'"
-            )
-          ),
-          bslib::card(
-            card_header("Asset Size"),
-            shiny::radioButtons(
-              inputId = "size_level",
-              label = NULL,
-              inline = TRUE,
-              choices = list(
-                "All Asset Sizes" = "all", 
-                "Individual Asset Sizes" = "individual"
-              )
-            ),
-            shiny::conditionalPanel(
-              selectizeInput(
-                inputId = "size_select",
-                label = NULL,
-                multiple = TRUE,
-                options = list(maxItems = 5),
-                choices = list(
-                  "Under $100,000" = 1,
-                  "$100,000 - $499,999" = 2,
-                  "$500,000 - $999,999" = 3,
-                  "$1 Million - $4.99 Million" = 4,
-                  "$5 Million - $9.99 Million" = 5,
-                  "Above $10 Million" = 6
-                )
-              ),
-              condition = "input.size_level == 'individual'"
-            )
-          ),
-          bslib::card(
-            card_header("Date Range"),
-            sliderInput(
-              "date_range",
-              label = NULL,
-              min = 1989,
-              max = 2024,
-              value = c(1989, 2024),
-              step = NULL,
-              ticks = FALSE,
-              sep = "",
-              dragRange = TRUE
-            )
+            condition = "input.org_level == 'Other Nonprofits'"
           )
         ),
-        bslib::input_task_button(
-          id = "update_plot",
-          style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
-          label = "RETRIEVE DATA",
-          label_busy = "UPDATING PLOTS",
-          type = "primary"
+        bslib::card(
+          card_header("Geography"),
+          radioButtons(
+            "geo_level",
+            inline = FALSE,
+            "Select Geographic Level",
+            choices = list("Entire USA" = "all", 
+                           "Region" = "census_region", 
+                           "State" = "CENSUS_STATE_ABBR", 
+                           "County" = "CENSUS_COUNTY_NAME", 
+                           "Metro/Micro Area" = "CENSUS_CBSA_NAME")
+          ),
+          shiny::conditionalPanel(
+            selectizeInput(
+              "region_selector",
+              label = "Select Region(s)",
+              choices = c("Northeast", "South", "Midwest", "West"),
+              multiple = TRUE
+            ),
+            condition = "input.geo_level == 'census_region'"
+          ),
+          shiny::conditionalPanel(
+            selectizeInput(
+              "state_selector_multi",
+              label = "Select State(s)",
+              choices = state_choices,
+              multiple = TRUE
+            ),
+            condition = "input.geo_level == 'CENSUS_STATE_ABBR'"
+          ),
+          shiny::conditionalPanel(
+            selectizeInput(
+              "state_selector_single",
+              label = "Select State",
+              choices = state_choices,
+              multiple = FALSE
+            ),
+            condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_selector == 'CENSUS_CBSA_NAME'"
+          ),
+          shiny::conditionalPanel(
+            selectizeInput(
+              "county_selector",
+              label = "Select Counties",
+              choices = NULL,
+              multiple = TRUE,
+              options = list(maxItems = 5)
+            ),
+            condition = "input.geo_level == 'CENSUS_COUNTY_NAME'"
+          ),
+          shiny::conditionalPanel(
+            selectizeInput(
+              "cbsa_selector",
+              label = "Select Metro/Micro Area(s)",
+              choices = NULL,
+              multiple = TRUE,
+              options = list(maxItems = 5)
+            ),
+            condition = "input.geo_level == 'CENSUS_CBSA_NAME'"
+          )
+        ),
+        bslib::card(
+          bslib::card_header("Subsector"),
+          shiny::radioButtons(
+            inputId = "subsector_level",
+            label = NULL,
+            inline = TRUE,
+            choices = list(
+              "All Subsectors" = "all", 
+              "Individual Subsectors" = "individual"
+            )
+          ),
+          shiny::conditionalPanel(
+            selectizeInput(
+              inputId = "subsector_select",
+              label = NULL,
+              choices = list(
+                "Arts, Culture, and Humanities" = "ART", 
+                "Education (minus Universities)" = "EDU",
+                "Health (minus Hospitals)" = "HEL",
+                "Human Services" = "HMS",
+                "International, Foreign Affairs" = "IFA",
+                "Public, Societal Benefit" = "PSB",
+                "Religion Related" = "REL",
+                "Mutual/Membership Benefit" = "MMB",
+                "Universities" = "UNI",
+                "Hospitals" = "HOS"
+              ),
+              multiple = TRUE,
+              options = list(maxItems = 5)
+            ),
+            condition = "input.subsector_level == 'individual'"
+          )
+        ),
+        bslib::card(
+          card_header("Asset Size"),
+          shiny::radioButtons(
+            inputId = "size_level",
+            label = NULL,
+            inline = TRUE,
+            choices = list(
+              "All Asset Sizes" = "all", 
+              "Individual Asset Sizes" = "individual"
+            )
+          ),
+          shiny::conditionalPanel(
+            selectizeInput(
+              inputId = "size_select",
+              label = NULL,
+              multiple = TRUE,
+              options = list(maxItems = 5),
+              choices = list(
+                "Under $100,000" = 1,
+                "$100,000 - $499,999" = 2,
+                "$500,000 - $999,999" = 3,
+                "$1 Million - $4.99 Million" = 4,
+                "$5 Million - $9.99 Million" = 5,
+                "Above $10 Million" = 6
+              )
+            ),
+            condition = "input.size_level == 'individual'"
+          )
+        ),
+        bslib::card(
+          card_header("Date Range"),
+          sliderInput(
+            "date_range",
+            label = NULL,
+            min = 1989,
+            max = 2024,
+            value = c(1989, 2024),
+            step = NULL,
+            ticks = FALSE,
+            sep = "",
+            dragRange = TRUE
+          )
         )
       ),
-  bslib::navset_card_tab(
-    title =   "View Results",
-    height = "100%",
-    bslib::nav_panel(
-      "Overall",
-      layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
-        bslib::card(
-          bslib::card_body(plotOutput("plot")),
-          plot_footer
-        ),
-        bslib::card(
-          bslib::card_body(reactable::reactableOutput("table")),
-          bslib::card_body(
-            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
-          )
-        )
+      bslib::input_task_button(
+        id = "update_plot",
+        style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
+        label = "RETRIEVE DATA",
+        label_busy = "UPDATING PLOTS",
+        type = "primary"
       )
     ),
-    bslib::nav_panel(
-      "By Subsector",
-      layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
-        bslib::card(
-          bslib::card_body(plotOutput("plot_subsector")),
-          plot_footer
-        ),
-        bslib::card(
-          bslib::card_body(reactable::reactableOutput("table_subsector")),
-          bslib::card_body(
-            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+    bslib::navset_card_tab(
+      title =   "View Results",
+      height = "100%",
+      bslib::nav_panel(
+        "Overall",
+        layout_column_wrap(
+          width = NULL,
+          height = 650,
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
+          bslib::card(
+            bslib::card_body(plotOutput("plot")),
+            plot_footer
+          ),
+          bslib::card(
+            bslib::card_body(reactable::reactableOutput("table")),
+            bslib::card_body(
+              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+            )
           )
         )
-      )
-    ),
-    bslib::nav_panel(
-      "By Geography",
-      layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
-        bslib::card(
-          bslib::card_body(plotOutput("plot_geo")),
-          plot_footer
-        ),
-        bslib::card(
-          bslib::card_body(reactable::reactableOutput("table_geo")),
-          bslib::card_body(
-            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+      ),
+      bslib::nav_panel(
+        "By Subsector",
+        layout_column_wrap(
+          width = NULL,
+          height = 650,
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
+          bslib::card(
+            bslib::card_body(plotOutput("plot_subsector")),
+            plot_footer
+          ),
+          bslib::card(
+            bslib::card_body(reactable::reactableOutput("table_subsector")),
+            bslib::card_body(
+              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+            )
           )
         )
-      )
-    ),
-    bslib::nav_panel(
-      "By Asset Size",
-      layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
-        bslib::card(
-          bslib::card_body(plotOutput("plot_size")),
-          plot_footer
-        ),
-        bslib::card(
-          bslib::card_body(reactable::reactableOutput("table_size")),
-          bslib::card_body(
-            downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+      ),
+      bslib::nav_panel(
+        "By Geography",
+        layout_column_wrap(
+          width = NULL,
+          height = 650,
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
+          bslib::card(
+            bslib::card_body(plotOutput("plot_geo")),
+            plot_footer
+          ),
+          bslib::card(
+            bslib::card_body(reactable::reactableOutput("table_geo")),
+            bslib::card_body(
+              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+            )
+          )
+        )
+      ),
+      bslib::nav_panel(
+        "By Asset Size",
+        layout_column_wrap(
+          width = NULL,
+          height = 650,
+          style = htmltools::css(grid_template_columns = "3fr 1fr"),
+          bslib::card(
+            bslib::card_body(plotOutput("plot_size")),
+            plot_footer
+          ),
+          bslib::card(
+            bslib::card_body(reactable::reactableOutput("table_size")),
+            bslib::card_body(
+              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
+            )
           )
         )
       )
@@ -405,7 +416,8 @@ server <- function(input, output, session) {
       subtitle <- paste(subtitle, "Subsector(s):", paste(input$subsector_select, collapse = ", "), "\n")
     }
     if (input$size_level == "individual"){
-      subtitle <- paste(subtitle, "Asset Size(s):", paste(input$size_select, collapse = ", "), "\n")
+      sizes <- unlist(purrr::map(input$size_select, .f = function(x){asset_size_ls[[x]]}))
+      subtitle <- paste(subtitle, "Asset Size(s):", paste(sizes, collapse = ", "), "\n")
     }
     print(subtitle)
   })
@@ -449,7 +461,7 @@ server <- function(input, output, session) {
           title = plot_title(),
           subtitle = plot_subtitle()
         )
-        setProgress(4, message = "Displays Results...")
+        setProgress(4, message = "Displaying Results...")
         output$plot <- renderPlot({
             plots[["default"]]
           })
@@ -458,7 +470,7 @@ server <- function(input, output, session) {
             tables[["default"]],
             outlined = TRUE,
             defaultPageSize = 10,
-            defaultColDef = colDef(align = "center")
+            defaultColDef = colDef(align = "left")
           )
         })
         # Stage 5 Displaying Results - By Subsector
@@ -484,7 +496,7 @@ server <- function(input, output, session) {
           if (input$geo_level != "all") {
             reactable(
               tables[["by_geo"]],
-              groupBy = input$geo_level,
+              groupBy = var_rename_ls[[input$geo_level]],
               outlined = TRUE,
               defaultPageSize = 10,
               defaultColDef = colDef(align = "center")
@@ -499,7 +511,7 @@ server <- function(input, output, session) {
           if (input$size_level == "individual") {
             reactable(
               tables[["by_asset_size"]],
-              groupBy = "Asset_Size",
+              groupBy = "Asset Size",
               outlined = TRUE,
               defaultPageSize = 10,
               defaultColDef = colDef(align = "center")

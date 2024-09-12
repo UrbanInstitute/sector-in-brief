@@ -7,10 +7,7 @@
 
 exec_summary <- bslib::nav_panel(
   "Executive Summary",
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "sib_style.css"),
-    tags$style(
-      HTML(
+HTML(
         "
 <!DOCTYPE html>
 <html lang='en'>
@@ -23,12 +20,12 @@ exec_summary <- bslib::nav_panel(
             font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
         h1, h2 {
             color: #2c3e50;
+            text-align: left;
         }
         ul {
             padding-left: 20px;
@@ -94,7 +91,4 @@ exec_summary <- bslib::nav_panel(
 </html>
         "
       )
-    )
-    
   )
-)
