@@ -134,7 +134,7 @@ create_plots <- function(table_ls, geo_level, subsector_level, asset_size_level,
     plot_ls[["by_geo"]] <- create_blank_plot("Select A Sub-Geographic Level From Above For Data By Geography")
   }
   if (subsector_level == "individual") {
-    subsector_title <- paste(title, ". By Subsector")
+    subsector_title <- paste(title, ", By Subsector")
     by_subsector_plot <- create_group_plot(table_ls[["by_subsector"]], "Subsector", subsector_title, subtitle)
     plot_ls[["by_subsector"]] <- by_subsector_plot
   } else {
