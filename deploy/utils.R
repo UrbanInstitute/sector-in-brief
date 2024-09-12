@@ -135,10 +135,10 @@ create_line_graph <- function(data,
       dplyr::collect()
   }
   p <- ggplot(data, aes(x = .data[[xvar]], y = .data[[yvar]])) +
-    geom_line(size = 1,
+    geom_line(size = 2,
               linetype = 1,
               color = color) +
-    geom_point(size = 2, color = color) +
+    geom_point(size = 3, color = color) +
     scale_y_continuous(
       limits = c(0, NA),
       expand = expansion(mult = 0.1),
