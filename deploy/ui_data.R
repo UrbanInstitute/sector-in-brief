@@ -1,6 +1,8 @@
 # Test data wrangling script for the number of nonprofits
 # Decide on which ones to filter on and then filter
 
+# List for renaming geographies
+
 # Data Wrangling Functions
 orgtype_query <- function(data, org, other_orgs = NULL) {
   if (org == "501(c)(3) Public Charities"){
@@ -78,20 +80,21 @@ filter_data <- function(data,
 summarise_data <- function(data, geo_level, subsector_level, asset_size_level) {
   table_default <- data |>
     group_by(Year) |>
-    summarise(Number_Of_Nonprofits = sum(num_nonprofit, na.rm = TRUE)) |>
+    summarise("Number of Nonprofits" = sum(num_nonprofit, na.rm = TRUE)) |>
     dplyr::collapse()
   table_ls <- list("default" = table_default)
   if (geo_level != "all") {
     table_by_geo <- data |>
       dplyr::group_by(Year, !!sym(geo_level)) |>
-      summarise(Number_Of_Nonprofits = sum(num_nonprofit, na.rm = TRUE)) |>
+      summarise("Number of Nonprofits" = sum(num_nonprofit, na.rm = TRUE)) |>
+      dplyr::rename_with(~var_rename_ls[[geo_level]], !!sym(geo_level)) |>
       dplyr::collapse()
     table_ls[["by_geo"]] <- table_by_geo
   }
   if (subsector_level != "all") {
     table_by_subsector <- data |>
       group_by(Year, Subsector) |>
-      summarise(Number_Of_Nonprofits = sum(num_nonprofit)) |>
+      summarise("Number of Nonprofits" = sum(num_nonprofit)) |>
       dplyr::collapse()
     table_ls[["by_subsector"]] <- table_by_subsector
   }
@@ -106,7 +109,8 @@ summarise_data <- function(data, geo_level, subsector_level, asset_size_level) {
         Asset_Size == 6 ~ "Above $10 Million",
       )) |>
       group_by(Year, Asset_Size) |>
-      summarise(Number_Of_Nonprofits = sum(num_nonprofit)) |>
+      summarise("Number of Nonprofits" = sum(num_nonprofit)) |>
+      dplyr::rename_with(~var_rename_ls[["Asset_Size"]], Asset_Size) |>
       dplyr::collapse()
     table_ls[["by_asset_size"]] <- table_by_asset_size
   }
@@ -154,7 +158,7 @@ create_plots <- function(table_ls, geo_level, subsector_level, asset_size_level,
 
 # Plotting Functions
 create_single_plot <- function(table, title, subtitle) {
-  p <- ggplot(table, aes(x = Year, y = Number_Of_Nonprofits)) +
+  p <- ggplot(table, aes(x = Year, y = `Number of Nonprofits`)) +
     geom_line(size = 1.5,
               linetype = 1,
               color = "#1696d2") +
@@ -189,7 +193,7 @@ create_single_plot <- function(table, title, subtitle) {
 }
 
 create_group_plot <- function(table, grouping_var, title, subtitle) {
-  p <- ggplot(table, aes(x = Year, y = Number_Of_Nonprofits, colour = !!sym(grouping_var))) +
+  p <- ggplot(table, aes(x = Year, y = `Number of Nonprofits`, colour = !!sym(var_rename_ls[[grouping_var]]))) +
     geom_line(size = 1.5,
               linetype = 1) +
     geom_point(size = 3, fill = "white", shape = 21, stroke = 1.2) +
