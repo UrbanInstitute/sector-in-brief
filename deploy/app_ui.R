@@ -281,12 +281,14 @@ ui <- bslib::page_navbar(
     bslib::nav_panel(
       "Overall",
       bslib::card(
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          card_body(plotOutput("plot")),
-          card_body(reactable::reactableOutput("table"))
+        bslib::card_body(
+          layout_column_wrap(
+            width = NULL,
+            height = 650,
+            style = htmltools::css(grid_template_columns = "3fr 1fr"),
+            plotOutput("plot"),
+            reactable::reactableOutput("table")
+          )
         ),
         div(
           p(tags$b("Source"), ": IRS Business Master File"),
@@ -304,8 +306,8 @@ ui <- bslib::page_navbar(
           width = NULL,
           height = 650,
           style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          card_body(plotOutput("plot_subsector")),
-          card_body(reactable::reactableOutput("table_subsector"))
+          plotOutput("plot_subsector"),
+          reactable::reactableOutput("table_subsector")
         ),
         div(
           p(tags$b("Source"), ": IRS Business Master File"),
@@ -323,8 +325,8 @@ ui <- bslib::page_navbar(
           width = NULL,
           height = 650,
           style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          card_body(plotOutput("plot_geo")),
-          card_body(reactable::reactableOutput("table_geo"))
+          plotOutput("plot_geo"),
+          reactable::reactableOutput("table_geo")
         ),
         div(
           p(tags$b("Source"), ": IRS Business Master File"),
@@ -342,8 +344,8 @@ ui <- bslib::page_navbar(
           width = NULL,
           height = 650,
           style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          card_body(plotOutput("plot_size")),
-          card_body(reactable::reactableOutput("table_size"))
+          plotOutput("plot_size"),
+          reactable::reactableOutput("table_size")
         ),
         div(
           p(tags$b("Source"), ": IRS Business Master File"),
@@ -412,97 +414,105 @@ server <- function(input, output, session) {
   })
   # Data Wrangling
   shiny::observeEvent(input$update_plot, {
-    # Stage 1 Filtering Data
-    filtered_data <- filter_data(
-      data = data,
-      org_level = input$org_level,
-      other_orgs = input$other_orgs,
-      geo_level = input$geo_level,
-      region = input$region_selector,
-      state_single = input$state_selector_single,
-      state_mult = input$state_selector_multi,
-      county = input$county_selector,
-      cbsa = input$cbsa_selector,
-      subsector_level = input$subsector_level,
-      subsectors = input$subsector_select,
-      asset_size_level = input$size_level,
-      asset_sizes = input$size_select,
-      year_start = input$date_range[1],
-      year_end = input$date_range[2]
-    )
-    # Stage 2 Creating Tables
-    tables <- summarise_data(
-      data = filtered_data,
-      geo_level = input$geo_level,
-      subsector_level = input$subsector_level,
-      asset_size_level = input$size_level
-    )
-    # Stage 3 Creating Plots
-    plots <- create_plots(
-      table_ls = tables,
-      geo_level = input$geo_level,
-      subsector_level = input$subsector_level,
-      asset_size_level = input$size_level,
-      title = plot_title(),
-      subtitle = plot_subtitle()
-    )
-    # Stage 5 Displaying Results - Overall
-    output$plot <- renderPlot({
-      plots[["default"]]
-    })
-    output$table <- renderReactable({
-      reactable(
-        tables[["default"]],
-        outlined = TRUE,
-        defaultPageSize = 10,
-        defaultColDef = colDef(align = "center")
-      )
-    })
-    # Stage 5 Displaying Results - By Subsector
-    output$plot_subsector <- renderPlot({
-      plots[["by_subsector"]]
-    })
-    output$table_subsector <- renderReactable({
-      if (input$subsector_level == "individual") {
-        reactable(
-          tables[["by_subsector"]],
-          groupBy = "Subsector",
-          outlined = TRUE,
-          defaultPageSize = 10,
-          defaultColDef = colDef(align = "center")
+    shiny::withProgress(
+      min = 1,
+      max = 5,
+      {
+        setProgress(1, message = "Filtering Data...")
+        filtered_data <- filter_data(
+          data = data,
+          org_level = input$org_level,
+          other_orgs = input$other_orgs,
+          geo_level = input$geo_level,
+          region = input$region_selector,
+          state_single = input$state_selector_single,
+          state_mult = input$state_selector_multi,
+          county = input$county_selector,
+          cbsa = input$cbsa_selector,
+          subsector_level = input$subsector_level,
+          subsectors = input$subsector_select,
+          asset_size_level = input$size_level,
+          asset_sizes = input$size_select,
+          year_start = input$date_range[1],
+          year_end = input$date_range[2]
         )
+        setProgress(2, message = "Creating Tables...")
+        tables <- summarise_data(
+          data = filtered_data,
+          geo_level = input$geo_level,
+          subsector_level = input$subsector_level,
+          asset_size_level = input$size_level
+        )
+        setProgress(3, message = "Creating Graphs...")
+        plots <- create_plots(
+          table_ls = tables,
+          geo_level = input$geo_level,
+          subsector_level = input$subsector_level,
+          asset_size_level = input$size_level,
+          title = plot_title(),
+          subtitle = plot_subtitle()
+        )
+        setProgress(4, message = "Displays Results...")
+        output$plot <- renderPlot({
+            plots[["default"]]
+          })
+        output$table <- renderReactable({
+          reactable(
+            tables[["default"]],
+            outlined = TRUE,
+            defaultPageSize = 10,
+            defaultColDef = colDef(align = "center")
+          )
+        })
+        # Stage 5 Displaying Results - By Subsector
+        output$plot_subsector <- renderPlot({
+          plots[["by_subsector"]]
+        })
+        output$table_subsector <- renderReactable({
+          if (input$subsector_level == "individual") {
+            reactable(
+              tables[["by_subsector"]],
+              groupBy = "Subsector",
+              outlined = TRUE,
+              defaultPageSize = 10,
+              defaultColDef = colDef(align = "center")
+            )
+          }
+        })
+        # Stage 5 Displaying Results - Geography
+        output$plot_geo <- renderPlot({
+          plots[["by_geo"]]
+        })
+        output$table_geo <- renderReactable({
+          if (input$geo_level != "all") {
+            reactable(
+              tables[["by_geo"]],
+              groupBy = input$geo_level,
+              outlined = TRUE,
+              defaultPageSize = 10,
+              defaultColDef = colDef(align = "center")
+            )
+          } 
+        })
+        output$plot_size <- renderPlot({
+          plots[["by_asset_size"]]
+        })
+        # Stage 5 Displaying Results - Asset Size
+        output$table_size <- renderReactable({
+          if (input$size_level == "individual") {
+            reactable(
+              tables[["by_asset_size"]],
+              groupBy = "Asset_Size",
+              outlined = TRUE,
+              defaultPageSize = 10,
+              defaultColDef = colDef(align = "center")
+            )
+          }
+        })
+        setProgress(5, message = "Done!")
       }
-    })
-    # Stage 5 Displaying Results - Geography
-    output$plot_geo <- renderPlot({
-      plots[["by_geo"]]
-    })
-    output$table_geo <- renderReactable({
-      if (input$geo_level != "all") {
-        reactable(
-          tables[["by_geo"]],
-          groupBy = input$geo_level,
-          outlined = TRUE,
-          defaultPageSize = 10,
-          defaultColDef = colDef(align = "center")
-        )
-      } 
-    })
-    output$plot_size <- renderPlot({
-      plots[["by_asset_size"]]
-    })
-    # Stage 5 Displaying Results - Asset Size
-    output$table_size <- renderReactable({
-      if (input$size_level == "individual") {
-        reactable(
-          tables[["by_asset_size"]],
-          groupBy = "Asset_Size",
-          outlined = TRUE,
-          defaultPageSize = 10,
-          defaultColDef = colDef(align = "center")
-        )
-      }
-    })
+      
+    )
   })
 
   output$downloadData <- downloadHandler(
