@@ -276,6 +276,14 @@ plot_subtitle <- function(geo_level,
                           subsector_select,
                           size_level,
                           size_select){
+  asset_size_ls <- list(
+    "1" = "Under $100,000",
+    "2" = "$100,000 - $499,999",
+    "3" = "$500,000 - $999,999",
+    "4" = "$1 Million - $4.99 Million",
+    "5" = "$5 Million - $9.99 Million",
+    "6" = "Above $10 Million"
+  )
   subtitle <- ""
   if (geo_level == "census_region"){
     subtitle <- paste("Region(s):", paste(region_selector, collapse = ", "), "\n")
