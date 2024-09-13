@@ -46,7 +46,7 @@ create_plots <- function(table_ls,
 }
 
 create_single_facet_bar_plot <- function(table, title, subtitle) {
-  p <- ggplot(table, aes(x = "Total", y = `Value`, fill = Metric)) +
+  p <- ggplot(table, aes(x = "Total", y = Value, fill = Metric)) +
     geom_col() +
     facet_wrap(~Metric) +
     scale_y_continuous(
@@ -57,7 +57,7 @@ create_single_facet_bar_plot <- function(table, title, subtitle) {
     labs(subtitle = subtitle, 
          x = "",
          title = title,
-         y = "Number of Nonprofits (millions)") +
+         y = "Dollar Amount (millions)") +
     theme_classic() +
     theme(
       text = element_text(family = "Lato"),
@@ -74,7 +74,43 @@ create_single_facet_bar_plot <- function(table, title, subtitle) {
       plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
       plot.margin = margin(t = 20, r = 20, b = 20, l = 20),
       strip.background = element_blank(),
-      strip.text=element_text(size=12, colour="black")
+      strip.text=element_text(size=12, colour="black"),
+      panel.spacing = unit(4, "lines")
+    )
+  return(p)
+}
+
+create_single_facet_bar_plot_int <- function(table, title, subtitle) {
+  p <- ggplot(table, aes(x = "Total", y = Value, fill = Metric)) +
+    geom_col() +
+    facet_wrap(~Metric, scales = "free_y") +
+    scale_y_continuous(
+      limits = c(0, NA),
+      expand = expansion(mult = 0.1),
+      labels = scales::unit_format(unit = "", scale = 1)
+    ) +
+    labs(subtitle = subtitle, 
+         x = NULL,
+         title = title,
+         y = "Number") +
+    theme_classic() +
+    theme(
+      text = element_text(family = "Lato"),
+      plot.title = element_text(size = 20, face = "bold", hjust = 0),
+      plot.subtitle = element_text(size = 16, hjust = 0, margin = margin(b = 20)),
+      axis.text = element_text(size = 12, color = "#000000"),
+      axis.title.y = element_text(size = 12, angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r = 10)),
+      axis.line.y = element_blank(),
+      axis.title.x = element_text(size = 12, margin = margin(t = 10), color = "#000000"),
+      panel.grid.major.y = element_line(color = "#dcdcdc"),
+      panel.grid.minor.y = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
+      plot.margin = margin(t = 20, r = 20, b = 20, l = 20),
+      strip.background = element_blank(),
+      strip.text=element_text(size=12, colour="black"),
+      panel.spacing = unit(4, "lines")
     )
   return(p)
 }
@@ -88,15 +124,15 @@ create_group_facet_bar_plot <- function(table, grouping_var, title, subtitle) {
       expand = expansion(mult = 0.1),
       labels = scales::unit_format(unit = "m", scale = 1e-6)
     ) +
-    labs(subtitle = subtitle, 
+    labs(subtitle = NULL, 
          x = var_rename_ls[[grouping_var]],
-         title = title,
-         y = "Number of Nonprofits (millions)") +
+         title = NULL,
+         y = "Dollar Amount (millions)") +
     theme_classic() +
     theme(
       text = element_text(family = "Lato"),
-      plot.title = element_text(size = 20, face = "bold", hjust = 0),
-      plot.subtitle = element_text(size = 16, hjust = 0, margin = margin(b = 20)),
+      plot.title = element_blank(),
+      plot.subtitle = element_blank(),
       axis.text = element_text(size = 12, color = "#000000"),
       axis.title.y = element_text(size = 12, angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r = 10)),
       axis.line.y = element_blank(),
@@ -108,7 +144,43 @@ create_group_facet_bar_plot <- function(table, grouping_var, title, subtitle) {
       plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
       plot.margin = margin(t = 20, r = 20, b = 20, l = 20),
       strip.background = element_blank(),
-      strip.text=element_text(size=12, colour="black")
+      strip.text=element_text(size=12, colour="black"),
+      panel.spacing = unit(4, "lines")
+    )
+  return(p)
+}
+
+daf_num_plot <- function(table, grouping_var, title, subtitle) {
+  p <- ggplot(table, aes(x = !!sym(var_rename_ls[[grouping_var]]), y = `Value`, fill = !!sym(var_rename_ls[[grouping_var]]))) +
+    geom_col() +
+    facet_wrap(~Metric, scales = "free_y") +
+    scale_y_continuous(
+      limits = c(0, NA),
+      expand = expansion(mult = 0.1),
+      labels = scales::unit_format(unit = "", scale = 1)
+    ) +
+    labs(subtitle = NULL, 
+         x = var_rename_ls[[grouping_var]],
+         title = NULL,
+         y = "Number") +
+    theme_classic() +
+    theme(
+      text = element_text(family = "Lato"),
+      plot.title = element_blank(),
+      plot.subtitle = element_blank(),
+      axis.text = element_text(size = 12, color = "#000000"),
+      axis.title.y = element_text(size = 12, angle = 90, vjust = 0.5, hjust = 0.5, margin = margin(r = 10)),
+      axis.line.y = element_blank(),
+      axis.title.x = element_text(size = 12, margin = margin(t = 10), color = "#000000"),
+      panel.grid.major.y = element_line(color = "#dcdcdc"),
+      panel.grid.minor.y = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      plot.caption = element_text(hjust = 0, size = 10, color = "grey50", margin = margin(t = 20)),
+      plot.margin = margin(t = 20, r = 20, b = 20, l = 20),
+      strip.background = element_blank(),
+      strip.text=element_text(size=12, colour="black"),
+      panel.spacing = unit(4, "lines")
     )
   return(p)
 }
@@ -192,4 +264,40 @@ create_blank_plot <- function(title) {
       plot.margin = margin(t = 20, r = 20, b = 20, l = 20)
     )
   return(p)
+}
+
+plot_subtitle <- function(geo_level,
+                          region_selector,
+                          state_selector_single,
+                          state_selector_multi,
+                          county_selector,
+                          cbsa_selector,
+                          subsector_level,
+                          subsector_select,
+                          size_level,
+                          size_select){
+  subtitle <- ""
+  if (geo_level == "census_region"){
+    subtitle <- paste("Region(s):", paste(region_selector, collapse = ", "), "\n")
+  }
+  else if (geo_level == "CENSUS_STATE_ABBR"){
+    subtitle <- paste("State(s):", paste(state_selector_multi, collapse = ", "), "\n")
+  }
+  else if (geo_level == "CENSUS_COUNTY_NAME"){
+    subtitle <- paste("State:", state_selector_single, "\n",
+                      "County(s):", paste(county_selector, collapse = ", "), "\n")
+  }
+  else if (geo_level == "CENSUS_CBSA_NAME"){
+    subtitle <- paste("State:", state_selector_single, "\n",
+                      "Metro/Micro Area(s):", paste(cbsa_selector, collapse = ", "), "\n")
+  }
+  
+  if (subsector_level == "individual"){
+    subtitle <- paste(subtitle, "Subsector(s):", paste(subsector_select, collapse = ", "), "\n")
+  }
+  if (size_level == "individual"){
+    sizes <- unlist(purrr::map(size_select, .f = function(x){asset_size_ls[[x]]}))
+    subtitle <- paste(subtitle, "Asset Size(s):", paste(sizes, collapse = ", "), "\n")
+  }
+  return(subtitle)
 }

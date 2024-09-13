@@ -16,7 +16,7 @@ daf_frontend <- bslib::nav_panel(
       bslib::card(
         card_header("Organization Type"),
         selectizeInput(
-          "org_level",
+          "daf_org_level",
           label = NULL,
           choices = c("501(c)(3) Public Charities",
                       "501(c)(4) Social Welfare Organizations", 
@@ -25,7 +25,7 @@ daf_frontend <- bslib::nav_panel(
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            "other_orgs",
+            "daf_other_orgs",
             width = "500px",
             label = "Other 501(c) Types",
             choices = org_type_choices,
@@ -36,7 +36,7 @@ daf_frontend <- bslib::nav_panel(
       bslib::card(
         card_header("Geography"),
         radioButtons(
-          "geo_level",
+          "daf_geo_level",
           inline = FALSE,
           "Select Geographic Level",
           choices = list("Entire USA" = "all", 
@@ -47,56 +47,56 @@ daf_frontend <- bslib::nav_panel(
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            "region_selector",
+            "daf_region_selector",
             label = "Select Region(s)",
             choices = c("Northeast", "South", "Midwest", "West"),
             multiple = TRUE
           ),
-          condition = "input.geo_level == 'census_region'"
+          condition = "input.daf_geo_level == 'census_region'"
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            "state_selector_multi",
+            "daf_state_selector_multi",
             label = "Select State(s)",
             choices = state_choices,
             multiple = TRUE
           ),
-          condition = "input.geo_level == 'CENSUS_STATE_ABBR'"
+          condition = "input.daf_geo_level == 'CENSUS_STATE_ABBR'"
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            "state_selector_single",
+            "daf_state_selector_single",
             label = "Select State",
             choices = state_choices,
             multiple = FALSE
           ),
-          condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_selector == 'CENSUS_CBSA_NAME'"
+          condition = "input.daf_geo_level == 'CENSUS_COUNTY_NAME' | input.daf_geo_level == 'CENSUS_CBSA_NAME'"
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            "county_selector",
+            "daf_county_selector",
             label = "Select Counties",
             choices = NULL,
             multiple = TRUE,
             options = list(maxItems = 5)
           ),
-          condition = "input.geo_level == 'CENSUS_COUNTY_NAME'"
+          condition = "input.daf_geo_level == 'CENSUS_COUNTY_NAME'"
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            "cbsa_selector",
+            "daf_cbsa_selector",
             label = "Select Metro/Micro Area(s)",
             choices = NULL,
             multiple = TRUE,
             options = list(maxItems = 5)
           ),
-          condition = "input.geo_level == 'CENSUS_CBSA_NAME'"
+          condition = "input.daf_geo_level == 'CENSUS_CBSA_NAME'"
         )
       ),
       bslib::card(
         bslib::card_header("Subsector"),
         shiny::radioButtons(
-          inputId = "subsector_level",
+          inputId = "daf_subsector_level",
           label = NULL,
           inline = TRUE,
           choices = list(
@@ -106,7 +106,7 @@ daf_frontend <- bslib::nav_panel(
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            inputId = "subsector_select",
+            inputId = "daf_subsector_select",
             label = NULL,
             choices = list(
               "Arts, Culture, and Humanities" = "ART", 
@@ -123,13 +123,13 @@ daf_frontend <- bslib::nav_panel(
             multiple = TRUE,
             options = list(maxItems = 5)
           ),
-          condition = "input.subsector_level == 'individual'"
+          condition = "input.daf_subsector_level == 'individual'"
         )
       ),
       bslib::card(
         card_header("Asset Size"),
         shiny::radioButtons(
-          inputId = "size_level",
+          inputId = "daf_size_level",
           label = NULL,
           inline = TRUE,
           choices = list(
@@ -139,7 +139,7 @@ daf_frontend <- bslib::nav_panel(
         ),
         shiny::conditionalPanel(
           selectizeInput(
-            inputId = "size_select",
+            inputId = "daf_size_select",
             label = NULL,
             multiple = TRUE,
             options = list(maxItems = 5),
@@ -152,7 +152,7 @@ daf_frontend <- bslib::nav_panel(
               "Above $10 Million" = 6
             )
           ),
-          condition = "input.size_level == 'individual'"
+          condition = "input.daf_size_level == 'individual'"
         )
       )
     ),
@@ -170,11 +170,10 @@ daf_frontend <- bslib::nav_panel(
     bslib::nav_panel(
       "Overall",
       layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        width = 1,
         bslib::card(
           bslib::card_body(plotOutput("daf_plot_overall")),
+          bslib::card_body(plotOutput("plot_overall_num_daf")),
           daf_footer
         ),
         bslib::card(
@@ -188,11 +187,10 @@ daf_frontend <- bslib::nav_panel(
     bslib::nav_panel(
       "By Subsector",
       layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        width = 1,
         bslib::card(
           bslib::card_body(plotOutput("daf_plot_subsector")),
+          bslib::card_body(plotOutput("plot_subsector_num_daf")),
           daf_footer
         ),
         bslib::card(
@@ -206,11 +204,10 @@ daf_frontend <- bslib::nav_panel(
     bslib::nav_panel(
       "By Geography",
       layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        width = 1,
         bslib::card(
           bslib::card_body(plotOutput("daf_plot_geo")),
+          bslib::card_body(plotOutput("plot_geo_num_daf")),
           daf_footer
         ),
         bslib::card(
@@ -224,11 +221,10 @@ daf_frontend <- bslib::nav_panel(
     bslib::nav_panel(
       "By Asset Size",
       layout_column_wrap(
-        width = NULL,
-        height = 650,
-        style = htmltools::css(grid_template_columns = "3fr 1fr"),
+        width = 1,
         bslib::card(
           bslib::card_body(plotOutput("daf_plot_size")),
+          bslib::card_body(plotOutput("plot_size_num_daf")),
           daf_footer
         ),
         bslib::card(
@@ -313,7 +309,7 @@ num_nonprofit_frontend <-   bslib::nav_panel(
             choices = state_choices,
             multiple = FALSE
           ),
-          condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_selector == 'CENSUS_CBSA_NAME'"
+          condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_level == 'CENSUS_CBSA_NAME'"
         ),
         shiny::conditionalPanel(
           selectizeInput(
@@ -428,10 +424,11 @@ num_nonprofit_frontend <-   bslib::nav_panel(
       "Overall",
       layout_column_wrap(
         width = NULL,
-        height = 650,
+        heigh = 650,
         style = htmltools::css(grid_template_columns = "3fr 1fr"),
         bslib::card(
-          bslib::card_body(plotOutput("num_nonprofit_plot_overall")),
+          bslib::card_body(shinycssloaders::withSpinner(plotOutput("num_nonprofit_plot_overall",
+                                                                   height = "500px"))),
           plot_footer
         ),
         bslib::card(

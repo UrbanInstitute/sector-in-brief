@@ -82,16 +82,16 @@ filter_data <- function(data,
 }
 
 # Function to summarise data
-summarise_data <- function(data, groupby_var, geo_level, subsector_level, asset_size_level) {
+summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_level, asset_size_level) {
   table_default <- data |>
     group_by(!!sym(groupby_var)) |>
-    summarise("Value" = sum(Value, na.rm = TRUE)) |>
+    summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
     dplyr::collapse()
   table_ls <- list("default" = table_default)
   if (geo_level != "all") {
     table_by_geo <- data |>
       dplyr::group_by(!!sym(groupby_var), !!sym(geo_level)) |>
-      summarise("Value" = sum(Value, na.rm = TRUE)) |>
+      summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
       dplyr::rename_with(~var_rename_ls[[geo_level]], !!sym(geo_level)) |>
       dplyr::collapse()
     table_ls[["by_geo"]] <- table_by_geo
@@ -99,7 +99,7 @@ summarise_data <- function(data, groupby_var, geo_level, subsector_level, asset_
   if (subsector_level != "all") {
     table_by_subsector <- data |>
       group_by(!!sym(groupby_var), Subsector) |>
-      summarise("Value" = sum(Value, na.rm = TRUE)) |>
+      summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
       dplyr::collapse()
     table_ls[["by_subsector"]] <- table_by_subsector
   }
@@ -114,7 +114,7 @@ summarise_data <- function(data, groupby_var, geo_level, subsector_level, asset_
         Asset_Size == 6 ~ "Above $10 Million",
       )) |>
       group_by(!!sym(groupby_var), Asset_Size) |>
-      summarise("Value" = sum(Value, na.rm = TRUE)) |>
+      summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
       dplyr::rename_with(~var_rename_ls[["Asset_Size"]], Asset_Size) |>
       dplyr::collapse()
     table_ls[["by_asset_size"]] <- table_by_asset_size

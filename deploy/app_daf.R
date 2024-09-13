@@ -18,8 +18,10 @@ library(reactable)
 source("executive_summary.R")
 source("assets/assets.R")
 source("assets/choices.R")
-source("daf_data.R")
+source("data.R")
+source("plots.R")
 source("utils.R")
+source("frontend.R")
 
 asset_size_ls <- list(
   "1" = "Under $100,000",
@@ -109,247 +111,7 @@ ui <- bslib::page_navbar(
     )
   ),
   exec_summary,
-  bslib::nav_panel(
-    title = "Donor Advised Funds",
-    div(
-      br(),
-      h2("Donor Advised Funds", class = "pageheader"),
-      br(),
-      h3("A donor advised fund (DAF) is a tool that allows individuals and organizations to contribute money and non-cash assets to a giving account, receive an immediate tax deduction, and recommend grants to nonprofits at a later time."),
-      br()
-    ),
-    bslib::card(
-      card_header("Step 1: Filters"),
-      title = "",
-      bslib::layout_columns(
-        bslib::card(
-          card_header("Organization Type"),
-          selectizeInput(
-            "org_level",
-            label = NULL,
-            choices = c("501(c)(3) Public Charities",
-                        "501(c)(4) Social Welfare Organizations", 
-                        "Other Nonprofits",
-                        "All Nonprofits")
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              "other_orgs",
-              width = "500px",
-              label = "Other 501(c) Types",
-              choices = org_type_choices,
-            ),
-            condition = "input.org_level == 'Other Nonprofits'"
-          )
-        ),
-        bslib::card(
-          card_header("Geography"),
-          radioButtons(
-            "geo_level",
-            inline = FALSE,
-            "Select Geographic Level",
-            choices = list("Entire USA" = "all", 
-                           "Region" = "census_region", 
-                           "State" = "CENSUS_STATE_ABBR", 
-                           "County" = "CENSUS_COUNTY_NAME", 
-                           "Metro/Micro Area" = "CENSUS_CBSA_NAME")
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              "region_selector",
-              label = "Select Region(s)",
-              choices = c("Northeast", "South", "Midwest", "West"),
-              multiple = TRUE
-            ),
-            condition = "input.geo_level == 'census_region'"
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              "state_selector_multi",
-              label = "Select State(s)",
-              choices = state_choices,
-              multiple = TRUE
-            ),
-            condition = "input.geo_level == 'CENSUS_STATE_ABBR'"
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              "state_selector_single",
-              label = "Select State",
-              choices = state_choices,
-              multiple = FALSE
-            ),
-            condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_selector == 'CENSUS_CBSA_NAME'"
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              "county_selector",
-              label = "Select Counties",
-              choices = NULL,
-              multiple = TRUE,
-              options = list(maxItems = 5)
-            ),
-            condition = "input.geo_level == 'CENSUS_COUNTY_NAME'"
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              "cbsa_selector",
-              label = "Select Metro/Micro Area(s)",
-              choices = NULL,
-              multiple = TRUE,
-              options = list(maxItems = 5)
-            ),
-            condition = "input.geo_level == 'CENSUS_CBSA_NAME'"
-          )
-        ),
-        bslib::card(
-          bslib::card_header("Subsector"),
-          shiny::radioButtons(
-            inputId = "subsector_level",
-            label = NULL,
-            inline = TRUE,
-            choices = list(
-              "All Subsectors" = "all", 
-              "Individual Subsectors" = "individual"
-            )
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              inputId = "subsector_select",
-              label = NULL,
-              choices = list(
-                "Arts, Culture, and Humanities" = "ART", 
-                "Education (minus Universities)" = "EDU",
-                "Health (minus Hospitals)" = "HEL",
-                "Human Services" = "HMS",
-                "International, Foreign Affairs" = "IFA",
-                "Public, Societal Benefit" = "PSB",
-                "Religion Related" = "REL",
-                "Mutual/Membership Benefit" = "MMB",
-                "Universities" = "UNI",
-                "Hospitals" = "HOS"
-              ),
-              multiple = TRUE,
-              options = list(maxItems = 5)
-            ),
-            condition = "input.subsector_level == 'individual'"
-          )
-        ),
-        bslib::card(
-          card_header("Asset Size"),
-          shiny::radioButtons(
-            inputId = "size_level",
-            label = NULL,
-            inline = TRUE,
-            choices = list(
-              "All Asset Sizes" = "all", 
-              "Individual Asset Sizes" = "individual"
-            )
-          ),
-          shiny::conditionalPanel(
-            selectizeInput(
-              inputId = "size_select",
-              label = NULL,
-              multiple = TRUE,
-              options = list(maxItems = 5),
-              choices = list(
-                "Under $100,000" = 1,
-                "$100,000 - $499,999" = 2,
-                "$500,000 - $999,999" = 3,
-                "$1 Million - $4.99 Million" = 4,
-                "$5 Million - $9.99 Million" = 5,
-                "Above $10 Million" = 6
-              )
-            ),
-            condition = "input.size_level == 'individual'"
-          )
-        )
-      ),
-      bslib::input_task_button(
-        id = "update_plot",
-        style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
-        label = "RETRIEVE DATA",
-        label_busy = "UPDATING PLOTS",
-        type = "primary"
-      )
-    ),
-    bslib::navset_card_tab(
-      title =   "View Results",
-      height = "100%",
-      bslib::nav_panel(
-        "Overall",
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          bslib::card(
-            bslib::card_body(plotOutput("plot")),
-            daf_footer
-          ),
-          bslib::card(
-            bslib::card_body(reactable::reactableOutput("table")),
-            bslib::card_body(
-              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
-            )
-          )
-        )
-      ),
-      bslib::nav_panel(
-        "By Subsector",
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          bslib::card(
-            bslib::card_body(plotOutput("plot_subsector")),
-            daf_footer
-          ),
-          bslib::card(
-            bslib::card_body(reactable::reactableOutput("table_subsector")),
-            bslib::card_body(
-              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
-            )
-          )
-        )
-      ),
-      bslib::nav_panel(
-        "By Geography",
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          bslib::card(
-            bslib::card_body(plotOutput("plot_geo")),
-            daf_footer
-          ),
-          bslib::card(
-            bslib::card_body(reactable::reactableOutput("table_geo")),
-            bslib::card_body(
-              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
-            )
-          )
-        )
-      ),
-      bslib::nav_panel(
-        "By Asset Size",
-        layout_column_wrap(
-          width = NULL,
-          height = 650,
-          style = htmltools::css(grid_template_columns = "3fr 1fr"),
-          bslib::card(
-            bslib::card_body(plotOutput("plot_size")),
-            daf_footer
-          ),
-          bslib::card(
-            bslib::card_body(reactable::reactableOutput("table_size")),
-            bslib::card_body(
-              downloadButton("downloadData", "DOWNLOAD", class = "btn-download", icon = NULL)
-            )
-          )
-        )
-      )
-    )
-  )
+  daf_frontend
 )
 
 server <- function(input, output, session) {
@@ -369,9 +131,9 @@ server <- function(input, output, session) {
   plot_title <- reactive({
     
     if (input$org_level == "Other Nonprofits") {
-      title <- paste("Donor Advised Funds For:", input$other_orgs)
+      title <- paste("Donor Advised Funds In", input$other_orgs)
     } else {
-      title <- paste("Donor Advised Funds For:", input$org_level)
+      title <- paste("Donor Advised Funds In", input$org_level)
     }
   })
   
@@ -402,7 +164,7 @@ server <- function(input, output, session) {
     print(subtitle)
   })
   # Data Wrangling
-  shiny::observeEvent(input$update_plot, {
+  shiny::observeEvent(input$process_daf_data, {
     shiny::withProgress(
       min = 1,
       max = 5,
@@ -421,11 +183,16 @@ server <- function(input, output, session) {
           subsector_level = input$subsector_level,
           subsectors = input$subsector_select,
           asset_size_level = input$size_level,
-          asset_sizes = input$size_select
+          asset_sizes = input$size_select,
+          time_series = FALSE,
+          year_start = NULL,
+          year_end = NULL
         )
         setProgress(2, message = "Creating Tables...")
         tables <- summarise_data(
           data = filtered_data,
+          groupby_var = "Metric",
+          sum_var = "Value",
           geo_level = input$geo_level,
           subsector_level = input$subsector_level,
           asset_size_level = input$size_level
@@ -433,6 +200,8 @@ server <- function(input, output, session) {
         setProgress(3, message = "Creating Graphs...")
         plots <- create_plots(
           table_ls = tables,
+          single_plot_func = create_single_facet_bar_plot,
+          group_plot_func = create_group_facet_bar_plot,
           geo_level = input$geo_level,
           subsector_level = input$subsector_level,
           asset_size_level = input$size_level,
@@ -440,10 +209,10 @@ server <- function(input, output, session) {
           subtitle = plot_subtitle()
         )
         setProgress(4, message = "Displaying Results...")
-        output$plot <- renderPlot({
+        output$daf_plot_overall <- renderPlot({
           plots[["default"]]
         })
-        output$table <- renderReactable({
+        output$daf_table_overall <- renderReactable({
           reactable(
             tables[["default"]],
             outlined = TRUE,
@@ -452,10 +221,10 @@ server <- function(input, output, session) {
           )
         })
         # Stage 5 Displaying Results - By Subsector
-        output$plot_subsector <- renderPlot({
+        output$daf_plot_subsector <- renderPlot({
           plots[["by_subsector"]]
         })
-        output$table_subsector <- renderReactable({
+        output$daf_table_subsector <- renderReactable({
           if (input$subsector_level == "individual") {
             reactable(
               tables[["by_subsector"]],
@@ -467,10 +236,10 @@ server <- function(input, output, session) {
           }
         })
         # Stage 5 Displaying Results - Geography
-        output$plot_geo <- renderPlot({
+        output$daf_plot_geo <- renderPlot({
           plots[["by_geo"]]
         })
-        output$table_geo <- renderReactable({
+        output$daf_table_geo <- renderReactable({
           if (input$geo_level != "all") {
             reactable(
               tables[["by_geo"]],
@@ -481,11 +250,11 @@ server <- function(input, output, session) {
             )
           } 
         })
-        output$plot_size <- renderPlot({
+        output$daf_plot_size <- renderPlot({
           plots[["by_asset_size"]]
         })
         # Stage 5 Displaying Results - Asset Size
-        output$table_size <- renderReactable({
+        output$daf_table_size <- renderReactable({
           if (input$size_level == "individual") {
             reactable(
               tables[["by_asset_size"]],

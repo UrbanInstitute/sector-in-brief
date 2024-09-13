@@ -238,7 +238,7 @@ data.table::setnafill(efile_daf, fill = 0, cols = daf_cols)
 data.table::setnafill(efile_assets_df, fill = 0, cols = c("F9_10_ASSET_TOT_EOY"))
 # Replace negative values with 0
 efile_daf[, (daf_cols) := lapply(.SD, function(x){x <- ifelse(x < 0, 0, x)}), .SDcols = daf_cols]
-efile_assets_df[, F9_10_ASSET_TOT_EOY := ifelse(F9_10_ASSET_TOT_EOY < 0, 0, F9_10_ASSET_TOT_EOY)]
+efile_assets_df[, F9_10_ASSET_TOT_EOY := ifelse(F9_10_ASSET_TOT_EOY < 0, 0, F9_10_ASSET_TOT_EOY), by = 1:nrow(efile_assets_df)]
 # Perform summations
 efile_daf <- efile_daf[, .(
   EIN2 = EIN2,
