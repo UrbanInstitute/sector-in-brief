@@ -14,6 +14,15 @@ library(ggplot2)
 library(urbnthemes)
 library(reactable)
 
+asset_size_ls <- list(
+  "1" = "Under $100,000",
+  "2" = "$100,000 - $499,999",
+  "3" = "$500,000 - $999,999",
+  "4" = "$1 Million - $4.99 Million",
+  "5" = "$5 Million - $9.99 Million",
+  "6" = "Above $10 Million"
+)
+
 # Load assets
 source("executive_summary.R")
 source("assets/assets.R")
@@ -23,15 +32,7 @@ source("plots.R")
 source("utils.R")
 source("frontend.R")
 source("backend.R")
-
-asset_size_ls <- list(
-  "1" = "Under $100,000",
-  "2" = "$100,000 - $499,999",
-  "3" = "$500,000 - $999,999",
-  "4" = "$1 Million - $4.99 Million",
-  "5" = "$5 Million - $9.99 Million",
-  "6" = "Above $10 Million"
-)
+source("daf_data.R")
 
 # Load Data
 data <- arrow::read_parquet("data/num_nonprofits_full.parquet") |>
