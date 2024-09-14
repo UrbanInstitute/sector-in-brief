@@ -25,7 +25,7 @@ daf_frontend <- bslib::nav_panel(
             label = "Other 501(c) Types",
             choices = org_type_choices,
           ),
-          condition = "input.org_level == 'Other Nonprofits'"
+          condition = "input.daf_org_level == 'Other Nonprofits'"
         )
       ),
       bslib::card(
