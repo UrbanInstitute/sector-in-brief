@@ -1,3 +1,5 @@
+source("R/org_filters.R")
+
 # Consolidate frontends
 
 daf_frontend <- bslib::nav_panel(
@@ -15,14 +17,7 @@ daf_frontend <- bslib::nav_panel(
     bslib::layout_columns(
       bslib::card(
         card_header("Organization Type"),
-        selectizeInput(
-          "daf_org_level",
-          label = NULL,
-          choices = c("501(c)(3) Public Charities",
-                      "501(c)(4) Social Welfare Organizations", 
-                      "Other Nonprofits",
-                      "All Nonprofits")
-        ),
+        org_filters$daf_org_filter,
         shiny::conditionalPanel(
           selectizeInput(
             "daf_other_orgs",
@@ -253,15 +248,7 @@ num_nonprofit_frontend <-   bslib::nav_panel(
     bslib::layout_columns(
       bslib::card(
         card_header("Organization Type"),
-        selectizeInput(
-          "org_level",
-          label = NULL,
-          choices = c("501(c)(3) Public Charities", 
-                      "501(c)(3) Private Foundations", 
-                      "501(c)(4) Social Welfare Organizations", 
-                      "Other Nonprofits",
-                      "All Nonprofits")
-        ),
+        org_filters$nn_org_filter,
         shiny::conditionalPanel(
           selectizeInput(
             "other_orgs",
