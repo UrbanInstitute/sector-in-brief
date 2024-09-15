@@ -17,14 +17,9 @@ daf_frontend <- bslib::nav_panel(
     bslib::layout_columns(
       bslib::card(
         card_header("Organization Type"),
-        org_filters$daf_org_filter,
+        org_filters$daf_org_level,
         shiny::conditionalPanel(
-          selectizeInput(
-            "daf_other_orgs",
-            width = "500px",
-            label = "Other 501(c) Types",
-            choices = org_type_choices,
-          ),
+          org_filters$daf_other_orgs,
           condition = "input.daf_org_level == 'Other Nonprofits'"
         )
       ),
@@ -192,16 +187,9 @@ num_nonprofit_frontend <-   bslib::nav_panel(
     bslib::layout_columns(
       bslib::card(
         card_header("Organization Type"),
-        org_filters$nn_org_filter,
-        shiny::conditionalPanel(
-          selectizeInput(
-            "other_orgs",
-            width = "500px",
-            label = "Other 501(c) Types",
-            choices = org_type_choices,
-          ),
-          condition = "input.org_level == 'Other Nonprofits'"
-        )
+        org_filters$nn_org_level,
+        shiny::conditionalPanel(org_filters$nn_other_orgs,
+                                condition = "input.nn_org_level == 'Other Nonprofits'")
       ),
       bslib::card(
         card_header("Geography"),

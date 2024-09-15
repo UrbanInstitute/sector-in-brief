@@ -127,10 +127,10 @@ server <- function(input, output, session) {
   # Plot Header
   plot_title_num_nonprofit <- reactive({
     
-    if (input$org_level == "Other Nonprofits") {
-      title <- paste("Number of", input$other_orgs)
+    if (input$nn_org_level == "Other Nonprofits") {
+      title <- paste("Number of", input$nn_other_orgs)
     } else {
-      title <- paste("Number of", input$org_level)
+      title <- paste("Number of", input$nn_org_level)
     }
     if (input$date_range[1] != input$date_range[2] ) {
       title <- paste(title, ",", input$date_range[1], "-", input$date_range[2])
@@ -164,8 +164,8 @@ server <- function(input, output, session) {
         setProgress(1, message = "Filtering Data...")
         filtered_data <- filter_data(
           data = data,
-          org_level = input$org_level,
-          other_orgs = input$other_orgs,
+          org_level = input$nn_org_level,
+          other_orgs = input$nn_other_orgs,
           geo_level = input$geo_level,
           region = input$region_selector,
           state_single = input$state_selector_single,
