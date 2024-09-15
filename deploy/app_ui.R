@@ -30,6 +30,7 @@ source("assets/choices.R")
 source("data.R")
 source("plots.R")
 source("utils.R")
+source("R/geo_filter_module.R")
 source("frontend.R")
 source("backend.R")
 source("daf_data.R")
@@ -119,29 +120,9 @@ ui <- bslib::page_navbar(
 )
 
 server <- function(input, output, session) {
-  # Updating filter inputs
-  observeEvent(input$state_selector_single, {
-    updateSelectizeInput(session, 
-                         "county_selector",
-                         choices = geo_df$CENSUS_COUNTY_NAME[geo_df$CENSUS_STATE_ABBR == input$state_selector_single],
-                         server = TRUE)
-    updateSelectizeInput(session, 
-                         "cbsa_selector",
-                         choices = geo_df$CENSUS_CBSA_NAME[geo_df$CENSUS_STATE_ABBR == input$state_selector_single],
-                         server = TRUE)
-    
-  })
-  observeEvent(input$daf_state_selector_single, {
-    updateSelectizeInput(session, 
-                         "daf_county_selector",
-                         choices = geo_df$CENSUS_COUNTY_NAME[geo_df$CENSUS_STATE_ABBR == input$daf_state_selector_single],
-                         server = TRUE)
-    updateSelectizeInput(session, 
-                         "daf_cbsa_selector",
-                         choices = geo_df$CENSUS_CBSA_NAME[geo_df$CENSUS_STATE_ABBR == input$daf_state_selector_single],
-                         server = TRUE)
-    
-  })
+  # Server modules to update county and cbsa options based on State
+  geo_filter_server("nn_geo_filter", geo_df)
+  geo_filter_server("daf_geo_filter", geo_df)
   
   # Plot Header
   plot_title_num_nonprofit <- reactive({
@@ -158,13 +139,7 @@ server <- function(input, output, session) {
     }
   })
   
-  plot_title_daf <- reactive({
-    if (input$daf_org_level == "Other Nonprofits") {
-      title <- paste("Donor Advised Funds In", input$daf_other_orgs)
-    } else {
-      title <- paste("Donor Advised Funds In", input$daf_org_level)
-    }
-  })
+
   
   
   # Data Wrangling
@@ -289,6 +264,7 @@ server <- function(input, output, session) {
   })
   
   shiny::observeEvent(input$process_daf_data, {
+    plot_title_daf <- plot_title_daf(input$daf_other_orgs, input$daf_org_level)
     plot_subtitle_daf <-
       plot_subtitle(
         geo_level = input$daf_geo_level,
@@ -368,7 +344,7 @@ server <- function(input, output, session) {
           geo_level = input$daf_geo_level,
           subsector_level = input$daf_subsector_level,
           asset_size_level = input$daf_size_level,
-          title = plot_title_daf(),
+          title = plot_title_daf,
           subtitle = plot_subtitle_daf
         )
         plots_daf_num <- create_plots(
@@ -378,7 +354,7 @@ server <- function(input, output, session) {
           geo_level = input$daf_geo_level,
           subsector_level = input$daf_subsector_level,
           asset_size_level = input$daf_size_level,
-          title = plot_title_daf(),
+          title = plot_title_daf,
           subtitle = plot_subtitle_daf
         )
         setProgress(4, message = "Displaying Results...")

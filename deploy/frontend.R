@@ -30,63 +30,7 @@ daf_frontend <- bslib::nav_panel(
       ),
       bslib::card(
         card_header("Geography"),
-        radioButtons(
-          "daf_geo_level",
-          inline = FALSE,
-          "Select Geographic Level",
-          choices = list("Entire USA" = "all", 
-                         "Region" = "census_region", 
-                         "State" = "CENSUS_STATE_ABBR", 
-                         "County" = "CENSUS_COUNTY_NAME", 
-                         "Metro/Micro Area" = "CENSUS_CBSA_NAME")
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "daf_region_selector",
-            label = "Select Region(s)",
-            choices = c("Northeast", "South", "Midwest", "West"),
-            multiple = TRUE
-          ),
-          condition = "input.daf_geo_level == 'census_region'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "daf_state_selector_multi",
-            label = "Select State(s)",
-            choices = state_choices,
-            multiple = TRUE
-          ),
-          condition = "input.daf_geo_level == 'CENSUS_STATE_ABBR'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "daf_state_selector_single",
-            label = "Select State",
-            choices = state_choices,
-            multiple = FALSE
-          ),
-          condition = "input.daf_geo_level == 'CENSUS_COUNTY_NAME' | input.daf_geo_level == 'CENSUS_CBSA_NAME'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "daf_county_selector",
-            label = "Select Counties",
-            choices = NULL,
-            multiple = TRUE,
-            options = list(maxItems = 5)
-          ),
-          condition = "input.daf_geo_level == 'CENSUS_COUNTY_NAME'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "daf_cbsa_selector",
-            label = "Select Metro/Micro Area(s)",
-            choices = NULL,
-            multiple = TRUE,
-            options = list(maxItems = 5)
-          ),
-          condition = "input.daf_geo_level == 'CENSUS_CBSA_NAME'"
-        )
+        geo_filter_ui("daf_geo_filter", state_choices),
       ),
       bslib::card(
         bslib::card_header("Subsector"),
@@ -261,63 +205,7 @@ num_nonprofit_frontend <-   bslib::nav_panel(
       ),
       bslib::card(
         card_header("Geography"),
-        radioButtons(
-          "geo_level",
-          inline = FALSE,
-          "Select Geographic Level",
-          choices = list("Entire USA" = "all", 
-                         "Region" = "census_region", 
-                         "State" = "CENSUS_STATE_ABBR", 
-                         "County" = "CENSUS_COUNTY_NAME", 
-                         "Metro/Micro Area" = "CENSUS_CBSA_NAME")
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "region_selector",
-            label = "Select Region(s)",
-            choices = c("Northeast", "South", "Midwest", "West"),
-            multiple = TRUE
-          ),
-          condition = "input.geo_level == 'census_region'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "state_selector_multi",
-            label = "Select State(s)",
-            choices = state_choices,
-            multiple = TRUE
-          ),
-          condition = "input.geo_level == 'CENSUS_STATE_ABBR'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "state_selector_single",
-            label = "Select State",
-            choices = state_choices,
-            multiple = FALSE
-          ),
-          condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_level == 'CENSUS_CBSA_NAME'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "county_selector",
-            label = "Select Counties",
-            choices = NULL,
-            multiple = TRUE,
-            options = list(maxItems = 5)
-          ),
-          condition = "input.geo_level == 'CENSUS_COUNTY_NAME'"
-        ),
-        shiny::conditionalPanel(
-          selectizeInput(
-            "cbsa_selector",
-            label = "Select Metro/Micro Area(s)",
-            choices = NULL,
-            multiple = TRUE,
-            options = list(maxItems = 5)
-          ),
-          condition = "input.geo_level == 'CENSUS_CBSA_NAME'"
-        )
+        geo_filter_ui("nn_geo_filter", state_choices),
       ),
       bslib::card(
         bslib::card_header("Subsector"),
