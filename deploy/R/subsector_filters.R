@@ -20,12 +20,12 @@ subsector_choices <- list(
 
 radio_button_vars <- tibble::tribble(
   ~ inputId, ~ label, ~ inline, ~ choices,
-  "nn_subsector_level", NULL, TRUE, subsector_level_choices
+  "subsector_level", NULL, TRUE, subsector_level_choices
 )
 
 selectize_vars <- tibble::tribble(
   ~ inputId, ~ label, ~ choices, ~ multiple, ~ options,
-  "nn_subsector_select", NULL, subsector_choices, TRUE, list(maxItems = 5)
+  "subsector_select", NULL, subsector_choices, TRUE, list(maxItems = 5)
 )
 
 subsector_level_filter <- build_filters(radioButtons, radio_button_vars)
