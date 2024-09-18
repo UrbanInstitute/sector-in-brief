@@ -1,4 +1,3 @@
-
 # Dataa Wrangling
 daf <- arrow::read_parquet("data/efile_daf_metrics.parquet")
 
@@ -22,9 +21,10 @@ daf <- daf |>
   ) |>
   mutate(
     Organization_Type = ifelse(Organization_Type == "501(c)(3)", "501(c)(3) Public Charities", Organization_Type),
+    Year = 2021
   )
 
-daf_int64 <- daf |>
+daf_contributions <- daf |>
   dplyr::select(
     CENSUS_STATE_ABBR,
     Subsector,
@@ -34,12 +34,39 @@ daf_int64 <- daf |>
     CENSUS_STATE_ABBR,
     CENSUS_COUNTY_NAME,
     CENSUS_CBSA_NAME,
-    `Total Contributions`,
-    `Total Grants`,
+    Year,
+    `Total Contributions`
+  )
+
+daf_grants <- daf |>
+  dplyr::select(
+    CENSUS_STATE_ABBR,
+    Subsector,
+    Organization_Type,
+    Asset_Size,
+    census_region,
+    CENSUS_STATE_ABBR,
+    CENSUS_COUNTY_NAME,
+    CENSUS_CBSA_NAME,
+    Year,
+    `Total Grants`
+  )
+
+daf_value <- daf |>
+  dplyr::select(
+    CENSUS_STATE_ABBR,
+    Subsector,
+    Organization_Type,
+    Asset_Size,
+    census_region,
+    CENSUS_STATE_ABBR,
+    CENSUS_COUNTY_NAME,
+    CENSUS_CBSA_NAME,
+    Year,
     `Total Value`
   )
 
-daf_int <- daf |>
+daf_number <- daf |>
   dplyr::select(
     CENSUS_STATE_ABBR,
     Subsector,
@@ -49,20 +76,20 @@ daf_int <- daf |>
     CENSUS_STATE_ABBR,
     CENSUS_COUNTY_NAME,
     CENSUS_CBSA_NAME,
-    `Number of DAFs`,
+    Year,
+    `Number of DAFs`
+  )
+
+daf_proportion <- daf |>
+  dplyr::select(
+    CENSUS_STATE_ABBR,
+    Subsector,
+    Organization_Type,
+    Asset_Size,
+    census_region,
+    CENSUS_STATE_ABBR,
+    CENSUS_COUNTY_NAME,
+    CENSUS_CBSA_NAME,
+    Year,
     `Proportion of Nonprofits with DAFs`
-  )
-
-daf_int64 <- daf_int64 |>
-  pivot_longer(
-    cols = c("Total Contributions", "Total Grants", "Total Value"),
-    names_to = "Metric",
-    values_to = "Value"
-  )
-
-daf_int <- daf_int |>
-  pivot_longer(
-    cols = c("Number of DAFs", "Proportion of Nonprofits with DAFs"),
-    names_to = "Metric",
-    values_to = "Value"
   )
