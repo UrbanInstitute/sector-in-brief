@@ -77,6 +77,7 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
         })
         output$table_subsector <- renderReactable({
           if (input$subsector_level == "individual") {
+            shiny::req(tables[["by_subsector"]])
             reactable(
               tables[["by_subsector"]],
               groupBy = "Subsector",
