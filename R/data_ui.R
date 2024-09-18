@@ -89,14 +89,13 @@ data_ui <- function(id, org_type_choices, date) {
           )
         )
       }
-      ,
-      bslib::input_task_button(
-        id = shiny::NS(id, "process_data"),
-        style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
-        label = "RETRIEVE DATA",
-        label_busy = "UPDATING PLOTS",
-        type = "primary"
-      )
+    ),
+    bslib::input_task_button(
+      id = shiny::NS(id, "process_data"),
+      style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
+      label = "RETRIEVE DATA",
+      label_busy = "UPDATING PLOTS",
+      type = "primary"
     )
   )
 }
