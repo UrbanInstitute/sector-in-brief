@@ -24,10 +24,9 @@ asset_size_ls <- list(
 )
 
 # Load assets
-source("executive_summary.R")
+source("R/executive_summary.R")
 source("assets/assets.R")
 source("assets/choices.R")
-source("utils.R")
 source("R/org_filters.R")
 source("R/geo_filter_module.R")
 source("R/plot_ui.R")
@@ -168,12 +167,13 @@ ui <- bslib::page_navbar(
 server <- function(input, output, session) {
   # Server modules to update county and cbsa options based on State
   # Data Wrangling
-  data_server("nn_data", geo_df, num_nonprofit_data, "Year", "Number of Nonprofits", create_single_line_plot, create_group_line_plot)
-  data_server("daf_contributions", geo_df, daf_contributions, "Year", "Total Contributions", create_single_col_plot, create_group_col_plot, FALSE)
-  data_server("daf_num", geo_df, daf_number, "Year", "Number of DAFs", create_single_col_plot, create_group_col_plot, FALSE)
-  data_server("daf_proportion", geo_df, daf_proportion, "Year", "DAF Proportion", create_single_col_plot, create_group_col_plot, FALSE)
-  data_server("daf_value", geo_df, daf_value, "Year", "Total Value", create_single_col_plot, create_group_col_plot, FALSE)
-  data_server("daf_grants", geo_df, daf_grants, "Year", "Total Grants", create_single_col_plot, create_group_col_plot, FALSE)
+  daf_title_prefix <- "Donor Advised Funds For: "
+  data_server("nn_data", geo_df, num_nonprofit_data, "Year", "Number of Nonprofits", create_single_line_plot, create_group_line_plot, "Number of")
+  data_server("daf_contributions", geo_df, daf_contributions, "Year", "Total Contributions", create_single_col_plot, create_group_col_plot, daf_title_prefix,FALSE)
+  data_server("daf_num", geo_df, daf_number, "Year", "Number of DAFs", create_single_col_plot, create_group_col_plot, daf_title_prefix, FALSE)
+  data_server("daf_proportion", geo_df, daf_proportion, "Year", "DAF Proportion", create_single_col_plot, create_group_col_plot, daf_title_prefix, FALSE)
+  data_server("daf_value", geo_df, daf_value, "Year", "Total Value", create_single_col_plot, create_group_col_plot, daf_title_prefix, FALSE)
+  data_server("daf_grants", geo_df, daf_grants, "Year", "Total Grants", create_single_col_plot, create_group_col_plot, daf_title_prefix, FALSE)
   
   
   output$downloadData <- downloadHandler(

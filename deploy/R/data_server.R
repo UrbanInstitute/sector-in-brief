@@ -1,8 +1,8 @@
-data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func, group_plot_func, time_series=TRUE) {
+data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func, group_plot_func, title_prefix, time_series=TRUE) {
   shiny::moduleServer(id, function(input, output, session) {
     geo_filters <- geo_filter_server("geo_filter", geo_df)
     observeEvent(input$process_data, {
-      title <- create_plot_title(input$org_level, input$other_orgs, input$date_range, time_series)
+      title <- create_plot_title(input$org_level, input$other_orgs, input$date_range, time_series, title_prefix)
       print("title created")
       subtitle <- create_plot_subtitle(
         geo_filters$geo_level(),
