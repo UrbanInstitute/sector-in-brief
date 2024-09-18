@@ -80,16 +80,25 @@ geo_filter_ui <- function(id, state_choices) {
 geo_filter_server <- function(id, geo_df) {
   shiny::moduleServer(id, function(input, output, session) {
     observeEvent(input$state_selector_single, {
-      update_nestgeo(session,
+      substate_filter(session,
                      "county_selector",
                      input$state_selector_single,
                      geo_df,
                      "CENSUS_COUNTY_NAME")
-      update_nestgeo(session,
+      substate_filter(session,
                      "cbsa_selector",
                      input$state_selector_single,
                      geo_df,
                      "CENSUS_CBSA_NAME")
     })
+    list(
+      state_selector_single = reactive(input$state_selector_single),
+      state_selector_multi = reactive(input$state_selector_multi),
+      region_selector = reactive(input$region_selector),
+      geo_level = reactive(input$geo_level),
+      county_selector = reactive(input$county_selector),
+      cbsa_selector = reactive(input$cbsa_selector)
+    )
+    
   })
 }
