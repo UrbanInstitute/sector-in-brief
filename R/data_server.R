@@ -3,7 +3,6 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
     geo_filters <- geo_filter_server("geo_filter", geo_df)
     observeEvent(input$process_data, {
       title <- create_plot_title(input$org_level, input$other_orgs, input$date_range, time_series, title_prefix)
-      print("title created")
       subtitle <- create_plot_subtitle(
         geo_filters$geo_level(),
         geo_filters$region_selector(),
@@ -36,7 +35,6 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           year_start = input$date_range[1],
           year_end = input$date_range[2]
         )
-        print("data filtered")
         setProgress(2, message = "Creating Tables...")
         tables <- summarise_data(
           data = filtered_data,
@@ -46,7 +44,6 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           subsector_level = input$subsector_level,
           asset_size_level = input$size_level
         )
-        print("tables created")
         setProgress(3, message = "Creating Graphs...")
         plots <- create_plots(
           table_ls = tables,
