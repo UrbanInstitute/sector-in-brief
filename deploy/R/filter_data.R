@@ -1,4 +1,8 @@
 # Function to filter data
+source("R/orgtype_query.R")
+source("R/geo_query.R")
+source("R/general_query.R")
+
 filter_data <- function(data,
                         org_level = "All Nonprofits",
                         other_orgs = NULL,
@@ -22,10 +26,10 @@ filter_data <- function(data,
     data <- geo_query(data, geo_level, region, state_single, state_mult, county, cbsa)
   }
   if (subsector_level != "all") {
-    data <- subsector_query(data, subsectors)
+    data <- general_query(data, "Subsector",subsectors)
   }
   if (asset_size_level != "all") {
-    data <- filter_asset_size(data, asset_sizes)
+    data <- general_query(data, "Asset Size", asset_sizes)
   }
   if (time_series){
     if (year_start != 1989) {
