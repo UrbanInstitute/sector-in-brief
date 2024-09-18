@@ -27,17 +27,14 @@ asset_size_ls <- list(
 source("executive_summary.R")
 source("assets/assets.R")
 source("assets/choices.R")
-source("data.R")
-source("plots.R")
 source("utils.R")
+source("R/org_filters.R")
 source("R/geo_filter_module.R")
-source("frontend.R")
-source("backend.R")
-source("daf_data.R")
-
-# Load Data
-data <- arrow::read_parquet("data/num_nonprofits_full.parquet") |>
-  dplyr::rename("Number of Nonprofits" = num_nonprofit)
+source("R/plot_ui.R")
+source("R/data.R")
+source("R/create_plot_title.R")
+source("R/data_server.R")
+source("R/data_ui.R")
 
 # Theme
 # Shiny Theme
@@ -115,323 +112,70 @@ ui <- bslib::page_navbar(
     )
   ),
   exec_summary,
-  num_nonprofit_frontend,
-  daf_frontend
+  bslib::nav_panel(
+    title = "Number",
+    div(
+      br(),
+      h2("Total number of nonprofits", class = "pageheader"),
+      br(),
+      h3("The number of organizations that are registered with the Internal Revenue Service (IRS)."),
+      br()
+    ),
+    data_ui("nn_data", org_type_choices, date = TRUE),
+    plot_ui("nn_data")
+  ),
+  bslib::nav_panel(
+    title = "Donor Advised Funds",
+    div(
+      br(),
+      h2("Donor Advised Funds", class = "pageheader"),
+      br(),
+      h3("A donor advised fund (DAF) is a tool that allows individuals and organizations to contribute money and non-cash assets to a giving account, receive an immediate tax deduction, and recommend grants to nonprofits at a later time."),
+      br()
+    ),
+    bslib::navset_pill(
+      bslib::nav_panel(
+        "Total Contributions",
+        data_ui("daf_contributions", org_type_choices, date = FALSE),
+        plot_ui("daf_contributions")
+      ),
+      bslib::nav_panel(
+        "Total Grants",
+        data_ui("daf_grants", org_type_choices, date = FALSE),
+        plot_ui("daf_grants")
+      ),
+      bslib::nav_panel(
+        "Total Value",
+        data_ui("daf_value", org_type_choices, date = FALSE),
+        plot_ui("daf_value")
+      ),
+      bslib::nav_panel(
+        "Number of DAFs",
+        data_ui("daf_num", org_type_choices, date = FALSE),
+        plot_ui("daf_num")
+      ),
+      bslib::nav_panel(
+        "DAF Proprotion",
+        data_ui("daf_proportion", org_type_choices, date = FALSE),
+        plot_ui("daf_proportion")
+      )
+      
+    )
+    
+  )
 )
 
 server <- function(input, output, session) {
   # Server modules to update county and cbsa options based on State
-  geo_filter_server("nn_geo_filter", geo_df)
-  geo_filter_server("daf_geo_filter", geo_df)
-  
-  # Plot Header
-  plot_title_num_nonprofit <- reactive({
-    
-    if (input$nn_org_level == "Other Nonprofits") {
-      title <- paste("Number of", input$nn_other_orgs)
-    } else {
-      title <- paste("Number of", input$nn_org_level)
-    }
-    if (input$date_range[1] != input$date_range[2] ) {
-      title <- paste(title, ",", input$date_range[1], "-", input$date_range[2])
-    } else {
-      title <- paste(title, ",", input$date_range[1])
-    }
-  })
-  
-
-  
-  
   # Data Wrangling
-  shiny::observeEvent(input$process_num_nonprofit_data, {
-    plot_subtitle_num_nonprofit <-
-      plot_subtitle(
-        geo_level = input$geo_level,
-        region_selector = input$region_selector,
-        state_selector_single = input$state_selector_single,
-        state_selector_multi = input$state_selector_multi,
-        county_selector = input$county_selector,
-        cbsa_selector = input$cbsa_selector,
-        subsector_level = input$subsector_level,
-        subsector_select = input$subsector_select,
-        size_level = input$size_level,
-        size_select = input$size_select
-      )
-    shiny::withProgress(
-      min = 1,
-      max = 5,
-      {
-        setProgress(1, message = "Filtering Data...")
-        filtered_data <- filter_data(
-          data = data,
-          org_level = input$nn_org_level,
-          other_orgs = input$nn_other_orgs,
-          geo_level = input$geo_level,
-          region = input$region_selector,
-          state_single = input$state_selector_single,
-          state_mult = input$state_selector_multi,
-          county = input$county_selector,
-          cbsa = input$cbsa_selector,
-          subsector_level = input$subsector_level,
-          subsectors = input$subsector_select,
-          asset_size_level = input$size_level,
-          asset_sizes = input$size_select,
-          time_series = TRUE,
-          year_start = input$date_range[1],
-          year_end = input$date_range[2]
-        )
-        setProgress(2, message = "Creating Tables...")
-        tables <- summarise_data(
-          data = filtered_data,
-          groupby_var = "Year",
-          sum_var = "Number of Nonprofits",
-          geo_level = input$geo_level,
-          subsector_level = input$subsector_level,
-          asset_size_level = input$size_level
-        )
-        setProgress(3, message = "Creating Graphs...")
-        plots <- create_plots(
-          table_ls = tables,
-          single_plot_func = create_single_line_plot,
-          group_plot_func = create_group_line_plot,
-          geo_level = input$geo_level,
-          subsector_level = input$subsector_level,
-          asset_size_level = input$size_level,
-          title = plot_title_num_nonprofit(),
-          subtitle = plot_subtitle_num_nonprofit
-        )
-        setProgress(4, message = "Displaying Results...")
-        output$num_nonprofit_plot_overall <- renderPlot({
-          plots[["default"]]
-        })
-        output$num_nonprofit_table_overall <- renderReactable({
-          reactable(
-            tables[["default"]],
-            outlined = TRUE,
-            defaultPageSize = 10,
-            defaultColDef = colDef(align = "left")
-          )
-        })
-        # Stage 5 Displaying Results - By Subsector
-        output$num_nonprofit_plot_subsector <- renderPlot({
-          plots[["by_subsector"]]
-        })
-        output$num_nonprofit_table_subsector <- renderReactable({
-          if (input$subsector_level == "individual") {
-            reactable(
-              tables[["by_subsector"]],
-              groupBy = "Subsector",
-              outlined = TRUE,
-              defaultPageSize = 10,
-              defaultColDef = colDef(align = "center")
-            )
-          }
-        })
-        # Stage 5 Displaying Results - Geography
-        output$num_nonprofit_plot_geo <- renderPlot({
-          plots[["by_geo"]]
-        })
-        output$num_nonprofit_table_geo <- renderReactable({
-          if (input$geo_level != "all") {
-            reactable(
-              tables[["by_geo"]],
-              groupBy = var_rename_ls[[input$geo_level]],
-              outlined = TRUE,
-              defaultPageSize = 10,
-              defaultColDef = colDef(align = "center")
-            )
-          } 
-        })
-        output$num_nonprofit_plot_size <- renderPlot({
-          plots[["by_asset_size"]]
-        })
-        # Stage 5 Displaying Results - Asset Size
-        output$num_nonprofit_table_size <- renderReactable({
-          if (input$size_level == "individual") {
-            reactable(
-              tables[["by_asset_size"]],
-              groupBy = "Asset Size",
-              outlined = TRUE,
-              defaultPageSize = 10,
-              defaultColDef = colDef(align = "center")
-            )
-          }
-        })
-        setProgress(5, message = "Done!")
-      }
-      
-    )
-  })
+  data_server("nn_data", geo_df, num_nonprofit_data, "Year", "Number of Nonprofits", create_single_line_plot, create_group_line_plot)
+  data_server("daf_contributions", geo_df, daf_contributions, "Year", "Total Contributions", create_single_col_plot, create_group_col_plot, FALSE)
+  data_server("daf_num", geo_df, daf_number, "Year", "Number of DAFs", create_single_col_plot, create_group_col_plot, FALSE)
+  data_server("daf_proportion", geo_df, daf_proportion, "Year", "DAF Proportion", create_single_col_plot, create_group_col_plot, FALSE)
+  data_server("daf_value", geo_df, daf_value, "Year", "Total Value", create_single_col_plot, create_group_col_plot, FALSE)
+  data_server("daf_grants", geo_df, daf_grants, "Year", "Total Grants", create_single_col_plot, create_group_col_plot, FALSE)
   
-  shiny::observeEvent(input$process_daf_data, {
-    plot_title_daf <- plot_title_daf(input$daf_other_orgs, input$daf_org_level)
-    plot_subtitle_daf <-
-      plot_subtitle(
-        geo_level = input$daf_geo_level,
-        region_selector = input$daf_region_selector,
-        state_selector_single = input$daf_state_selector_single,
-        state_selector_multi = input$daf_state_selector_multi,
-        county_selector = input$daf_county_selector,
-        cbsa_selector = input$daf_cbsa_selector,
-        subsector_level = input$daf_subsector_level,
-        subsector_select = input$daf_subsector_select,
-        size_level = input$daf_size_level,
-        size_select = input$daf_size_select
-      )
-    shiny::withProgress(
-      min = 1,
-      max = 5,
-      {
-        setProgress(1, message = "Filtering Data...")
-        filtered_data <- filter_data(
-          data = daf_int64,
-          org_level = input$daf_org_level,
-          other_orgs = input$daf_other_orgs,
-          geo_level = input$daf_geo_level,
-          region = input$daf_region_selector,
-          state_single = input$daf_state_selector_single,
-          state_mult = input$daf_state_selector_multi,
-          county = input$daf_county_selector,
-          cbsa = input$daf_cbsa_selector,
-          subsector_level = input$daf_subsector_level,
-          subsectors = input$daf_subsector_select,
-          asset_size_level = input$daf_size_level,
-          asset_sizes = input$daf_size_select,
-          time_series = FALSE,
-          year_start = NULL,
-          year_end = NULL
-        )
-        filtered_data_daf_num <- filter_data(
-          data = daf_int,
-          org_level = input$daf_org_level,
-          other_orgs = input$daf_other_orgs,
-          geo_level = input$daf_geo_level,
-          region = input$daf_region_selector,
-          state_single = input$daf_state_selector_single,
-          state_mult = input$daf_state_selector_multi,
-          county = input$daf_county_selector,
-          cbsa = input$daf_cbsa_selector,
-          subsector_level = input$daf_subsector_level,
-          subsectors = input$daf_subsector_select,
-          asset_size_level = input$daf_size_level,
-          asset_sizes = input$daf_size_select,
-          time_series = FALSE,
-          year_start = NULL,
-          year_end = NULL
-        )
-        setProgress(2, message = "Creating Tables...")
-        tables <- summarise_data(
-          data = filtered_data,
-          groupby_var = "Metric",
-          sum_var = "Value",
-          geo_level = input$daf_geo_level,
-          subsector_level = input$daf_subsector_level,
-          asset_size_level = input$daf_size_level
-        )
-        tables_daf_num <- summarise_data(
-          data = filtered_data_daf_num,
-          groupby_var = "Metric",
-          sum_var = "Value",
-          geo_level = input$daf_geo_level,
-          subsector_level = input$daf_subsector_level,
-          asset_size_level = input$daf_size_level
-        )
-        setProgress(3, message = "Creating Graphs...")
-        plots <- create_plots(
-          table_ls = tables,
-          single_plot_func = create_single_facet_bar_plot,
-          group_plot_func = create_group_facet_bar_plot,
-          geo_level = input$daf_geo_level,
-          subsector_level = input$daf_subsector_level,
-          asset_size_level = input$daf_size_level,
-          title = plot_title_daf,
-          subtitle = plot_subtitle_daf
-        )
-        plots_daf_num <- create_plots(
-          table_ls = tables_daf_num,
-          single_plot_func = create_single_facet_bar_plot_int,
-          group_plot_func = daf_num_plot,
-          geo_level = input$daf_geo_level,
-          subsector_level = input$daf_subsector_level,
-          asset_size_level = input$daf_size_level,
-          title = plot_title_daf,
-          subtitle = plot_subtitle_daf
-        )
-        setProgress(4, message = "Displaying Results...")
-        output$daf_plot_overall <- renderPlot({
-          plots[["default"]]
-        })
-        output$daf_table_overall <- renderReactable({
-          reactable(
-            tables[["default"]],
-            outlined = TRUE,
-            defaultPageSize = 10,
-            defaultColDef = colDef(align = "left")
-          )
-        })
-        output$plot_overall_num_daf <- renderPlot({
-          plots_daf_num[["default"]]
-        })
-        # Stage 5 Displaying Results - By Subsector
-        output$daf_plot_subsector <- renderPlot({
-          plots[["by_subsector"]]
-        })
-        output$daf_table_subsector <- renderReactable({
-          if (input$daf_subsector_level == "individual") {
-            reactable(
-              tables[["by_subsector"]],
-              groupBy = "Subsector",
-              outlined = TRUE,
-              defaultPageSize = 10,
-              defaultColDef = colDef(align = "center")
-            )
-          }
-        })
-        output$plot_subsector_num_daf <- renderPlot({
-          plots_daf_num[["by_subsector"]]
-        })
-        # Stage 5 Displaying Results - Geography
-        output$daf_plot_geo <- renderPlot({
-          plots[["by_geo"]]
-        })
-        output$daf_table_geo <- renderReactable({
-          if (input$daf_geo_level != "all") {
-            reactable(
-              tables[["by_geo"]],
-              groupBy = var_rename_ls[[input$daf_geo_level]],
-              outlined = TRUE,
-              defaultPageSize = 10,
-              defaultColDef = colDef(align = "center")
-            )
-          } 
-        })
-        output$plot_geo_num_daf <- renderPlot({
-          plots_daf_num[["by_geo"]]
-        })
-        output$daf_plot_size <- renderPlot({
-          plots[["by_asset_size"]]
-        })
-        # Stage 5 Displaying Results - Asset Size
-        output$daf_table_size <- renderReactable({
-          if (input$daf_size_level == "individual") {
-            reactable(
-              tables[["by_asset_size"]],
-              groupBy = "Asset Size",
-              outlined = TRUE,
-              defaultPageSize = 10,
-              defaultColDef = colDef(align = "center")
-            )
-          }
-        })
-        output$plot_size_num_daf <- renderPlot({
-          plots_daf_num[["by_asset_size"]]
-        })
-        setProgress(5, message = "Done!")
-      }
-      
-    )
-  })
-
+  
   output$downloadData <- downloadHandler(
     filename = "nonprofit.csv",
     content = function(file) {
