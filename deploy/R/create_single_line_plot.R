@@ -1,5 +1,5 @@
-create_single_line_plot <- function(table, title, subtitle) {
-  p <- ggplot(table, aes(x = Year, y = `Number of Nonprofits`)) +
+create_single_line_plot <- function(table, title, subtitle, yvar) {
+  p <- ggplot(table, aes(x = Year, y = !!sym(yvar))) +
     geom_line(size = 1.5,
               linetype = 1,
               color = "#1696d2") +
