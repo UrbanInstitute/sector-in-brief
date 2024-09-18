@@ -1,4 +1,8 @@
-# Dataa Wrangling
+# Data Wrangling
+num_nonprofit_data <- arrow::read_parquet("data/num_nonprofits_full.parquet") |>
+  dplyr::rename("Number of Nonprofits" = num_nonprofit)
+
+
 daf <- arrow::read_parquet("data/efile_daf_metrics.parquet")
 
 # Create Region Column - need to add into 00_data_download
