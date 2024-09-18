@@ -24,16 +24,8 @@ asset_size_ls <- list(
 )
 
 # Load assets
-source("R/executive_summary.R")
 source("assets/assets.R")
 source("assets/choices.R")
-source("R/org_filters.R")
-source("R/geo_filter_module.R")
-source("R/plot_ui.R")
-source("R/data.R")
-source("R/create_plot_title.R")
-source("R/data_server.R")
-source("R/data_ui.R")
 
 # Theme
 # Shiny Theme
