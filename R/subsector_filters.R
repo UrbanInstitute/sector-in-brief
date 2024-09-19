@@ -1,5 +1,3 @@
-source("R/build_filters.R")
-
 subsector_level_choices <- list(
   "All Subsectors" = "all", 
   "Individual Subsectors" = "individual"
