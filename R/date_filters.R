@@ -7,4 +7,4 @@ vars <- tibble::tribble(
   "date_range", NULL, 1989, 2024, c(1989, 2024), NULL, FALSE, "", TRUE
 )
 
-date_filter <- build_filters(sliderInput, vars)
+date_filter <- build_filters(shiny::sliderInput, vars)
