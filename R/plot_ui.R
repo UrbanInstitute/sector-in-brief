@@ -1,6 +1,3 @@
-source("R/create_group_col_plot.R")
-source("R/create_single_col_plot.R")
-
 plot_ui <- function(id) {
   bslib::navset_card_tab(
     title =   "View Results",
