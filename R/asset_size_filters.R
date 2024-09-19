@@ -1,5 +1,3 @@
-source("R/build_filters.R")
-
 size_level_choices <- list(
   "All Asset Sizes" = "all", 
   "Individual Asset Sizes" = "individual"
@@ -24,5 +22,5 @@ selectize_vars <- tibble::tribble(
   "size_select", NULL, size_choices, TRUE, list(maxItems = 5)
 )
 
-size_level_filter <- build_filters(radioButtons, radio_button_vars)
-size_select_filter <- build_filters(selectizeInput, selectize_vars)
+size_level_filter <- build_filters(shiny::radioButtons, radio_button_vars)
+size_select_filter <- build_filters(shiny::selectizeInput, selectize_vars)
