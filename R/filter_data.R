@@ -1,8 +1,4 @@
 # Function to filter data
-source("R/orgtype_query.R")
-source("R/geo_query.R")
-source("R/general_query.R")
-
 filter_data <- function(data,
                         org_level = "All Nonprofits",
                         other_orgs = NULL,
