@@ -3,20 +3,20 @@ summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_leve
   table_default <- data |>
     group_by(!!sym(groupby_var)) |>
     summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
-    dplyr::collapse()
+    dplyr::collect()
   table_ls <- list("default" = table_default)
   if (geo_level != "all") {
     table_by_geo <- data |>
       dplyr::group_by(!!sym(groupby_var), !!sym(geo_level)) |>
       summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
-      dplyr::collapse()
+      dplyr::collect()
     table_ls[["by_geo"]] <- table_by_geo
   }
   if (subsector_level != "all") {
     table_by_subsector <- data |>
       group_by(!!sym(groupby_var), Subsector) |>
       summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
-      dplyr::collapse()
+      dplyr::collect()
     table_ls[["by_subsector"]] <- table_by_subsector
   }
   if (asset_size_level != "all") {
@@ -31,7 +31,7 @@ summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_leve
         `Asset Size` == 5 ~ "$5 Million - $9.99 Million",
         `Asset Size` == 6 ~ "Above $10 Million",
       )) |>
-      dplyr::collapse()
+      dplyr::collect()
     table_ls[["by_asset_size"]] <- table_by_asset_size
   }
   return(table_ls)
