@@ -83,10 +83,3 @@ state_choices <- list(
   "Wisconsin" = "WI",
   "Wyoming" = "WY"
 )
-
-var_rename_ls = list("census_region" = "Census Region", 
-                     "CENSUS_STATE_ABBR" = "Census State", 
-                     "CENSUS_COUNTY_NAME" = "Census County", 
-                     "CENSUS_CBSA_NAME" = "Census Metro/Micro Area",
-                     "Subsector" = "Subsector",
-                     "Asset_Size" = "Asset Size")
