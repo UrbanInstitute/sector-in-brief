@@ -5,7 +5,7 @@ data_ui <- function(id, org_type_choices, date) {
     title = "",
     bslib::layout_columns(
       bslib::card(
-        card_header("Organization Type"),
+        bslib::card_header("Organization Type"),
         shiny::selectizeInput(
           inputId = shiny::NS(id, "org_level"),
           label = NULL,
