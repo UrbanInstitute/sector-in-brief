@@ -4,17 +4,15 @@
 # parquet formats
 # Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
 # Date Created: 2024-07-02
-# Date Last Edited: 2024-08-12
+# Date Last Edited: 2024-09-18
 # Details:
-# (1) - CORE and BMF Data for sector size and workforce pages
+# (1) - Assets
 # (2) - Private Foundation Data
 # (3) - EFile Data
 # (4) - Aggregated Data
 # (5) - Upload to S3
 
 # Packages
-library(blscrapeR)
-library(data.table)
 library(dplyr)
 library(arrow)
 library(purrr)
@@ -22,9 +20,15 @@ library(purrr)
 # Helper Scripts
 source("R/utils.R")
 
-# (1) - Processing Form 990 Data Needed for sector in brief
+# AWS Credentials
+
+# (1) - Create Assets Data
 
 # (1.1) - CORE data
+bucket <- arrow::s3_bucket("nccsdata")
+asset_path <- bucket$path("sector-in-brief/Total_Assets.parquet")
+assets <- arrow::read_parquet(asset_path)
+arrow::write_parquet(assets, "data/Total_Assets.parquet")
 
 core_subset_url <-   "https://nccsdata.s3.amazonaws.com/harmonized/sector-in-brief/core_metrics.csv"
 core_subset_dt <- data.table::fread(core_subset_url, key = "EIN2")

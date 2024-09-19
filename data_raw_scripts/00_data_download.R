@@ -541,3 +541,45 @@ daf_final <- daf |>
   dplyr::collapse()
 arrow::write_parquet(daf_final, "sector-in-brief/daf.parquet")
 
+# Save all files to disk
+Sys.setenv("AWS_ACCESS_KEY_ID" = "xxx",
+           "AWS_SECRET_ACCESS_KEY" = "xxx",
+           "AWS_SESSION_TOKEN" = "xxx",
+           "AWS_DEFAULT_REGION" = "us-east-1")
+
+pq_files <- c(
+  "Total_Assets.parquet",
+  "Total_Revenues.parquet",
+  "Total_Expenses.parquet",
+  "pf_grants.parquet",
+  "number_nonprofits.parquet",
+  "daf.parquet"
+)
+
+purrr::map(
+  pq_files,
+  function(file) {
+    bucket <- arrow::s3_bucket("nccsdata")
+    asset_path <- paste0("sector-in-brief/", file)
+    asset_path <- bucket$path(asset_path)
+    df <- arrow::read_parquet(asset_path)
+    arrow::write_parquet(df, paste0("data/", file))
+  },
+  .progress = TRUE
+)
+
+csv_files <- c(
+  "nested_geographies.csv"
+)
+
+purrr::map(
+  csv_files,
+  function(file) {
+    bucket <- arrow::s3_bucket("nccsdata")
+    asset_path <- paste0("sector-in-brief/", file)
+    asset_path <- bucket$path(asset_path)
+    df <- arrow::read_csv_arrow(asset_path)
+    arrow::write_csv_arrow(df, paste0("data/", file))
+  },
+  .progress = TRUE
+)
