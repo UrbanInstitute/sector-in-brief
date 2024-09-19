@@ -1,5 +1,5 @@
-create_single_line_plot <- function(table, title, subtitle, yvar) {
-  p <- ggplot(table, aes(x = Year, y = !!sym(yvar))) +
+create_single_line_plot <- function(table, title, subtitle, yvar, xvar) {
+  p <- ggplot(table, aes(x = !!sym(xvar), y = !!sym(yvar))) +
     geom_line(size = 1.5,
               linetype = 1,
               color = "#1696d2") +
@@ -10,7 +10,7 @@ create_single_line_plot <- function(table, title, subtitle, yvar) {
       labels = scales::unit_format(unit = "m", scale = 1e-6)
     ) +
     labs(subtitle = subtitle, 
-         x = "Fiscal Year",
+         x = xvar,
          title = title,
          y = "Number of Nonprofits (millions)") +
     scale_x_continuous(breaks = seq(1990, 2024, 4)) +

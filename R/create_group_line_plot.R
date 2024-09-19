@@ -1,5 +1,5 @@
-create_group_line_plot <- function(table, grouping_var, title, subtitle, yvar) {
-  p <- ggplot(table, aes(x = Year, y = !!sym(yvar), colour = !!sym(grouping_var))) +
+create_group_line_plot <- function(table, grouping_var, title, subtitle, yvar, xvar) {
+  p <- ggplot(table, aes(x = !!sym(xvar), y = !!sym(yvar), colour = !!sym(grouping_var))) +
     geom_line(size = 1.5,
               linetype = 1) +
     geom_point(size = 3, fill = "white", shape = 21, stroke = 1.2) +
@@ -9,7 +9,7 @@ create_group_line_plot <- function(table, grouping_var, title, subtitle, yvar) {
       labels = scales::unit_format(unit = "m", scale = 1e-6)
     ) +
     labs(subtitle = subtitle, 
-         x = "Fiscal Year",
+         x = xvar,
          title = title,
          y = "Number of Nonprofits (millions)") +
     scale_x_continuous(breaks = seq(1990, 2024, 4)) +

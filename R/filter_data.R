@@ -18,7 +18,8 @@ filter_data <- function(data,
                         asset_sizes = NULL,
                         time_series = FALSE,
                         year_start = NULL,
-                        year_end = NULL) {
+                        year_end = NULL,
+                        yearvar = "Year") {
   if (org_level != "All Nonprofits") {
     data <- orgtype_query(data, org_level, other_orgs)
   }
@@ -33,10 +34,10 @@ filter_data <- function(data,
   }
   if (time_series){
     if (year_start != 1989) {
-      data <- filter(data, Year >= year_start)
+      data <- filter(data, !!sym(yearvar) >= year_start)
     }
     if (year_end != 2024) {
-      data <- filter(data, Year <= year_end)
+      data <- filter(data, !!sym(yearvar) <= year_end)
     }
   }
   return(data)

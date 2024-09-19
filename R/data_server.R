@@ -33,7 +33,8 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           asset_sizes = input$size_select,
           time_series = time_series,
           year_start = input$date_range[1],
-          year_end = input$date_range[2]
+          year_end = input$date_range[2],
+          yearvar = groupby_var
         )
         setProgress(2, message = "Creating Tables...")
         tables <- summarise_data(
@@ -54,7 +55,8 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           asset_size_level = input$size_level,
           title = title,
           subtitle = subtitle,
-          yvar = sum_var
+          yvar = sum_var,
+          xvar = groupby_var
         )
         setProgress(4, message = "Displaying Results...")
         output$plot_overall <- renderPlot({

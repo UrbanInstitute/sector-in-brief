@@ -92,6 +92,20 @@ app <- function(...) {
         plot_ui("nn_data")
       ),
       bslib::nav_panel(
+        title = "Assets",
+        div(
+          br(),
+          h2("Total Assets", class = "pageheader"),
+          br(),
+          h3(
+            "Total assets – The aggregate value of everything nonprofits own."
+          ),
+          br()
+        ),
+        data_ui("assets", org_type_choices, date = TRUE),
+        plot_ui("assets")
+      ),
+      bslib::nav_panel(
         title = "Donor Advised Funds",
         div(
           br(),
@@ -156,6 +170,16 @@ app <- function(...) {
       create_single_line_plot,
       create_group_line_plot,
       "Number of"
+    )
+    data_server(
+      "assets",
+      geo_df,
+      assets,
+      "Tax Year",
+      "Total Assets",
+      create_single_line_plot,
+      create_group_line_plot,
+      "Total Assets For: "
     )
     data_server(
       "daf_contributions",

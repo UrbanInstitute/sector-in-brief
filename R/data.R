@@ -1,5 +1,5 @@
 # Data Loading
-num_nonprofit_data <- arrow::read_parquet("data/num_nonprofits.parquet")
+num_nonprofit_data <- arrow::read_parquet("data/number_nonprofits.parquet")
 geo_df <- arrow::read_csv_arrow("data/nested_geographies.csv")
 daf <- arrow::read_parquet("data/daf.parquet") |>
   dplyr::mutate(
