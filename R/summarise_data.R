@@ -9,7 +9,6 @@ summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_leve
     table_by_geo <- data |>
       dplyr::group_by(!!sym(groupby_var), !!sym(geo_level)) |>
       summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
-      dplyr::rename_with(~var_rename_ls[[geo_level]], !!sym(geo_level)) |>
       dplyr::collapse()
     table_ls[["by_geo"]] <- table_by_geo
   }
