@@ -1,2 +1,11 @@
-pkgload::load_all(".")
+library(bslib)
+library(shiny)
+library(shinycssloaders)
+library(bsicons)
+library(htmlwidgets)
+library(htmltools)
+library(dplyr)
+library(ggplot2)
+library(reactable)
+
 app()
