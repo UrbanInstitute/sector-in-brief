@@ -17,15 +17,15 @@ create_plot_subtitle <- function(geo_level,
     "6" = "Above $10 Million"
   )
   subtitle <- ""
-  if (geo_level == "census_region") {
+  if (geo_level == "Census Region") {
     subtitle <- paste("Region(s):", paste(region_selector, collapse = ", "), "\n")
   }
-  else if (geo_level == "CENSUS_STATE_ABBR") {
+  else if (geo_level == "Census State") {
     subtitle <- paste("State(s):",
                       paste(state_selector_multi, collapse = ", "),
                       "\n")
   }
-  else if (geo_level == "CENSUS_COUNTY_NAME") {
+  else if (geo_level == "Census County") {
     subtitle <- paste(
       "State:",
       state_selector_single,
@@ -35,7 +35,7 @@ create_plot_subtitle <- function(geo_level,
       "\n"
     )
   }
-  else if (geo_level == "CENSUS_CBSA_NAME") {
+  else if (geo_level == "Census CBSA") {
     subtitle <- paste(
       "State:",
       state_selector_single,
