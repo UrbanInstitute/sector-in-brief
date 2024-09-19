@@ -7,7 +7,7 @@
 
 exec_summary <- bslib::nav_panel(
   "Executive Summary",
-HTML(
+htmltools::HTML(
         "
 <!DOCTYPE html>
 <html lang='en'>
