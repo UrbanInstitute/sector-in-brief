@@ -105,7 +105,7 @@ app <- function(...) {
     data_select <- observeEvent( input$tabs, {
       if(input$tabs == "Number"){
         shinycssloaders::showPageSpinner()
-        data_select <- arrow::read_parquet("data/number_nonprofits.parquet")
+        data_select <- arrow::read_parquet("data/number_nonprofits.parquet", as_data_frame = FALSE)
         shinycssloaders::hidePageSpinner()
         data_server(
           "nn_data",
@@ -120,7 +120,7 @@ app <- function(...) {
       }
       else if(input$tabs == "Assets"){
         shinycssloaders::showPageSpinner()
-        data_select <- arrow::read_parquet("data/Total_Assets.parquet")
+        data_select <- arrow::read_parquet("data/Total_Assets.parquet", as_data_frame = FALSE)
         shinycssloaders::hidePageSpinner()
         data_server(
           "assets",
@@ -135,11 +135,10 @@ app <- function(...) {
       }
       else if(input$tabs == "Donor Advised Funds"){
         shinycssloaders::showPageSpinner()
-        data_select <- arrow::read_parquet("data/daf.parquet") |>
+        data_select <- arrow::read_parquet("data/daf.parquet", as_data_frame = FALSE) |>
           dplyr::mutate(
             Year = 2021
-          ) |>
-          dplyr::collapse()
+          )
         shinycssloaders::hidePageSpinner()
         data_server(
           "daf_contributions",
