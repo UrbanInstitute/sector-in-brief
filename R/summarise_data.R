@@ -21,6 +21,8 @@ summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_leve
   }
   if (asset_size_level != "all") {
     table_by_asset_size <- data |>
+      group_by(!!sym(groupby_var), `Asset Size`) |>
+      summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
       dplyr::mutate("Asset Size" = case_when(
         `Asset Size` <= 1 ~ "Under $100,000",
         `Asset Size` == 2 ~ "$100,000 - $499,999",
@@ -29,8 +31,6 @@ summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_leve
         `Asset Size` == 5 ~ "$5 Million - $9.99 Million",
         `Asset Size` == 6 ~ "Above $10 Million",
       )) |>
-      group_by(!!sym(groupby_var), `Asset Size`) |>
-      summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
       dplyr::collapse()
     table_ls[["by_asset_size"]] <- table_by_asset_size
   }
