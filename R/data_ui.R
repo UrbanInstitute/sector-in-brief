@@ -47,7 +47,7 @@ data_ui <- function(id, org_type_choices, date) {
             label = NULL,
             choices = subsector_choices,
             multiple = TRUE,
-            options = list(maxItems = 5)
+            options = list(maxItems = 10)
           ),
           condition = "input.subsector_level == 'individual'",
           ns = shiny::NS(id)
