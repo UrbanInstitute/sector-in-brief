@@ -13,13 +13,13 @@ create_plots <- function(table_ls,
   default_plot <- single_plot_func(table_ls[["default"]], title, subtitle, yvar)
   plot_ls[["default"]] <- default_plot
   if (geo_level != "all") {
-    if (geo_level == "census_region"){
+    if (geo_level == "Census Region"){
       geo_title <- paste(title, ", By Census Region")
-    } else if (geo_level == "CENSUS_STATE_ABBR") {
+    } else if (geo_level == "Census State") {
       geo_title <- paste(title, ", By State")
-    } else if (geo_level == "CENSUS_COUNTY_NAME") {
+    } else if (geo_level == "Census County") {
       geo_title <- paste(title, ", By County")
-    } else if (geo_level == "CENSUS_CBSA_NAME") {
+    } else if (geo_level == "Census CBSA") {
       geo_title <- paste(title, ", By CBSA")
     }
     by_geo_plot <- group_plot_func(table_ls[["by_geo"]], geo_level, geo_title, subtitle, yvar)
