@@ -36,7 +36,7 @@ create_plots <- function(table_ls,
   }
   if (asset_size_level == "individual") {
     size_title <- paste(title, ", By Asset Size")
-    by_asset_size_plot <- group_plot_func(table_ls[["by_asset_size"]], "Asset_Size", size_title, subtitle, yvar)
+    by_asset_size_plot <- group_plot_func(table_ls[["by_asset_size"]], "Asset Size", size_title, subtitle, yvar)
     plot_ls[["by_asset_size"]] <- by_asset_size_plot
   } else {
     plot_ls[["by_asset_size"]] <- create_blank_plot("Select A Individual Asset Size From Above For Data By Asset Size")
