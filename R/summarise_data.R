@@ -31,7 +31,6 @@ summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_leve
       )) |>
       group_by(!!sym(groupby_var), Asset_Size) |>
       summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
-      dplyr::rename_with(~var_rename_ls[["Asset_Size"]], Asset_Size) |>
       dplyr::collapse()
     table_ls[["by_asset_size"]] <- table_by_asset_size
   }
