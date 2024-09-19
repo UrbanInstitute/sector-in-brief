@@ -18,7 +18,6 @@ app <- function(...) {
     base_font = font_google("Lato"),
     version = 5
   )
-  geo_df <- read.csv("data/nested_geographies.csv")
   ui <- bslib::page_navbar(
     title = "Nonprofit Sector In Brief",
     id = "tabs",
