@@ -16,10 +16,10 @@ app <- function(...) {
     id = "tabs",
     fillable = FALSE,
     bg = "#a2d4ec",
-    tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "sib_style.css"),
-      tags$style(
-        HTML(
+    htmltools::tags$head(
+      htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "sib_style.css"),
+      htmltools::tags$style(
+        htmltools::HTML(
           "
         .pageheader {
           font-size: 2em;
@@ -69,74 +69,22 @@ app <- function(...) {
     exec_summary,
     bslib::nav_menu(
       title = "Visualise Data",
-      bslib::nav_panel(
+      visual_panel(
         title = "Number",
-        div(
-          br(),
-          h2("Total number of nonprofits", class = "pageheader"),
-          br(),
-          h3(
-            "The number of organizations that are registered with the Internal Revenue Service (IRS)."
-          ),
-          br()
-        ),
-        data_ui("nn_data", org_type_choices, date = TRUE),
-        plot_ui("nn_data")
+        panel_header = "Total number of nonprofits",
+        panel_desc = "The number of organizations that are registered with the Internal Revenue Service (IRS).",
+        panelid = "nn_data"
       ),
-      bslib::nav_panel(
+      visual_panel(
         title = "Assets",
-        div(
-          br(),
-          h2("Total Assets", class = "pageheader"),
-          br(),
-          h3(
-            "Total assets – The aggregate value of everything nonprofits own."
-          ),
-          br()
-        ),
-        data_ui("assets", org_type_choices, date = TRUE),
-        plot_ui("assets")
+        panel_header = "Total Assets",
+        panel_desc = "Total assets – The aggregate value of everything nonprofits own.",
+        panelid = "assets"
       ),
-      bslib::nav_panel(
+     visual_pill_panel(
         title = "Donor Advised Funds",
-        div(
-          br(),
-          h2("Donor Advised Funds", class = "pageheader"),
-          br(),
-          h3(
-            "A donor advised fund (DAF) is a tool that allows individuals and organizations to contribute money and non-cash assets to a giving account, receive an immediate tax deduction, and recommend grants to nonprofits at a later time."
-          ),
-          br()
-        ),
-        bslib::navset_pill(
-          bslib::nav_panel(
-            "Total Contributions",
-            data_ui("daf_contributions", org_type_choices, date = FALSE),
-            plot_ui("daf_contributions")
-          ),
-          bslib::nav_panel(
-            "Total Grants",
-            data_ui("daf_grants", org_type_choices, date = FALSE),
-            plot_ui("daf_grants")
-          ),
-          bslib::nav_panel(
-            "Total Value",
-            data_ui("daf_value", org_type_choices, date = FALSE),
-            plot_ui("daf_value")
-          ),
-          bslib::nav_panel(
-            "Number of DAFs",
-            data_ui("daf_num", org_type_choices, date = FALSE),
-            plot_ui("daf_num")
-          ),
-          bslib::nav_panel(
-            "DAF Proprotion",
-            data_ui("daf_proportion", org_type_choices, date = FALSE),
-            plot_ui("daf_proportion")
-          )
-          
-        )
-        
+        panel_header = "Donor Advised Funds",
+        panel_desc = "Donor Advised Funds (DAFs) are charitable giving accounts that allow donors to make contributions to a public charity that sponsors a DAF program."
       )
     ),
     bslib::nav_panel(title = "Download Data", div(
@@ -153,83 +101,104 @@ app <- function(...) {
     # Server modules to update county and cbsa options based on State
     # Data Wrangling
     daf_title_prefix <- "Donor Advised Funds For: "
-    data_server(
-      "nn_data",
-      geo_df,
-      num_nonprofit_data,
-      "Year",
-      "Number of Nonprofits",
-      create_single_line_plot,
-      create_group_line_plot,
-      "Number of"
-    )
-    data_server(
-      "assets",
-      geo_df,
-      assets,
-      "Tax Year",
-      "Total Assets",
-      create_single_line_plot,
-      create_group_line_plot,
-      "Total Assets For: "
-    )
-    data_server(
-      "daf_contributions",
-      geo_df,
-      daf,
-      "Year",
-      "Total Contributions",
-      create_single_col_plot,
-      create_group_col_plot,
-      daf_title_prefix,
-      FALSE
-    )
-    data_server(
-      "daf_num",
-      geo_df,
-      daf,
-      "Year",
-      "Number of DAFs",
-      create_single_col_plot,
-      create_group_col_plot,
-      daf_title_prefix,
-      FALSE
-    )
-    data_server(
-      "daf_proportion",
-      geo_df,
-      daf,
-      "Year",
-      "Proportion With DAFs",
-      create_single_col_plot,
-      create_group_col_plot,
-      daf_title_prefix,
-      FALSE
-    )
-    data_server(
-      "daf_value",
-      geo_df,
-      daf,
-      "Year",
-      "Total Value",
-      create_single_col_plot,
-      create_group_col_plot,
-      daf_title_prefix,
-      FALSE
-    )
-    data_server(
-      "daf_grants",
-      geo_df,
-      daf,
-      "Year",
-      "Total Grants",
-      create_single_col_plot,
-      create_group_col_plot,
-      daf_title_prefix,
-      FALSE
-    )
     
-    
+    data_select <- observeEvent( input$tabs, {
+      if(input$tabs == "Number"){
+        shinycssloaders::showPageSpinner()
+        data_select <- arrow::read_parquet("data/number_nonprofits.parquet")
+        shinycssloaders::hidePageSpinner()
+        data_server(
+          "nn_data",
+          geo_df,
+          data_select,
+          "Year",
+          "Number of Nonprofits",
+          create_single_line_plot,
+          create_group_line_plot,
+          "Number of"
+        )
+      }
+      else if(input$tabs == "Assets"){
+        shinycssloaders::showPageSpinner()
+        data_select <- arrow::read_parquet("data/Total_Assets.parquet")
+        shinycssloaders::hidePageSpinner()
+        data_server(
+          "assets",
+          geo_df,
+          data_select,
+          "Tax Year",
+          "Total Assets",
+          create_single_line_plot,
+          create_group_line_plot,
+          "Total Assets For: "
+        )
+      }
+      else if(input$tabs == "Donor Advised Funds"){
+        shinycssloaders::showPageSpinner()
+        data_select <- arrow::read_parquet("data/daf.parquet") |>
+          dplyr::mutate(
+            Year = 2021
+          ) |>
+          dplyr::collapse()
+        shinycssloaders::hidePageSpinner()
+        data_server(
+          "daf_contributions",
+          geo_df,
+          data_select,
+          "Year",
+          "Total Contributions",
+          create_single_col_plot,
+          create_group_col_plot,
+          daf_title_prefix,
+          FALSE
+        )
+        data_server(
+          "daf_num",
+          geo_df,
+          data_select,
+          "Year",
+          "Number of DAFs",
+          create_single_col_plot,
+          create_group_col_plot,
+          daf_title_prefix,
+          FALSE
+        )
+        data_server(
+          "daf_proportion",
+          geo_df,
+          data_select,
+          "Year",
+          "Proportion With DAFs",
+          create_single_col_plot,
+          create_group_col_plot,
+          daf_title_prefix,
+          FALSE
+        )
+        data_server(
+          "daf_value",
+          geo_df,
+          data_select,
+          "Year",
+          "Total Value",
+          create_single_col_plot,
+          create_group_col_plot,
+          daf_title_prefix,
+          FALSE
+        )
+        data_server(
+          "daf_grants",
+          geo_df,
+          data_select,
+          "Year",
+          "Total Grants",
+          create_single_col_plot,
+          create_group_col_plot,
+          daf_title_prefix,
+          FALSE
+        )
+      }
+    })
+
     output$downloadData <- downloadHandler(
       filename = "nonprofit.csv",
       content = function(file) {
