@@ -4,7 +4,7 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
   shiny::updateSelectizeInput(
     session = session,
     inputId = id,
-    choices = geo_df[[geo_var]][geo_df[["CENSUS_STATE_ABBR"]] == geo_input],
+    choices = geo_df[[geo_var]][geo_df[["Census State"]] == geo_input],
     server = TRUE
   )
 }
@@ -84,12 +84,12 @@ geo_filter_server <- function(id, geo_df) {
                      "county_selector",
                      input$state_selector_single,
                      geo_df,
-                     "CENSUS_COUNTY_NAME")
+                     "Census County")
       substate_filter(session,
                      "cbsa_selector",
                      input$state_selector_single,
                      geo_df,
-                     "CENSUS_CBSA_NAME")
+                     "Census CBSA")
     })
     list(
       state_selector_single = reactive(input$state_selector_single),
