@@ -1,4 +1,4 @@
-create_group_col_plot <- function(table, grouping_var, title, subtitle, yvar) {
+create_group_col_plot <- function(table, grouping_var, title, subtitle, yvar, xvar) {
   p <- ggplot(table, aes(
     x = !!sym(grouping_var),
     y = !!sym(yvar),

@@ -1,4 +1,4 @@
-create_single_col_plot <- function(table, title, subtitle, yvar) {
+create_single_col_plot <- function(table, title, subtitle, yvar, xvar) {
   p <- ggplot(table, mapping = aes(x = "Total", y = !!sym(yvar))) +
     geom_col(fill = "#1696d2") +
     scale_y_continuous(
