@@ -53,4 +53,4 @@ vars <- tibble::tribble(
   "nn_other_orgs", "Other 501(c) Types", org_type_choices, "500px"
 )
 
-org_filters <- build_filters(selectizeInput, vars)
+org_filters <- build_filters(shiny::selectizeInput, vars)
