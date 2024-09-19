@@ -3,12 +3,12 @@
 # nonprofit sector in brief
 # Programmer: Thiyaghessan Poongundranar - tpoongundranar@urban.org
 # Date Created: 2024-07-02
-# Date Last Edited: 2024-09-10
+# Date Last Edited: 2024-09-18
 # Details:
 # (1) - BMF Data
 # (2) - CORE Data
-# (3) - Wrangle CORE Data to get Assets, Revenues, Expenses, Employment Numbers
-# (4) - PF Data for Grant Information
+# (3) - PF Data
+# (4) - Deriving financials and PF Grants Info
 # (5) - Efile Data for DAF information from 2021
 
 # Packages
@@ -25,18 +25,10 @@ PF_YEARS <- 1989:2019
 
 unified_bmf_url <- "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/BMF_UNIFIED_V1.1.csv"
 
-# (1) Download and save raw BMF Data
-unified_bmf <- data.table::fread(unified_bmf_url, key = "EIN2")
-# State - County - CBSA Nested table
 geo_cols <- c("CENSUS_STATE_ABBR",
               "CENSUS_COUNTY_NAME",
               "CENSUS_CBSA_NAME")
-geo_dt <- unified_bmf[, ..geo_cols]
-geo_dt <- unique(geo_dt)
-data.table::fwrite(geo_dt, "data/processed/nested_geographies.csv")
-rm(geo_dt)
-# Data set with number of nonprofits
-metadata_cols <-
+bmf_metadata_cols <-
   c(
     "EIN2",
     "NTEEV2",
@@ -50,34 +42,110 @@ metadata_cols <-
     "NCCS_LEVEL_1"
   )
 asset_col <- "F990_TOTAL_ASSETS_RECENT"
-# Subset and create new columns
-bmf_metadata_dat <- unified_bmf[, ..metadata_cols]
-bmf_metadata_dat[, Subsector := substr(NTEEV2, 1, 3), by = 1:nrow(bmf_metadata_dat)]
-bmf_metadata_dat[, Organization_Type := derive_501c_type(BMF_SUBSECTION_CODE, NCCS_LEVEL_1), by = 1:nrow(bmf_metadata_dat)]
-bmf_metadata_dat[, (asset_col) := lapply(.SD, function(x) {
-  x <- ifelse(x < 0, 0, x)
-}), .SDcols = asset_col]
-data.table::setnafill(bmf_metadata_dat, fill = 0, cols = asset_col)
-bmf_metadata_dat[, Asset_Size := derive_size_category(F990_TOTAL_ASSETS_RECENT), by = 1:nrow(bmf_metadata_dat)]
-# Add Census Region
-bmf_metadata_dat <- bmf_metadata_dat |>
-  mutate(census_region = case_when(
-    CENSUS_STATE_ABBR %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
-    CENSUS_STATE_ABBR %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
-    CENSUS_STATE_ABBR %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX") ~ "South",
-    CENSUS_STATE_ABBR %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY", "AK", "CA", "HI", "OR", "WA") ~ "West"
-  ))
-data.table::fwrite(bmf_metadata_dat, "data/raw/bmf_metadata.csv")
+# (1) Read raw bmf data to get metadata, geographic columns, and number of nonprofits
+unified_bmf <- arrow::read_csv(unified_bmf_url)
+# (1.1) Region-State - County - CBSA Nested Data Frame
+geo_df <- unified_bmf |>
+  dplyr::select(all_of(geo_cols)) |>
+  dplyr::distinct() |>
+  dplyr::mutate(
+    "Census Region" = dplyr::case_when(
+      CENSUS_STATE_ABBR %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
+      CENSUS_STATE_ABBR %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
+      CENSUS_STATE_ABBR %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX") ~ "South",
+      CENSUS_STATE_ABBR %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY", "AK", "CA", "HI", "OR", "WA") ~ "West"
+    )
+  ) |>
+  dplyr::rename(
+    "Census State" = "CENSUS_STATE_ABBR",
+    "Census County" = "CENSUS_COUNTY_NAME",
+    "Census CBSA" = "CENSUS_CBSA_NAME"
+  ) |>
+  dplyr::filter_all(dplyr::any_vars(!is.na(.))) |>
+  dplyr::collapse()
+arrow::write_csv_arrow(geo_df, "data/nested_geographies.csv")
+
+# (1.2 BMF metadata)
+bmf_metadata <- unified_bmf |>
+  dplyr::select(all_of(bmf_metadata_cols)) |>
+  dplyr::mutate(
+    "Census Region" = dplyr::case_when(
+      CENSUS_STATE_ABBR %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
+      CENSUS_STATE_ABBR %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
+      CENSUS_STATE_ABBR %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX") ~ "South",
+      CENSUS_STATE_ABBR %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY", "AK", "CA", "HI", "OR", "WA") ~ "West"
+      ),
+    "Subsector" = substr(NTEEV2, 1, 3),
+    "Asset Size" = dplyr::case_when(
+      F990_TOTAL_ASSETS_RECENT < 100000 ~ 1,
+      F990_TOTAL_ASSETS_RECENT < 499999 ~ 2,
+      F990_TOTAL_ASSETS_RECENT < 999999 ~ 3,
+      F990_TOTAL_ASSETS_RECENT < 4999999 ~ 4,
+      F990_TOTAL_ASSETS_RECENT < 9999999 ~ 5,
+      F990_TOTAL_ASSETS_RECENT > 9999999 ~ 6,
+      is.na(F990_TOTAL_ASSETS_RECENT) ~ 0,
+      .default = 0
+    ),
+    "Organization Type" = dplyr::case_when(
+      BMF_SUBSECTION_CODE == 3 & NCCS_LEVEL_1 == "501C3 PRIVATE FOUNDATION" ~ "501(c)(3) Private Foundations",
+      BMF_SUBSECTION_CODE == 3 & NCCS_LEVEL_1 == "501C3 CHARITY" ~ "501(c)(3) Public Charities",
+      BMF_SUBSECTION_CODE < 30 ~ sprintf("501(c)(%s)", BMF_SUBSECTION_CODE),
+      BMF_SUBSECTION_CODE == 40 ~ "501(c)(d)",
+      BMF_SUBSECTION_CODE == 50 ~ "501(c)(e)",
+      BMF_SUBSECTION_CODE == 60 ~ "501(c)(f)",
+      BMF_SUBSECTION_CODE == 70 ~ "501(c)(k)",
+      is.na(BMF_SUBSECTION_CODE) ~ "501(c)(3) Public Charities",
+      .default = "501(c)(3) Public Charities"
+    )
+    ) |>
+  dplyr::rename(
+    "Census State" = "CENSUS_STATE_ABBR",
+    "Census County" = "CENSUS_COUNTY_NAME",
+    "Census CBSA" = "CENSUS_CBSA_NAME"
+  ) |>
+  dplyr::select(
+    "EIN2",
+    "Subsector",
+    "Organization Type",
+    "Asset Size",
+    "Census Region",
+    "Census State",
+    "Census County",
+    "Census CBSA",
+    "ORG_YEAR_FIRST",
+    "ORG_YEAR_LAST"
+  ) |>
+  dplyr::collapse()
+arrow::write_parquet(bmf_metadata,
+                     "data_raw/intermediate/bmf_metadata.parquet")
+
 # Disaggregate by Tax Year
-yr_dat_ls <- purrr::map(BMF_YEARS,
-                        create_year_table,
-                        unified = bmf_metadata_dat,
-                        .progress = TRUE)
-num_nonprofits_dt <- purrr::list_rbind(yr_dat_ls)
-data.table::fwrite(num_nonprofits_dt,
-                   "data/intermediate/num_nonprofits_full.csv")
-arrow::write_parquet(num_nonprofits_dt,
-                     "deploy/data/num_nonprofits_full.parquet")
+num_nonprofits <- bmf_metadata |>
+  dplyr::mutate(
+    "Year" = purrr::map2(
+      ORG_YEAR_FIRST,
+      ORG_YEAR_LAST,
+      ~ seq(.x, .y, by = 1)
+    )
+  ) |>
+  tidyr::unnest(Year) |>
+  dplyr::group_by(
+    Year,
+    `Census Region`,
+    `Census State`,
+    Subsector,
+    `Organization Type`,
+    `Census County`,
+    `Census CBSA`,
+    `Asset Size`
+  ) |>
+  dplyr::summarize(
+    "Number of Nonprofits" = dplyr::n_distinct(EIN2)
+  ) |>
+  dplyr::collapse()
+
+arrow::write_parquet(num_nonprofits,
+                     "data/num_nonprofits.parquet")
 # (2) Core Data
 core_cols <- c(
   "EIN2",
@@ -95,68 +163,135 @@ core_cols <- c(
   "TAX_YEAR"
 )
 
-# Retrieve file paths to CORE Files on S3
-file_paths_c3 <- sprintf("core-501c3-pz/CORE-%s-501C3-CHARITIES-PZ-HRMN.csv", YEARS)
-file_paths_ce <- sprintf("core-501ce-pz/CORE-%s-501CE-NONPROFIT-PZ-HRMN.csv", YEARS)
+num_cols <- c(
+  "F9_08_REV_TOT_TOT",
+  "F9_09_EXP_TOT_TOT",
+  "F9_10_ASSET_TOT_EOY",
+  "F9_05_NUM_EMPL",
+  "F9_01_ACT_GVRN_VOL_TOT",
+  "F9_09_EXP_COMP_DTK_TOT",
+  "F9_09_EXP_COMP_DSQ_PERS_TOT",
+  "F9_09_EXP_OTH_SAL_WAGE_TOT",
+  "F9_09_EXP_PAYROLL_TAX_TOT",
+  "F9_09_EXP_PENSION_CONTR_TOT",
+  "F9_09_EXP_OTH_EMPL_BEN_TOT"
+)
+
+file_paths_c3 <- sprintf("core/501c3-pz/CORE-%s-501C3-CHARITIES-PZ-HRMN.csv", CORE_YEARS)
+file_paths_ce <- sprintf("core/501ce-pz/CORE-%s-501CE-NONPROFIT-PZ-HRMN.csv", CORE_YEARS)
 file_paths <- c(file_paths_c3, file_paths_ce)
 
-# Subset core files
-core_pz_ls <- purrr::map(
+core_ls <- purrr::map(
   .x = file_paths,
   .f = function(path) {
-    dt <- data.table::fread(path, key = "EIN2")
-    cols <- intersect(names(dt), core_cols)
-    dt <- dt[, ..cols]
-    return(dt)
+    df <- arrow::read_csv_arrow(path)
+    df <- df |>
+      dplyr::select(
+        dplyr::any_of(core_cols)
+      ) |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::any_of(num_cols),
+          as.numeric
+        )
+      ) |>
+      dplyr::rename(
+        "Tax Year" = "TAX_YEAR"
+      ) |>
+      dplyr::collapse()
+    return(df)
   },
   .progress = TRUE
 )
 
-data.table::fwrite(data.table::rbindlist(core_pz_ls, fill = TRUE),
-                   "data/raw/core_metrics.csv")
+core <- purrr::list_rbind(core_ls)
 
-# (3) BLS Data
+core <- core |>
+  dplyr::mutate(
+    "Asset Size" = dplyr::case_when(
+      F9_10_ASSET_TOT_EOY < 100000 ~ 1,
+      F9_10_ASSET_TOT_EOY < 499999 ~ 2,
+      F9_10_ASSET_TOT_EOY < 999999 ~ 3,
+      F9_10_ASSET_TOT_EOY < 4999999 ~ 4,
+      F9_10_ASSET_TOT_EOY < 9999999 ~ 5,
+      F9_10_ASSET_TOT_EOY > 9999999 ~ 6,
+      is.na(F9_10_ASSET_TOT_EOY) ~ 0,
+      .default = 0
+    )
+  ) |>
+  dplyr::rename(
+    "Total Revenues" = "F9_08_REV_TOT_TOT",
+    "Total Expenses" = "F9_09_EXP_TOT_TOT",
+    "Total Assets" = "F9_10_ASSET_TOT_EOY"    
+  )
 
-cpi <- blscrapeR::inflation_adjust(base_date = "1989-01-01")
-readr::write_csv(cpi, "data/raw/bls_inflation_data.csv")
+arrow::write_parquet(core, "sector-in-brief/core_vars.parquet")
 
-# (4) Private Foundation Data
+# (3) Private Foundation Data
 
-# (4.1): Reproducible steps for wrangling raw data from CORE-PF Legacy Files
+# (3.1): Reproducible steps for wrangling raw data from CORE-PF Legacy Files
+# aws s3 sync s3://nccsdata/legacy/core legacy 
 
-# Download all legacy core files or access from S3
-pf_files <-
-  sprintf("data/raw/CORE-%s-501C3-PRIVFOUND-PF.csv", pf_years)
+pf_files <-sprintf("legacy/CORE-%s-501C3-PRIVFOUND-PF.csv", PF_YEARS)
+pf_cols <- c("EIN", "P1CONTPD", "P2TOTAST", "TAXPER", "P1TOTREV", "P1TOTEXP")
+pf_num_cols <- c("P1CONTPD", "P2TOTAST", "TAXPER", "P1TOTREV", "P1TOTEXP")
 
 pf_files_ls <- purrr::map(
   .x = pf_files,
   .f = function(path) {
     if (file.exists(path)) {
-      dt <- data.table::fread(
-        path,
-        key = "EIN",
-        select = c("EIN", "P1CONTPD", "P2TOTAST", "TAXPER")
-      )
-      return(dt)
+      df <- arrow::read_csv_arrow(path)
+      df <- df |>
+        dplyr::select(
+          dplyr::any_of(pf_cols)
+        ) |>
+        dplyr::mutate(
+          dplyr::across(
+            dplyr::any_of(pf_num_cols),
+            as.numeric
+          ),
+          "Tax Year" := substr(TAXPER, 1, 4)
+        ) |>
+        dplyr::rename(
+          "Total Contributions" = "P1CONTPD",
+          "Total Assets" = "P2TOTAST",
+          "Total Revenues" = "P1TOTREV",
+          "Total Expenses" = "P1TOTEXP"
+        ) |>
+        dplyr::rowwise() |>
+        dplyr::mutate(
+          EIN2 := derive_ein2(EIN)
+        ) |>
+        dplyr::select(
+          EIN2,
+          `Total Contributions`,
+          `Total Assets`,
+          `Total Revenues`,
+          `Total Expenses`,
+          `Tax Year`
+        ) |>
+        dplyr::mutate(
+          "Asset Size" = dplyr::case_when(
+            `Total Assets` < 100000 ~ 1,
+            `Total Assets` < 499999 ~ 2,
+            `Total Assets` < 999999 ~ 3,
+            `Total Assets` < 4999999 ~ 4,
+            `Total Assets` < 9999999 ~ 5,
+            `Total Assets` > 9999999 ~ 6,
+            is.na(`Total Assets`) ~ 0,
+            .default = 0
+          )
+        ) |>
+        dplyr::collapse()
+      return(df)
     }
   },
   .progress = TRUE
 )
 
-pf_dt <- data.table::rbindlist(pf_files_ls, fill = TRUE)
+pf_legacy <- purrr::list_rbind(pf_files_ls)
 
-# Derive metadata
-pf_dt[, EIN2 := derive_ein2(EIN), by = 1:nrow(pf_dt)]
-pf_dt[, TAX_YEAR := derive_tax_year(TAXPER), by = 1:nrow(pf_dt)]
-pf_dt[, SIZE := derive_size_category(P2TOTAST), by = 1:nrow(pf_dt)]
-data.table::setnames(pf_dt, "P1CONTPD", "GRANTS")
-
-pf_cols <- c("EIN2", "GRANTS", "SIZE", "TAX_YEAR")
-pf_dt <- pf_dt[, ..pf_cols]
-
-data.table::fwrite(pf_dt, "data/intermediate/pf_metrics.csv")
-
-# (4.2) Append data from SOI extracts to PFs
+# (3.2) SOI PF Data
 
 soi_pf_urls <- c(
   "https://www.irs.gov/pub/irs-soi/22eoextract990pf.xlsx",
@@ -164,38 +299,129 @@ soi_pf_urls <- c(
   "https://www.irs.gov/pub/irs-soi/20eoextract990pf.xlsx"
 )
 
-soi_cols <- c("EIN", "CONTRPDPBKS", "TOTASSETSEND", "TAX_PRD")
+soi_pf_cols <- c("EIN", "CONTRPDPBKS", "TOTASSETSEND", "TAX_PRD", "TOTRCPTPERBKS", "TOTEXPNSPBKS")
+soi_pf_num_cols <- c("CONTRPDPBKS", "TOTASSETSEND", "TOTRCPTPERBKS", "TOTEXPNSPBKS")
 
-soi_pf_ls <- purrr::map(
+soi_pf_files_ls <- purrr::map(
   .x = soi_pf_urls,
   .f = function(url) {
     df <- rio::import(url)
-    dt <- data.table::as.data.table(df)
-    return(dt)
+    df <- df |>
+      dplyr::select(
+        dplyr::any_of(soi_pf_cols)
+      ) |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::any_of(soi_pf_num_cols),
+          as.numeric
+        ),
+        "Tax Year" := substr(TAX_PRD, 1, 4)
+      ) |>
+      dplyr::rename(
+        "Total Contributions" = "CONTRPDPBKS",
+        "Total Assets" = "TOTASSETSEND",
+        "Total Revenues" = "TOTRCPTPERBKS",
+        "Total Expenses" = "TOTEXPNSPBKS"
+      ) |>
+      dplyr::rowwise() |>
+      dplyr::mutate(
+        EIN2 := derive_ein2(EIN)
+      ) |>
+      dplyr::select(
+        EIN2,
+        `Total Contributions`,
+        `Total Assets`,
+        `Total Revenues`,
+        `Total Expenses`,
+        `Tax Year`
+      ) |>
+      dplyr::mutate(
+        "Asset Size" = dplyr::case_when(
+          `Total Assets` < 100000 ~ 1,
+          `Total Assets` < 499999 ~ 2,
+          `Total Assets` < 999999 ~ 3,
+          `Total Assets` < 4999999 ~ 4,
+          `Total Assets` < 9999999 ~ 5,
+          `Total Assets` > 9999999 ~ 6,
+          is.na(`Total Assets`) ~ 0,
+          .default = 0
+        )
+      ) |>
+      dplyr::collapse()
+    return(df)
   },
   .progress = TRUE
 )
-soi_pf_ls_proc <- purrr::map(
-  .x = soi_pf_ls,
-  .f = function(dt) {
-    dt <- dt[, ..soi_cols]
-    dt[, EIN2 := derive_ein2(EIN), by = 1:nrow(dt)]
-    dt[, TAX_YEAR := derive_tax_year(TAX_PRD), by = 1:nrow(dt)]
-    dt[, SIZE := derive_size_category(TOTASSETSEND), by = 1:nrow(dt)]
-    data.table::setnames(dt, "CONTRPDPBKS", "GRANTS")
-    dt <- dt[, ..pf_cols]
-  },
+
+soi_pf <- purrr::list_rbind(soi_pf_files_ls)
+
+# (3.3) Combine PF Data
+
+pf <- purrr::list_rbind(list(soi_pf, pf_legacy))
+pf <- pf |>
+  dplyr::mutate(`Tax Year` = as.integer(`Tax Year`)) |>
+  dplyr::collapse()
+arrow::write_parquet(pf, "sector-in-brief/pf_vars.parquet")
+
+# aws s3 sync sector-in-brief s3://nccsdata/sector-in-brief
+
+# (4) Derive Financials and PF Grants Info
+
+#(4.1) Financial Data
+
+metadata_cols <- c(
+  "EIN2",
+  "Subsector",
+  "Organization Type",
+  "Census Region",
+  "Census State",
+  "Census County",
+  "Census CBSA"
+)
+
+vars <- c(
+  "Total Assets",
+  "Total Revenues",
+  "Total Expenses"
+)
+
+rs <- purrr::map(
+  vars,
+  create_financial_data,
+  bmf_cols = metadata_cols,
+  core = core,
+  pf = pf,
+  bmf = bmf_metadata,
+  destfolder = "sector-in-brief/",
   .progress = TRUE
 )
 
-soi_pf_dt <- data.table::rbindlist(soi_pf_ls_proc)
+# (4.2) PF Grants Info
 
-# (4.3): Bring legacy PF and SOI PF together
-soi_full_dt <-
-  data.table::rbindlist(list(pf_dt, soi_pf_dt))
-soi_full_dt <- unique(soi_full_dt)
+grants <- pf |>
+  dplyr::select(
+    EIN2,
+    `Total Contributions`,
+    `Tax Year`,
+    `Asset Size`
+  ) |>
+  dplyr::collapse()
 
-data.table::fwrite(soi_full_dt, "data/processed/pf_grant_data.csv")
+bmf_merge <- bmf_metadata |>
+  dplyr::select(
+    dplyr::all_of(
+      metadata_cols
+    )
+  ) |>
+  dplyr::collapse()
+
+grants <- grants |>
+  tidylog::left_join(bmf_merge,
+                     by = "EIN2") |>
+  dplyr::distinct()
+
+arrow::write_parquet(grants, "sector-in-brief/pf_grants.parquet")
+
 
 # (5) Efile Data - Donor Advised Funds (2021)
 
