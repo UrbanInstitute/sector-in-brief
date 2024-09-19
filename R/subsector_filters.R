@@ -26,5 +26,5 @@ selectize_vars <- tibble::tribble(
   "subsector_select", NULL, subsector_choices, TRUE, list(maxItems = 5)
 )
 
-subsector_level_filter <- build_filters(radioButtons, radio_button_vars)
-subsector_select_filter <- build_filters(selectizeInput, selectize_vars)
+subsector_level_filter <- build_filters(shiny::radioButtons, radio_button_vars)
+subsector_select_filter <- build_filters(shiny::selectizeInput, selectize_vars)
