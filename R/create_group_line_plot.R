@@ -1,5 +1,5 @@
 create_group_line_plot <- function(table, grouping_var, title, subtitle, yvar) {
-  p <- ggplot(table, aes(x = Year, y = !!sym(yvar), colour = !!sym(var_rename_ls[[grouping_var]]))) +
+  p <- ggplot(table, aes(x = Year, y = !!sym(yvar), colour = !!sym(grouping_var))) +
     geom_line(size = 1.5,
               linetype = 1) +
     geom_point(size = 3, fill = "white", shape = 21, stroke = 1.2) +
