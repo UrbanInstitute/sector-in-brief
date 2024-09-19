@@ -11,23 +11,14 @@
 # (4) - Deriving financials and PF Grants Info
 # (5) - Efile Data for DAF information from 2021
 
-# Packages
-library(data.table)
 library(arrow)
 
-# Scripts
-source("R/utils.R")
+source("utils.R")
 
-# Global Variables
-BMF_YEARS <- 1989:2024
-CORE_YEARS <- 1989:2021
-PF_YEARS <- 1989:2019
+# BMF Data
+# aws s3 sync s3://nccsdata/harmonized/bmf/unified bmf
+unified_bmf <- arrow::read_csv_arrow("bmf/BMF_UNIFIED_V1.1.csv")
 
-unified_bmf_url <- "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/BMF_UNIFIED_V1.1.csv"
-
-geo_cols <- c("CENSUS_STATE_ABBR",
-              "CENSUS_COUNTY_NAME",
-              "CENSUS_CBSA_NAME")
 bmf_metadata_cols <-
   c(
     "EIN2",
@@ -41,31 +32,7 @@ bmf_metadata_cols <-
     "ORG_YEAR_LAST",
     "NCCS_LEVEL_1"
   )
-asset_col <- "F990_TOTAL_ASSETS_RECENT"
-# (1) Read raw bmf data to get metadata, geographic columns, and number of nonprofits
-unified_bmf <- arrow::read_csv(unified_bmf_url)
-# (1.1) Region-State - County - CBSA Nested Data Frame
-geo_df <- unified_bmf |>
-  dplyr::select(all_of(geo_cols)) |>
-  dplyr::distinct() |>
-  dplyr::mutate(
-    "Census Region" = dplyr::case_when(
-      CENSUS_STATE_ABBR %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
-      CENSUS_STATE_ABBR %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
-      CENSUS_STATE_ABBR %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX") ~ "South",
-      CENSUS_STATE_ABBR %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY", "AK", "CA", "HI", "OR", "WA") ~ "West"
-    )
-  ) |>
-  dplyr::rename(
-    "Census State" = "CENSUS_STATE_ABBR",
-    "Census County" = "CENSUS_COUNTY_NAME",
-    "Census CBSA" = "CENSUS_CBSA_NAME"
-  ) |>
-  dplyr::filter_all(dplyr::any_vars(!is.na(.))) |>
-  dplyr::collapse()
-arrow::write_csv_arrow(geo_df, "data/nested_geographies.csv")
 
-# (1.2 BMF metadata)
 bmf_metadata <- unified_bmf |>
   dplyr::select(all_of(bmf_metadata_cols)) |>
   dplyr::mutate(
@@ -74,7 +41,7 @@ bmf_metadata <- unified_bmf |>
       CENSUS_STATE_ABBR %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
       CENSUS_STATE_ABBR %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX") ~ "South",
       CENSUS_STATE_ABBR %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY", "AK", "CA", "HI", "OR", "WA") ~ "West"
-      ),
+    ),
     "Subsector" = substr(NTEEV2, 1, 3),
     "Asset Size" = dplyr::case_when(
       F990_TOTAL_ASSETS_RECENT < 100000 ~ 1,
@@ -89,7 +56,7 @@ bmf_metadata <- unified_bmf |>
     "Organization Type" = dplyr::case_when(
       BMF_SUBSECTION_CODE == 3 & NCCS_LEVEL_1 == "501C3 PRIVATE FOUNDATION" ~ "501(c)(3) Private Foundations",
       BMF_SUBSECTION_CODE == 3 & NCCS_LEVEL_1 == "501C3 CHARITY" ~ "501(c)(3) Public Charities",
-      BMF_SUBSECTION_CODE < 30 ~ sprintf("501(c)(%s)", BMF_SUBSECTION_CODE),
+      BMF_SUBSECTION_CODE < 30 & BMF_SUBSECTION_CODE >= 1 ~ sprintf("501(c)(%s)", BMF_SUBSECTION_CODE),
       BMF_SUBSECTION_CODE == 40 ~ "501(c)(d)",
       BMF_SUBSECTION_CODE == 50 ~ "501(c)(e)",
       BMF_SUBSECTION_CODE == 60 ~ "501(c)(f)",
@@ -97,7 +64,7 @@ bmf_metadata <- unified_bmf |>
       is.na(BMF_SUBSECTION_CODE) ~ "501(c)(3) Public Charities",
       .default = "501(c)(3) Public Charities"
     )
-    ) |>
+  ) |>
   dplyr::rename(
     "Census State" = "CENSUS_STATE_ABBR",
     "Census County" = "CENSUS_COUNTY_NAME",
@@ -116,10 +83,33 @@ bmf_metadata <- unified_bmf |>
     "ORG_YEAR_LAST"
   ) |>
   dplyr::collapse()
-arrow::write_parquet(bmf_metadata,
-                     "data_raw/intermediate/bmf_metadata.parquet")
+arrow::write_parquet(bmf_metadata, "sector-in-brief/bmf_metadata.parquet")
 
-# Disaggregate by Tax Year
+# Geographic Data
+geo_cols <- c("CENSUS_STATE_ABBR",
+              "CENSUS_COUNTY_NAME",
+              "CENSUS_CBSA_NAME")
+geo_df <- unified_bmf |>
+  dplyr::select(all_of(geo_cols)) |>
+  dplyr::distinct() |>
+  dplyr::mutate(
+    "Census Region" = dplyr::case_when(
+      CENSUS_STATE_ABBR %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", "NY", "PA") ~ "Northeast",
+      CENSUS_STATE_ABBR %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD") ~ "Midwest",
+      CENSUS_STATE_ABBR %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", "WV", "AL", "KY", "MS", "TN", "AR", "LA", "OK", "TX") ~ "South",
+      CENSUS_STATE_ABBR %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", "WY", "AK", "CA", "HI", "OR", "WA") ~ "West"
+    )
+  ) |>
+  dplyr::rename(
+    "Census State" = "CENSUS_STATE_ABBR",
+    "Census County" = "CENSUS_COUNTY_NAME",
+    "Census CBSA" = "CENSUS_CBSA_NAME"
+  ) |>
+  dplyr::filter_all(dplyr::any_vars(!is.na(.))) |>
+  dplyr::collapse()
+arrow::write_csv_arrow(geo_df, "sector-in-brief/nested_geographies.csv")
+
+# Number of Nonprofits
 num_nonprofits <- bmf_metadata |>
   dplyr::mutate(
     "Year" = purrr::map2(
@@ -143,10 +133,12 @@ num_nonprofits <- bmf_metadata |>
     "Number of Nonprofits" = dplyr::n_distinct(EIN2)
   ) |>
   dplyr::collapse()
+arrow::write_parquet(num_nonprofits, "sector-in-brief/number_nonprofits.parquet")
 
-arrow::write_parquet(num_nonprofits,
-                     "data/num_nonprofits.parquet")
-# (2) Core Data
+CORE_YEARS <- 1989:2021
+PF_YEARS <- 1989:2019
+
+
 core_cols <- c(
   "EIN2",
   "F9_08_REV_TOT_TOT",
@@ -227,11 +219,8 @@ core <- core |>
 
 arrow::write_parquet(core, "sector-in-brief/core_vars.parquet")
 
-# (3) Private Foundation Data
-
-# (3.1): Reproducible steps for wrangling raw data from CORE-PF Legacy Files
-# aws s3 sync s3://nccsdata/legacy/core legacy 
-
+# Private Foundation Data
+# aws s3 sync s3://nccsdata/legacy/core legacy - AWS CLI
 pf_files <-sprintf("legacy/CORE-%s-501C3-PRIVFOUND-PF.csv", PF_YEARS)
 pf_cols <- c("EIN", "P1CONTPD", "P2TOTAST", "TAXPER", "P1TOTREV", "P1TOTEXP")
 pf_num_cols <- c("P1CONTPD", "P2TOTAST", "TAXPER", "P1TOTREV", "P1TOTEXP")
@@ -291,7 +280,6 @@ pf_files_ls <- purrr::map(
 
 pf_legacy <- purrr::list_rbind(pf_files_ls)
 
-# (3.2) SOI PF Data
 
 soi_pf_urls <- c(
   "https://www.irs.gov/pub/irs-soi/22eoextract990pf.xlsx",
@@ -354,21 +342,16 @@ soi_pf_files_ls <- purrr::map(
 )
 
 soi_pf <- purrr::list_rbind(soi_pf_files_ls)
-
-# (3.3) Combine PF Data
-
 pf <- purrr::list_rbind(list(soi_pf, pf_legacy))
 pf <- pf |>
   dplyr::mutate(`Tax Year` = as.integer(`Tax Year`)) |>
   dplyr::collapse()
+
 arrow::write_parquet(pf, "sector-in-brief/pf_vars.parquet")
 
 # aws s3 sync sector-in-brief s3://nccsdata/sector-in-brief
 
-# (4) Derive Financials and PF Grants Info
-
-#(4.1) Financial Data
-
+# Assets
 metadata_cols <- c(
   "EIN2",
   "Subsector",
@@ -396,8 +379,8 @@ rs <- purrr::map(
   .progress = TRUE
 )
 
-# (4.2) PF Grants Info
 
+# Private Foundation Contributions
 grants <- pf |>
   dplyr::select(
     EIN2,
@@ -422,9 +405,7 @@ grants <- grants |>
 
 arrow::write_parquet(grants, "sector-in-brief/pf_grants.parquet")
 
-
-# (5) Efile Data - Donor Advised Funds (2021)
-
+# DAF Data
 daf_cols <- c(
   "ORG_EIN",
   "TAX_YEAR",
@@ -437,18 +418,126 @@ daf_cols <- c(
   "SD_01_AGGREGATE_VALUE_EOY_DAF",
   "SD_01_AGGREGATE_VALUE_EOY_OTH"
 )
-
-# (5.1) Download Efile Data
-
-# Schedule D
-efile_daf <- data.table::fread(
-  "https://nccs-efile.s3.us-east-1.amazonaws.com/parsed/SD-P01-T00-ORGS-DONOR-ADVISED-FUNDS-OTH-2021.csv",
-  select = daf_cols
+daf_num_cols <- c(
+  "SD_01_TOT_NUM_EOY_DAF",
+  "SD_01_TOT_NUM_EOY_OTH",
+  "SD_01_AGGREGATE_CONTR_DAF",
+  "SD_01_AGGREGATE_CONTR_OTH",
+  "SD_01_AGGREGATE_GRANT_DAF",
+  "SD_01_AGGREGATE_GRANT_OTH",
+  "SD_01_AGGREGATE_VALUE_EOY_DAF",
+  "SD_01_AGGREGATE_VALUE_EOY_OTH"
 )
-data.table::fwrite(efile_daf, "data/raw/efile_2021_daf.csv")
-# Part 10
-efile_assets_df <- data.table::fread(
-  "https://nccs-efile.s3.us-east-1.amazonaws.com/parsed/F9-P10-T00-BALANCE-SHEET-2021.csv",
-  select = c("ORG_EIN", "F9_10_ASSET_TOT_EOY")
+daf_asset_cols <- c(
+  "ORG_EIN", 
+  "F9_10_ASSET_TOT_EOY"
 )
-data.table::fwrite(efile_assets_df, "data/raw/efile_2021_assets.csv")
+
+daf_url <- "https://nccs-efile.s3.us-east-1.amazonaws.com/parsed/SD-P01-T00-ORGS-DONOR-ADVISED-FUNDS-OTH-2021.csv"
+daf_full <- arrow::read_csv_arrow(daf_url)
+daf <- daf_full |>
+  dplyr::select(
+    dplyr::all_of(
+      daf_cols
+    )
+  ) |>
+  dplyr::filter(TAX_YEAR == 2021) |>
+  dplyr::mutate(
+    dplyr::across(
+      dplyr::all_of(daf_num_cols),
+      as.numeric
+    )
+  ) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(
+    EIN2 := derive_ein2(ORG_EIN),
+    "Number of DAFs" = sum(SD_01_TOT_NUM_EOY_DAF, SD_01_TOT_NUM_EOY_OTH, na.rm = TRUE),
+    "Total Contributions" = sum(SD_01_AGGREGATE_CONTR_DAF, SD_01_AGGREGATE_CONTR_OTH, na.rm = TRUE),
+    "Total Grants" = sum(SD_01_AGGREGATE_GRANT_DAF, SD_01_AGGREGATE_GRANT_OTH, na.rm = TRUE),
+    "Total Value" = sum(SD_01_AGGREGATE_VALUE_EOY_DAF, SD_01_AGGREGATE_VALUE_EOY_OTH, na.rm = TRUE)
+  ) |>
+  dplyr::select(
+    EIN2,
+    `Number of DAFs`,
+    `Total Contributions`,
+    `Total Grants`,
+    `Total Value`
+  ) |>
+  dplyr::collapse()
+
+daf_assets_url <- "https://nccs-efile.s3.us-east-1.amazonaws.com/parsed/F9-P10-T00-BALANCE-SHEET-2021.csv"
+daf_assets <- arrow::read_csv_arrow(daf_assets_url)
+daf_assets <- daf_assets |>
+  dplyr::select(
+    dplyr::all_of(
+      daf_asset_cols
+    )
+  ) |>
+  dplyr::mutate(
+    "Asset Size" = dplyr::case_when(
+      F9_10_ASSET_TOT_EOY < 100000 ~ 1,
+      F9_10_ASSET_TOT_EOY < 499999 ~ 2,
+      F9_10_ASSET_TOT_EOY < 999999 ~ 3,
+      F9_10_ASSET_TOT_EOY < 4999999 ~ 4,
+      F9_10_ASSET_TOT_EOY < 9999999 ~ 5,
+      F9_10_ASSET_TOT_EOY > 9999999 ~ 6,
+      is.na(F9_10_ASSET_TOT_EOY) ~ 0,
+      .default = 0
+    )
+  ) |>
+  dplyr::rowwise() |>
+  dplyr::mutate(
+    EIN2 := derive_ein2(ORG_EIN)
+  ) |>
+  dplyr::select(
+    EIN2,
+    `Asset Size`
+  ) |>
+  dplyr::collapse()
+
+daf <- daf |>
+  tidylog::left_join(
+    daf_assets,
+    by = "EIN2"
+  ) |>
+  dplyr::collapse()
+
+daf <- bmf_merge |>
+  tidylog::left_join(
+    daf,
+    by = "EIN2"
+  ) |>
+  dplyr::distinct() |>
+  dplyr::collapse()
+
+daf_final <- daf |>
+  dplyr::mutate(
+    "Has DAF" = dplyr::case_when(
+      `Number of DAFs` > 0 ~ 1,
+      is.na(`Number of DAFs`) ~ 0,
+      .default = 0
+    )
+  ) |>
+  dplyr::group_by(
+    Subsector,
+    `Organization Type`,
+    `Asset Size`,
+    `Census Region`,
+    `Census State`,
+    `Census County`,
+    `Census CBSA`
+  ) |>
+  dplyr::summarise(
+    "Number of Nonprofits" = dplyr::n_distinct(EIN2),
+    "Has DAF" = sum(`Has DAF`, na.rm = TRUE),
+    "Number of DAFs" = sum(`Number of DAFs`, na.rm = TRUE),
+    "Total Contributions" = sum(`Total Contributions`, na.rm = TRUE),
+    "Total Grants" = sum(`Total Grants`, na.rm = TRUE),
+    "Total Value" = sum(`Total Value`, na.rm = TRUE)
+  ) |>
+  dplyr::mutate(
+    "Proportion With DAFs" = round(`Has DAF` / `Number of Nonprofits` * 100, 2)
+  ) |>
+  dplyr::collapse()
+arrow::write_parquet(daf_final, "sector-in-brief/daf.parquet")
+
