@@ -7,6 +7,6 @@ daf <- arrow::read_parquet("data/daf.parquet") |>
   ) |>
   dplyr::collapse()
 assets <- arrow::read_parquet("data/Total_Assets.parquet")
-revenue <- arrow::read_parquet("data/Total_Revenue.parquet")
+revenue <- arrow::read_parquet("data/Total_Revenues.parquet")
 expenses <- arrow::read_parquet("data/Total_Expenses.parquet")
 pf_grants <- arrow::read_parquet("data/pf_grants.parquet")
