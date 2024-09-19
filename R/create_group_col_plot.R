@@ -1,8 +1,8 @@
 create_group_col_plot <- function(table, grouping_var, title, subtitle, yvar) {
   p <- ggplot(table, aes(
-    x = !!sym(var_rename_ls[[grouping_var]]),
+    x = !!sym(grouping_var),
     y = !!sym(yvar),
-    fill = !!sym(var_rename_ls[[grouping_var]])
+    fill = !!sym(grouping_var)
   )) +
     geom_col() +
     scale_y_continuous(
@@ -12,7 +12,7 @@ create_group_col_plot <- function(table, grouping_var, title, subtitle, yvar) {
     ) +
     labs(
       subtitle = subtitle,
-      x = var_rename_ls[[grouping_var]],
+      x = grouping_var,
       title = title,
       y = "Dollar Amount (millions)"
     ) +
