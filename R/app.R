@@ -8,7 +8,7 @@ app <- function(...) {
     warning = "#ec008b",
     danger = "#db2b27",
     info = "#d2d2d2",
-    base_font = font_google("Lato"),
+    base_font = bslib::font_google("Lato"),
     version = 5
   )
   ui <- bslib::page_navbar(
