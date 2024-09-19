@@ -1,11 +1,3 @@
-library(bslib)
-library(shiny)
-library(dplyr)
-library(ggplot2)
-library(urbnthemes)
-library(reactable)
-
-
 app <- function(...) {
   sibtheme <- bslib::bs_theme(
     bg = "#ffffff",
