@@ -92,7 +92,7 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           if (geo_filters$geo_level() != "all") {
             reactable(
               tables[["by_geo"]],
-              groupBy = var_rename_ls[[input$geo_level]],
+              groupBy = input$geo_level,
               outlined = TRUE,
               defaultPageSize = 10,
               defaultColDef = colDef(align = "center")
