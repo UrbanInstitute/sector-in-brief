@@ -1,7 +1,4 @@
 # Script to build organization filters
-
-source("R/build_filters.R")
-
 org_type_choices <- list(
   "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)" = "501(c)(1)",
   "501(c)(2) - Title Holding Corporations for Exempt Organization" = "501(c)(2)", 
