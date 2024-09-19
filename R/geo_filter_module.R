@@ -16,10 +16,10 @@ geo_filter_ui <- function(id, state_choices) {
       inline = FALSE,
       "Select Geographic Level",
       choices = list("Entire USA" = "all", 
-                     "Region" = "census_region", 
-                     "State" = "CENSUS_STATE_ABBR", 
-                     "County" = "CENSUS_COUNTY_NAME", 
-                     "Metro/Micro Area" = "CENSUS_CBSA_NAME"),
+                     "Region" = "Census Region", 
+                     "State" = "Census State", 
+                     "County" = "Census County", 
+                     "Metro/Micro Area" = "Census CBSA"),
       selected = "all"
     ),
     shiny::conditionalPanel(
@@ -29,7 +29,7 @@ geo_filter_ui <- function(id, state_choices) {
         choices = c("Northeast", "South", "Midwest", "West"),
         multiple = TRUE
       ),
-      condition = "input.geo_level == 'census_region'",
+      condition = "input.geo_level == 'Census Region'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
@@ -39,7 +39,7 @@ geo_filter_ui <- function(id, state_choices) {
         choices = state_choices,
         multiple = TRUE
       ),
-      condition = "input.geo_level == 'CENSUS_STATE_ABBR'",
+      condition = "input.geo_level == 'Census State'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
@@ -49,7 +49,7 @@ geo_filter_ui <- function(id, state_choices) {
         choices = state_choices,
         multiple = FALSE
       ),
-      condition = "input.geo_level == 'CENSUS_COUNTY_NAME' | input.geo_level == 'CENSUS_CBSA_NAME'",
+      condition = "input.geo_level == 'Census County' | input.geo_level == 'Census CBSA'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
@@ -60,7 +60,7 @@ geo_filter_ui <- function(id, state_choices) {
         multiple = TRUE,
         options = list(maxItems = 5)
       ),
-      condition = "input.geo_level == 'CENSUS_COUNTY_NAME'",
+      condition = "input.geo_level == 'Census County'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
@@ -71,7 +71,7 @@ geo_filter_ui <- function(id, state_choices) {
         multiple = TRUE,
         options = list(maxItems = 5)
       ),
-      condition = "input.geo_level == 'CENSUS_CBSA_NAME'",
+      condition = "input.geo_level == 'Census CBSA'",
       ns = shiny::NS(id)
     )
   )
