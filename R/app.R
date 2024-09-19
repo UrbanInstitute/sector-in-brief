@@ -5,6 +5,7 @@ library(ggplot2)
 library(urbnthemes)
 library(reactable)
 
+
 app <- function(...) {
   sibtheme <- bslib::bs_theme(
     bg = "#ffffff",
@@ -74,61 +75,72 @@ app <- function(...) {
       )
     ),
     exec_summary,
-    bslib::nav_panel(
-      title = "Number",
-      div(
-        br(),
-        h2("Total number of nonprofits", class = "pageheader"),
-        br(),
-        h3(
-          "The number of organizations that are registered with the Internal Revenue Service (IRS)."
+    bslib::nav_menu(
+      title = "Visualise Data",
+      bslib::nav_panel(
+        title = "Number",
+        div(
+          br(),
+          h2("Total number of nonprofits", class = "pageheader"),
+          br(),
+          h3(
+            "The number of organizations that are registered with the Internal Revenue Service (IRS)."
+          ),
+          br()
         ),
-        br()
+        data_ui("nn_data", org_type_choices, date = TRUE),
+        plot_ui("nn_data")
       ),
-      data_ui("nn_data", org_type_choices, date = TRUE),
-      plot_ui("nn_data")
-    ),
-    bslib::nav_panel(
-      title = "Donor Advised Funds",
-      div(
-        br(),
-        h2("Donor Advised Funds", class = "pageheader"),
-        br(),
-        h3(
-          "A donor advised fund (DAF) is a tool that allows individuals and organizations to contribute money and non-cash assets to a giving account, receive an immediate tax deduction, and recommend grants to nonprofits at a later time."
+      bslib::nav_panel(
+        title = "Donor Advised Funds",
+        div(
+          br(),
+          h2("Donor Advised Funds", class = "pageheader"),
+          br(),
+          h3(
+            "A donor advised fund (DAF) is a tool that allows individuals and organizations to contribute money and non-cash assets to a giving account, receive an immediate tax deduction, and recommend grants to nonprofits at a later time."
+          ),
+          br()
         ),
-        br()
-      ),
-      bslib::navset_pill(
-        bslib::nav_panel(
-          "Total Contributions",
-          data_ui("daf_contributions", org_type_choices, date = FALSE),
-          plot_ui("daf_contributions")
-        ),
-        bslib::nav_panel(
-          "Total Grants",
-          data_ui("daf_grants", org_type_choices, date = FALSE),
-          plot_ui("daf_grants")
-        ),
-        bslib::nav_panel(
-          "Total Value",
-          data_ui("daf_value", org_type_choices, date = FALSE),
-          plot_ui("daf_value")
-        ),
-        bslib::nav_panel(
-          "Number of DAFs",
-          data_ui("daf_num", org_type_choices, date = FALSE),
-          plot_ui("daf_num")
-        ),
-        bslib::nav_panel(
-          "DAF Proprotion",
-          data_ui("daf_proportion", org_type_choices, date = FALSE),
-          plot_ui("daf_proportion")
+        bslib::navset_pill(
+          bslib::nav_panel(
+            "Total Contributions",
+            data_ui("daf_contributions", org_type_choices, date = FALSE),
+            plot_ui("daf_contributions")
+          ),
+          bslib::nav_panel(
+            "Total Grants",
+            data_ui("daf_grants", org_type_choices, date = FALSE),
+            plot_ui("daf_grants")
+          ),
+          bslib::nav_panel(
+            "Total Value",
+            data_ui("daf_value", org_type_choices, date = FALSE),
+            plot_ui("daf_value")
+          ),
+          bslib::nav_panel(
+            "Number of DAFs",
+            data_ui("daf_num", org_type_choices, date = FALSE),
+            plot_ui("daf_num")
+          ),
+          bslib::nav_panel(
+            "DAF Proprotion",
+            data_ui("daf_proportion", org_type_choices, date = FALSE),
+            plot_ui("daf_proportion")
+          )
+          
         )
         
       )
-      
-    )
+    ),
+    bslib::nav_panel(title = "Download Data", div(
+      br(),
+      h2("Download Data", class = "pageheader"),
+      br(),
+      h3("Download the data used in the visualizations above."),
+      br(),
+      downloadButton("downloadData", "Download Data", class = "btn-download")
+    ))
   )
   
   server <- function(input, output, session) {
@@ -148,7 +160,7 @@ app <- function(...) {
     data_server(
       "daf_contributions",
       geo_df,
-      daf_contributions,
+      daf,
       "Year",
       "Total Contributions",
       create_single_col_plot,
@@ -159,7 +171,7 @@ app <- function(...) {
     data_server(
       "daf_num",
       geo_df,
-      daf_number,
+      daf,
       "Year",
       "Number of DAFs",
       create_single_col_plot,
@@ -170,9 +182,9 @@ app <- function(...) {
     data_server(
       "daf_proportion",
       geo_df,
-      daf_proportion,
+      daf,
       "Year",
-      "DAF Proportion",
+      "Proportion With DAFs",
       create_single_col_plot,
       create_group_col_plot,
       daf_title_prefix,
@@ -181,7 +193,7 @@ app <- function(...) {
     data_server(
       "daf_value",
       geo_df,
-      daf_value,
+      daf,
       "Year",
       "Total Value",
       create_single_col_plot,
@@ -192,7 +204,7 @@ app <- function(...) {
     data_server(
       "daf_grants",
       geo_df,
-      daf_grants,
+      daf,
       "Year",
       "Total Grants",
       create_single_col_plot,
