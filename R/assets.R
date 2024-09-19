@@ -6,12 +6,6 @@
 # Date Created: 2024-08-05
 # Date Last Edited: 2024-08-05
 
-# Load Package
-library(usdata)
-
-# Scientific Notation
-options(scipen=999)
-
 # Footers
 plot_footer <- bslib::card_footer(
   div(
