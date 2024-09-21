@@ -1,23 +1,11 @@
 app <- function(...) {
-  sibtheme <- bslib::bs_theme(
-    bg = "#ffffff",
-    fg = "#000",
-    primary = "#1696d2",
-    secondary = "#fdbf11",
-    success = "#55b748",
-    warning = "#ec008b",
-    danger = "#db2b27",
-    info = "#d2d2d2",
-    base_font = bslib::font_google("Lato"),
-    version = 5
-  )
   ui <- bslib::page_navbar(
     title = "Nonprofit Sector In Brief",
     id = "tabs",
-    fillable = FALSE,
     bg = "#a2d4ec",
+    fillable = FALSE,
     htmltools::tags$head(
-      htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "sib_style.css"),
+      htmltools::includeCSS("www/sib_style.css"),
       htmltools::tags$style(
         htmltools::HTML(
           "
@@ -87,14 +75,8 @@ app <- function(...) {
         panel_desc = "Donor Advised Funds (DAFs) are charitable giving accounts that allow donors to make contributions to a public charity that sponsors a DAF program."
       )
     ),
-    bslib::nav_panel(title = "Download Data", div(
-      br(),
-      h2("Download Data", class = "pageheader"),
-      br(),
-      h3("Download the data used in the visualizations above."),
-      br(),
-      downloadButton("downloadData", "Download Data", class = "btn-download")
-    ))
+    bslib::nav_panel(title = "Download Data",
+                     dataRequestUI("data_download"))
   )
   
   server <- function(input, output, session) {
@@ -204,6 +186,8 @@ app <- function(...) {
         write.csv(tables[["default"]], file)
       }
     )
+    
+    dataRequestServer("data_download")
   }
   shinyApp(ui = ui, server = server)
 }
