@@ -8,9 +8,14 @@
     font-size: 16px;
     text-align: center;
 }
+.card-header { 
+        background-color: white ; 
+        color: black;
+        font-size: 16px;
+}
 .header {
     font-family: 'Lato'; /* Use the Lato font */
-    font-size: 16px; /* Set the font size to large */
+    font-size: 14px; /* Set the font size to large */
 }
 .title {
     font-family: 'Lato', sans-serif; /* Use the Lato font */
