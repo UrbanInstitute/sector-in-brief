@@ -4,9 +4,7 @@ create_plot_subtitle <- function(geo_level,
                                  state_selector_multi,
                                  county_selector,
                                  cbsa_selector,
-                                 subsector_level,
                                  subsector_select,
-                                 size_level,
                                  size_select) {
   asset_size_ls <- list(
     "1" = "Under $100,000",
@@ -46,23 +44,16 @@ create_plot_subtitle <- function(geo_level,
     )
   }
   
-  if (subsector_level == "individual") {
-    subtitle <- paste(subtitle,
-                      "Subsector(s):",
-                      paste(subsector_select, collapse = ", "),
-                      "\n")
-  }
-  if (size_level == "individual") {
-    sizes <- unlist(purrr::map(
-      size_select,
-      .f = function(x) {
-        asset_size_ls[[x]]
-      }
-    ))
-    subtitle <- paste(subtitle,
-                      "Asset Size(s):",
-                      paste(sizes, collapse = ", "),
-                      "\n")
-  }
+  subtitle <- paste(subtitle,
+                    "Subsector(s):",
+                    paste(subsector_select, collapse = ", "),
+                    "\n")
+  sizes <- unlist(purrr::map(
+    size_select,
+    .f = function(x) {
+      asset_size_ls[[x]]
+    }
+  ))
+  subtitle <- paste(subtitle, "Asset Size(s):", paste(sizes, collapse = ", "), "\n")
   return(subtitle)
 }
