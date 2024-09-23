@@ -41,7 +41,7 @@ validate_inputs <- function(org_type,
     message <- "Please select at least one subsector."
   }
   if (length(size) == 0){
-    message <- "Please select at least one size."
+    message <- "Please select at least one asset size category."
   }
   return(message)
 }
