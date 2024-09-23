@@ -37,7 +37,8 @@ geo_filter_ui <- function(id, state_choices) {
         shiny::NS(id, "state_selector_multi"),
         label = "Select State(s)",
         choices = state_choices,
-        multiple = TRUE
+        multiple = TRUE,
+        selected = NULL
       ),
       condition = "input.geo_level == 'Census State'",
       ns = shiny::NS(id)
@@ -47,7 +48,8 @@ geo_filter_ui <- function(id, state_choices) {
         shiny::NS(id, "state_selector_single"),
         label = "Select State",
         choices = state_choices,
-        multiple = FALSE
+        multiple = FALSE,
+        selected = NULL
       ),
       condition = "input.geo_level == 'Census County' | input.geo_level == 'Census CBSA'",
       ns = shiny::NS(id)
