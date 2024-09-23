@@ -56,7 +56,8 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           "Census County" = geo_filters$county_selector(),
           "Census CBSA" = geo_filters$cbsa_selector()
         )
-        highlight_server("geo_highlight", geo_highlight_ls[[geo_filters$geo_level()]])
+        highlights <- highlight_server("geo_highlight", geo_highlight_ls[[geo_filters$geo_level()]])
+        subsector_highlight <- highlight_server("subsector_highlight", input$subsector_select)
         shiny::withProgress(min = 1, max = 5, {
           setProgress(1, message = "Filtering Data...")
           filtered_data <- filter_data(
@@ -113,7 +114,7 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           # Stage 5 Displaying Results - By Subsector
           output$plot_subsector <- renderPlot({
             plots[["by_subsector"]] + gghighlight::gghighlight(
-              `Subsector` %in% input$subsector_highlight,
+              all(`Subsector` %in% subsector_highlight$highlights()),
             )
           })
           output$table_subsector <- renderReactable({
@@ -130,25 +131,27 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           })
           # Stage 5 Displaying Results - Geography
           output$plot_geo <- renderPlot({
-            plots[["by_geo"]] + gghighlight::gghighlight(
-              `Census State` == input$individual_geo,
-            )
+            if (geo_filters$geo_level() == "all") {
+              plots[["by_geo"]]
+            } else{
+              plots[["by_geo"]] + gghighlight::gghighlight(
+                all(!!sym(geo_filters$geo_level()) %in% highlights$highlights())
+              )
+            }
           })
           output$table_geo <- renderReactable({
             if (geo_filters$geo_level() != "all") {
               reactable(
                 tables[["by_geo"]],
-                groupBy = input$geo_level,
+                groupBy = geo_filters$geo_level(),
                 outlined = TRUE,
                 defaultPageSize = 10,
                 defaultColDef = colDef(align = "center")
               )
             }
           })
-          output$plot_size <- renderPlot({
-            plots[["by_asset_size"]]
-          })
           # Stage 5 Displaying Results - Asset Size
+          size_highlights <- highlight_server("size_highlight", size_choices[size_choices %in% input$size_filter])
           output$table_size <- renderReactable({
             if (length(input$size_filter) > 0){
               reactable(
@@ -159,6 +162,12 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
                 defaultColDef = colDef(align = "center")
               )
             }
+          })
+          output$plot_size <- renderPlot({
+            plots[["by_asset_size"]] +
+              gghighlight::gghighlight(
+                all(`Asset Size` %in% names(size_choices)[size_choices %in% size_highlights$highlights()])
+              )
           })
           setProgress(5, message = "Done!")
         })
