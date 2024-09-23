@@ -31,6 +31,10 @@ data_ui <- function(id, org_type_choices, date) {
         )
       ),
       bslib::card(
+        card_header("Geography"),
+        geo_filter_ui(NS(id, "geo_filter"), state_choices),
+      ),
+      bslib::card(
         bslib::card_header("Subsector"),
         shiny::checkboxGroupInput(
           inputId = shiny::NS(id, "subsector_select"),
@@ -42,7 +46,7 @@ data_ui <- function(id, org_type_choices, date) {
       ),
       bslib::card(
         card_header("Asset Size"),
-        shiny::radioButtons(
+        shiny::checkboxGroupInput(
           inputId = shiny::NS(id, "size_filter"),
           label = NULL,
           inline = FALSE,
