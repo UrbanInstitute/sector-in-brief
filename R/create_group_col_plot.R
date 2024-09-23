@@ -4,7 +4,7 @@ create_group_col_plot <- function(table, grouping_var, title, subtitle, yvar, xv
     y = !!sym(yvar),
     fill = !!sym(grouping_var)
   )) +
-    geom_col() +
+    geom_col(width = 0.9) +
     scale_y_continuous(
       limits = c(0, NA),
       expand = expansion(mult = 0.1),
