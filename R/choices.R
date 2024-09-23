@@ -83,3 +83,21 @@ state_choices <- list(
   "Wisconsin" = "WI",
   "Wyoming" = "WY"
 )
+
+asset_size_ls <- list(
+  "1" = "Under $100,000",
+  "2" = "$100,000 - $499,999",
+  "3" = "$500,000 - $999,999",
+  "4" = "$1 Million - $4.99 Million",
+  "5" = "$5 Million - $9.99 Million",
+  "6" = "Above $10 Million"
+)
+
+asset_sizes <- list(
+  "Under $100,000",
+  "$100,000 - $499,999",
+  "$500,000 - $999,999",
+  "$1 Million - $4.99 Million",
+  "$5 Million - $9.99 Million",
+  "Above $10 Million"
+)
