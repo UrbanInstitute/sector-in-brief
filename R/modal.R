@@ -1,5 +1,5 @@
 # Function to create a modal dialog box
-modal <- function(title, message){
+modal <- function(message){
   shiny::modalDialog(
     title = message,
     easyClose = TRUE
