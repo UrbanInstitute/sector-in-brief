@@ -13,8 +13,7 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
         geo_filters$county_selector(),
         geo_filters$cbsa_selector(),
         input$subsector_select,
-        input$size_level,
-        input$size_select,
+        input$size_filter,
         input$date_range
       )
 
