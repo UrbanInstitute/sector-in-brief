@@ -1,5 +1,5 @@
 # Function to summarise data
-summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_level, asset_size_level) {
+summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_choices, size_choices) {
   table_default <- data |>
     group_by(!!sym(groupby_var)) |>
     summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
@@ -12,14 +12,14 @@ summarise_data <- function(data, groupby_var, sum_var, geo_level, subsector_leve
       dplyr::collect()
     table_ls[["by_geo"]] <- table_by_geo
   }
-  if (subsector_level != "all") {
+  if (length(subsector_choices) > 0) {
     table_by_subsector <- data |>
       group_by(!!sym(groupby_var), Subsector) |>
       summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
       dplyr::collect()
     table_ls[["by_subsector"]] <- table_by_subsector
   }
-  if (asset_size_level != "all") {
+  if (length(size_choices) > 0) {
     table_by_asset_size <- data |>
       group_by(!!sym(groupby_var), `Asset Size`) |>
       summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
