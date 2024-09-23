@@ -1,6 +1,23 @@
 data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func, group_plot_func, title_prefix, time_series=TRUE) {
   shiny::moduleServer(id, function(input, output, session) {
     geo_filters <- geo_filter_server("geo_filter", geo_df)
+    output$data_selection <- renderReactable({
+      shiny::req(geo_filters$geo_level())
+      data_selection_text(
+        input$org_level,
+        input$other_orgs,
+        geo_filters$geo_level(),
+        geo_filters$region_selector(),
+        geo_filters$state_selector_single(),
+        geo_filters$state_selector_multi(),
+        geo_filters$county_selector(),
+        geo_filters$cbsa_selector(),
+        input$subsector_select,
+        input$size_level,
+        input$size_select,
+        input$date_range
+      )
+    })
     observeEvent(input$process_data, {
       title <- create_plot_title(input$org_level, input$other_orgs, input$date_range, time_series, title_prefix)
       subtitle <- create_plot_subtitle(
@@ -10,10 +27,8 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
         geo_filters$state_selector_multi(),
         geo_filters$county_selector(),
         geo_filters$cbsa_selector(),
-        input$subsector_level,
         input$subsector_select,
-        input$size_level,
-        input$size_select
+        input$size_filter
       )
       shiny::withProgress(min = 1, max = 5, {
         setProgress(1, message = "Filtering Data...")
@@ -27,10 +42,8 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           state_mult = geo_filters$state_selector_multi(),
           county = geo_filters$county_selector(),
           cbsa = geo_filters$cbsa_selector(),
-          subsector_level = input$subsector_level,
           subsectors = input$subsector_select,
-          asset_size_level = input$size_level,
-          asset_sizes = input$size_select,
+          asset_sizes = input$size_filter,
           time_series = time_series,
           year_start = input$date_range[1],
           year_end = input$date_range[2],
@@ -42,8 +55,8 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           groupby_var = groupby_var,
           sum_var = sum_var,
           geo_level = geo_filters$geo_level(),
-          subsector_level = input$subsector_level,
-          asset_size_level = input$size_level
+          subsector_choices = input$subsector_select,
+          size_choices = input$size_filter
         )
         setProgress(3, message = "Creating Graphs...")
         plots <- create_plots(
@@ -51,8 +64,8 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           single_plot_func = single_plot_func,
           group_plot_func = group_plot_func,
           geo_level = geo_filters$geo_level(),
-          subsector_level = input$subsector_level,
-          asset_size_level = input$size_level,
+          subsector_choices = input$subsector_select,
+          size_choices = input$size_level,
           title = title,
           subtitle = subtitle,
           yvar = sum_var,
@@ -72,10 +85,12 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
         })
         # Stage 5 Displaying Results - By Subsector
         output$plot_subsector <- renderPlot({
-          plots[["by_subsector"]]
+          plots[["by_subsector"]] + gghighlight::gghighlight(
+            `Subsector` %in% input$subsector_highlight,
+          )
         })
         output$table_subsector <- renderReactable({
-          if (input$subsector_level == "individual") {
+          if (length(input$subsector_select) > 0) {
             shiny::req(tables[["by_subsector"]])
             reactable(
               tables[["by_subsector"]],
@@ -88,7 +103,9 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
         })
         # Stage 5 Displaying Results - Geography
         output$plot_geo <- renderPlot({
-          plots[["by_geo"]]
+          plots[["by_geo"]] + gghighlight::gghighlight(
+            `Census State` == input$individual_geo,
+          )
         })
         output$table_geo <- renderReactable({
           if (geo_filters$geo_level() != "all") {
