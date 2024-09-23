@@ -1,8 +1,11 @@
 create_group_line_plot <- function(table, grouping_var, title, subtitle, yvar, xvar) {
-  p <- ggplot(table, aes(x = !!sym(xvar), y = !!sym(yvar), colour = !!sym(grouping_var))) +
-    geom_line(size = 1.5,
+  p <- ggplot(table, aes(x = !!sym(xvar), y = !!sym(yvar))) +
+    geom_line(aes(colour = !!sym(grouping_var)),
+              size = 1.5,
               linetype = 1) +
-    geom_point(size = 3, fill = "white", shape = 21, stroke = 1.2) +
+    geom_point(aes(colour = !!sym(grouping_var)),
+               size = 3, fill = "white", shape = 21, stroke = 1.2) +
+    scale_color_manual(values = c("#2c3e50", "#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6")) +
     scale_y_continuous(
       limits = c(0, NA),
       expand = expansion(mult = 0.1),
