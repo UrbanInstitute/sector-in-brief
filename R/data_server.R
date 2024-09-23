@@ -49,7 +49,14 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           input$subsector_select,
           input$size_filter
         )
-        highlight_server("geo_highlight", geo_filters$state_selector_multi())
+        geo_highlight_ls <- list(
+          "all" = state_choices,
+          "Census Region" = geo_filters$region_selector(),
+          "Census State" = geo_filters$state_selector_multi(),
+          "Census County" = geo_filters$county_selector(),
+          "Census CBSA" = geo_filters$cbsa_selector()
+        )
+        highlight_server("geo_highlight", geo_highlight_ls[[geo_filters$geo_level()]])
         shiny::withProgress(min = 1, max = 5, {
           setProgress(1, message = "Filtering Data...")
           filtered_data <- filter_data(
