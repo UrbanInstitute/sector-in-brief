@@ -35,7 +35,7 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
         input$date_range[2]
       )
       if (input_validation_msg != TRUE) {
-        shiny::showModal(modal(modal_titles[["invalid_inputs"]], input_validation_msg))
+        shiny::showModal(modal(input_validation_msg))
       }
       else {
         title <- create_plot_title(input$org_level, input$other_orgs, input$date_range, time_series, title_prefix)
@@ -49,6 +49,7 @@ data_server <- function(id, geo_df, data, groupby_var, sum_var, single_plot_func
           input$subsector_select,
           input$size_filter
         )
+        highlight_server("geo_highlight", geo_filters$state_selector_multi())
         shiny::withProgress(min = 1, max = 5, {
           setProgress(1, message = "Filtering Data...")
           filtered_data <- filter_data(
