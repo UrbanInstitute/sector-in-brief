@@ -2,9 +2,9 @@
 create_plots <- function(table_ls,
                          single_plot_func,
                          group_plot_func,
-                         geo_level, 
-                         subsector_level, 
-                         asset_size_level, 
+                         geo_level,
+                         subsector_choices,
+                         size_choices, 
                          title, 
                          subtitle,
                          yvar,
@@ -28,14 +28,14 @@ create_plots <- function(table_ls,
   } else {
     plot_ls[["by_geo"]] <- create_blank_plot("Select A Sub-Geographic Level From Above For Data By Geography")
   }
-  if (subsector_level == "individual") {
+  if (length(subsector_choices) > 0) {
     subsector_title <- paste(title, ", By Subsector")
     by_subsector_plot <- group_plot_func(table_ls[["by_subsector"]], "Subsector", subsector_title, subtitle, yvar, xvar)
     plot_ls[["by_subsector"]] <- by_subsector_plot
   } else {
     plot_ls[["by_subsector"]] <- create_blank_plot("Select A Individual Subsector From Above For Data By Subsector")
   }
-  if (asset_size_level == "individual") {
+  if (length(size_choices) > 0) {
     size_title <- paste(title, ", By Asset Size")
     by_asset_size_plot <- group_plot_func(table_ls[["by_asset_size"]], "Asset Size", size_title, subtitle, yvar, xvar)
     plot_ls[["by_asset_size"]] <- by_asset_size_plot
