@@ -8,9 +8,7 @@ filter_data <- function(data,
                         state_mult = NULL,
                         county = NULL,
                         cbsa = NULL,
-                        subsector_level = "all",
                         subsectors = NULL,
-                        asset_size_level = "all",
                         asset_sizes = NULL,
                         time_series = FALSE,
                         year_start = NULL,
@@ -22,12 +20,8 @@ filter_data <- function(data,
   if (geo_level != "all"){
     data <- geo_query(data, geo_level, region, state_single, state_mult, county, cbsa)
   }
-  if (subsector_level != "all") {
-    data <- general_query(data, "Subsector",subsectors)
-  }
-  if (asset_size_level != "all") {
-    data <- general_query(data, "Asset Size", asset_sizes)
-  }
+  data <- general_query(data, "Subsector",subsectors)
+  data <- general_query(data, "Asset Size", asset_sizes)
   if (time_series){
     if (year_start != 1989) {
       data <- filter(data, !!sym(yearvar) >= year_start)
