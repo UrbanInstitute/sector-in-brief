@@ -1,7 +1,8 @@
 # Module for data processing in Shiny App
 data_ui <- function(id, org_type_choices, date) {
+  tagList(
   bslib::card(
-    card_header("Step 1: Filters"),
+    card_header("Select Your Variables"),
     title = "",
     bslib::layout_columns(
       bslib::card(
@@ -30,47 +31,23 @@ data_ui <- function(id, org_type_choices, date) {
         )
       ),
       bslib::card(
-        card_header("Geography"),
-        geo_filter_ui(NS(id, "geo_filter"), state_choices),
-      ),
-      bslib::card(
         bslib::card_header("Subsector"),
-        shiny::radioButtons(
-          inputId = shiny::NS(id, "subsector_level"),
+        shiny::checkboxGroupInput(
+          inputId = shiny::NS(id, "subsector_select"),
           label = NULL,
-          choices = subsector_level_choices,
-          inline = TRUE
-        ),
-        shiny::conditionalPanel(
-          shiny::selectizeInput(
-            inputId = shiny::NS(id, "subsector_select"),
-            label = NULL,
-            choices = subsector_choices,
-            multiple = TRUE,
-            options = list(maxItems = 10)
-          ),
-          condition = "input.subsector_level == 'individual'",
-          ns = shiny::NS(id)
+          choices = subsector_choices,
+          selected = subsector_choices,
+          inline = FALSE
         )
       ),
       bslib::card(
         card_header("Asset Size"),
         shiny::radioButtons(
-          inputId = shiny::NS(id, "size_level"),
+          inputId = shiny::NS(id, "size_filter"),
           label = NULL,
-          inline = TRUE,
-          choices = size_level_choices
-        ),
-        shiny::conditionalPanel(
-          shiny::selectizeInput(
-            inputId = shiny::NS(id, "size_select"),
-            label = NULL,
-            choices = size_choices,
-            multiple = TRUE,
-            options = list(maxItems = 5)
-          ),
-          condition = "input.size_level == 'individual'",
-          ns = shiny::NS(id)
+          inline = FALSE,
+          choices = size_choices,
+          selected = size_choices
         )
       ),
       if (date == TRUE){
@@ -89,7 +66,11 @@ data_ui <- function(id, org_type_choices, date) {
           )
         )
       }
-    ),
+    )
+  ),
+  bslib::card(
+    card_header("Confirm Your Selections"),
+    reactable::reactableOutput(shiny::NS(id, "data_selection")),
     bslib::input_task_button(
       id = shiny::NS(id, "process_data"),
       style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
@@ -97,5 +78,6 @@ data_ui <- function(id, org_type_choices, date) {
       label_busy = "UPDATING PLOTS",
       type = "primary"
     )
+  )
   )
 }
