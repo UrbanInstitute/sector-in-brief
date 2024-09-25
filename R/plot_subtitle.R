@@ -1,4 +1,4 @@
-create_plot_subtitle <- function(inputs) {
+plot_subtitle <- function(inputs) {
   # Params
   subtitle <- ""
   geo_level <- inputs$geo_level
