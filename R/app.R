@@ -1,4 +1,5 @@
 app <- function(...) {
+  navpanels <- purrr::pmap(navpanels, navpanel_wrapper)
   ui <- bslib::page_navbar(
     title = "Nonprofit Sector In Brief",
     id = "tabs",
@@ -57,23 +58,10 @@ app <- function(...) {
     exec_summary,
     bslib::nav_menu(
       title = "Visualise Data",
-      visual_panel(
-        title = "Number",
-        panel_header = "Total number of nonprofits",
-        panel_desc = "The number of organizations that are registered with the Internal Revenue Service (IRS).",
-        panelid = "nn_data"
-      ),
-      visual_panel(
-        title = "Assets",
-        panel_header = "Total Assets",
-        panel_desc = "Total assets – The aggregate value of everything nonprofits own.",
-        panelid = "assets"
-      ),
-     visual_pill_panel(
-        title = "Donor Advised Funds",
-        panel_header = "Donor Advised Funds",
-        panel_desc = "Donor Advised Funds (DAFs) are charitable giving accounts that allow donors to make contributions to a public charity that sponsors a DAF program."
-      )
+      navpanels[[1]],
+      navpanels[[2]],
+      navpanels[[3]],
+      navpanels[[4]]
     ),
     bslib::nav_panel(title = "Download Data",
                      dataRequestUI("data_download"))
@@ -86,24 +74,20 @@ app <- function(...) {
     
     data_select <- observeEvent( input$tabs, {
       if(input$tabs == "Number"){
-        shinycssloaders::showPageSpinner()
-        data_select <- arrow::read_parquet("data/number_nonprofits.parquet", as_data_frame = FALSE)
-        shinycssloaders::hidePageSpinner()
+        data <- dataloader("data/number_nonprofits.parquet")
         data_server(
-          "nn_data",
-          geo_df,
-          data_select,
-          "Year",
-          "Number of Nonprofits",
-          create_single_line_plot,
-          create_group_line_plot,
-          "Number of"
+          id = "number",
+          geo_df = geo_df,
+          data = data,
+          groupby_var = "Year",
+          sum_var = "Number of Nonprofits",
+          ytitle = "Number of Nonprofits",
+          xtitle = "Year",
+          title_prefix = "Number of"
         )
       }
       else if(input$tabs == "Assets"){
-        shinycssloaders::showPageSpinner()
-        data_select <- arrow::read_parquet("data/Total_Assets.parquet", as_data_frame = FALSE)
-        shinycssloaders::hidePageSpinner()
+        loadingpage("data/Total_Assets.parquet")
         data_server(
           "assets",
           geo_df,
@@ -116,12 +100,7 @@ app <- function(...) {
         )
       }
       else if(input$tabs == "Donor Advised Funds"){
-        shinycssloaders::showPageSpinner()
-        data_select <- arrow::read_parquet("data/daf.parquet", as_data_frame = FALSE) |>
-          dplyr::mutate(
-            Year = 2021
-          )
-        shinycssloaders::hidePageSpinner()
+        loadingpage("data/daf.parquet")
         data_server(
           "daf_contributions",
           geo_df,
