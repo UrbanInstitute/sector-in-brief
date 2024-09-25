@@ -7,7 +7,7 @@ plots_build_single <- function(table,
                                ytitle,
                                xtitle,
                                year_var) {
-  if (length(unique(table[[year_var]]) > 1)) {
+  if (length(unique(table[[year_var]])) > 1) {
     if (is.null(groupby_var)) {
       single_line_plot(table = table, 
                        title = title, 
