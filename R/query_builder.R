@@ -16,10 +16,12 @@ query_builder <- function(inputs) {
   # Create query list
   filter_ls <- list("Organization Type" = org_level)
   # Organization Type
-  if (org_level == "501(c)(4) Social Welfare Organizations") {
-    filter_ls[["Organization Type"]] <- "501(c)(4)"
-  } else if (org_level == "Other Organizations") {
-    filter_ls[["Organization Type"]] <- other_orgs
+  if (! is.null(org_level)){
+    if (org_level == "501(c)(4) Social Welfare Organizations") {
+      filter_ls[["Organization Type"]] <- "501(c)(4)"
+    } else if (org_level == "Other Organizations") {
+      filter_ls[["Organization Type"]] <- other_orgs
+    }
   }
   # Geographies
   if (geo_level == "all") {
