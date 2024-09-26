@@ -9,14 +9,15 @@ query_builder <- function(inputs) {
   state_mult <- inputs$state_mult
   county <- inputs$county
   cbsa <- inputs$cbsa
-  subsector_select <- inputs$subsector_select
-  size_select <- inputs$size_select
+  subsector <- inputs$subsector
+  size <- inputs$size
   year_range <- inputs$year_range
+  year_var <- inputs$year_var
   # Create query list
   filter_ls <- list("Organization Type" = org_level)
   # Organization Type
   if (org_level == "501(c)(4) Social Welfare Organizations") {
-    filter_ls[["Organization Type"]] <- "501(c)(4) Social Welfare Organizations"
+    filter_ls[["Organization Type"]] <- "501(c)(4)"
   } else if (org_level == "Other Organizations") {
     filter_ls[["Organization Type"]] <- other_orgs
   }
@@ -39,14 +40,14 @@ query_builder <- function(inputs) {
   }
   filter_ls[[geo_level]] <- geo_selection
   # Subsector
-  filter_ls[["Subsector"]] <- subsector_select
+  filter_ls[["Subsector"]] <- subsector
   # Asset Size
-  filter_ls[["Asset Size"]] <- size_select
+  filter_ls[["Asset Size"]] <- size
   # Date Range
   if (length(year_range) > 0) {
     years <- seq(year_range[1], year_range[2])
-    filter_ls[["Year"]] <- years
+    filter_ls[[year_var]] <- years
   }
-  
-  return(filter_ls)
+  query_ls <- list(filters = filter_ls, geo_level = geo_level)
+  return(query_ls)
 }
