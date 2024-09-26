@@ -1,8 +1,11 @@
 plot_title <- function(inputs) {
-  if (inputs$org_level == "Other Nonprofits") {
-    title <- paste(inputs$title_prefix, inputs$other_orgs)
-  } else {
-    title <- paste(inputs$title_prefix, inputs$org_level)
+  title <- ""
+  if (! is.null(inputs$org_level)){
+    if (inputs$org_level == "Other Nonprofits") {
+      title <- paste(inputs$title_prefix, inputs$other_orgs)
+    } else {
+      title <- paste(inputs$title_prefix, inputs$org_level)
+    } 
   }
   if (inputs$time_series){
     start_year <- inputs$year_range[1]
