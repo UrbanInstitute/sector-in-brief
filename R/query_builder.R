@@ -14,9 +14,10 @@ query_builder <- function(inputs) {
   year_range <- inputs$year_range
   year_var <- inputs$year_var
   # Create query list
-  filter_ls <- list("Organization Type" = org_level)
+  filter_ls <- list()
   # Organization Type
   if (! is.null(org_level)){
+    filter_ls[["Organization Type"]] = org_level
     if (org_level == "501(c)(4) Social Welfare Organizations") {
       filter_ls[["Organization Type"]] <- "501(c)(4)"
     } else if (org_level == "Other Organizations") {
