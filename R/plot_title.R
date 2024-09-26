@@ -1,5 +1,5 @@
 plot_title <- function(inputs) {
-  title <- input$title_prefix
+  title <- inputs$title_prefix
   if (! is.null(inputs$org_level)){
     if (inputs$org_level == "Other Nonprofits") {
       title <- paste(title, inputs$other_orgs)
