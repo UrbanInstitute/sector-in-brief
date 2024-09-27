@@ -6,21 +6,19 @@ single_line_plot <- function(table,
                              xtitle,
                              ytitle) {
   p <- ggplot(table, aes(x = !!sym(xvar), y = !!sym(yvar))) +
-    geom_line(size = 1.5,
-              linetype = 1,
-              color = "#1696d2") +
-    geom_point(
+    ggiraph::geom_line_interactive(size = 1.5,
+                                   hover_nearest = FALSE,
+                                   color = "#1696d2") +
+    ggiraph::geom_point_interactive(
+      aes(tooltip = tooltip_text(table, yvar, xvar)),
       size = 3,
-      color = "#1696d2",
       fill = "white",
       shape = 21,
-      stroke = 1.2
+      stroke = 1.2,
+      color = "#1696d2",
+      hover_nearest = TRUE
     ) +
-    scale_y_continuous(
-      limits = c(0, NA),
-      expand = expansion(mult = 0.1),
-      labels = scales::comma()
-    ) +
+    plot_scales +
     labs(
       subtitle = subtitle,
       x = xtitle,
@@ -29,5 +27,8 @@ single_line_plot <- function(table,
     ) +
     scale_x_continuous(breaks = seq(1990, 2024, 4)) +
     plot_theme
- return(p)
+  p <- ggiraph::girafe(ggobj = p,
+                       width_svg = 20,
+                       options = ggiraph_options)
+  return(p)
 }
