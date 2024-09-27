@@ -46,7 +46,8 @@ plots_build_single <- function(table,
                      yvar = yvar, 
                      xvar = xvar, 
                      ytitle = ytitle, 
-                     xtitle = xtitle)
+                     xtitle = xtitle,
+                     num_groups = unique(table[[groupby_var]]) |> length())
     }
   }
 }

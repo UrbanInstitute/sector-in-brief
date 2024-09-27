@@ -1,11 +1,25 @@
-group_col_plot <- function(table, groupby_var, title, subtitle, yvar, xvar, ytitle, xtitle) {
+group_col_plot <- function(table,
+                           groupby_var,
+                           title,
+                           subtitle,
+                           yvar,
+                           xvar,
+                           ytitle,
+                           xtitle,
+                           num_groups) {
   p <- ggplot(table, aes(
     x = !!sym(groupby_var),
     y = !!sym(yvar),
     fill = !!sym(groupby_var)
   )) +
-    geom_col(width = 0.9) +
-    scale_fill_manual(values = colorpalette) +
+    ggiraph::geom_col_interactive(aes(tooltip = tooltip_text(table, 
+                                                             groupby_var, 
+                                                             yvar, 
+                                                             xvar)),
+                                  width = 0.9,
+                                  hover_nearest = TRUE,
+    ) +
+    scale_fill_manual(values = colorpalette(num_colors = num_groups)) +
     plot_scales +
     labs(
       subtitle = subtitle,
@@ -15,5 +29,8 @@ group_col_plot <- function(table, groupby_var, title, subtitle, yvar, xvar, ytit
     ) +
     coord_flip() +
     plot_theme
+  p <- ggiraph::girafe(ggobj = p,
+                       width_svg = 20,
+                       options = ggiraph_options)
   return(p)
 }
