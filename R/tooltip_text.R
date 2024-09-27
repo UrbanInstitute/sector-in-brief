@@ -7,7 +7,7 @@ tooltip_text <- function(table, groupby_var, yvar, xvar) {
     "<br><b>",
     yvar,
     "</b>: ",
-    table[[yvar]],
+    scales::comma(table[[yvar]]),
     "<br><b>",
     xvar,
     "</b>: ",
