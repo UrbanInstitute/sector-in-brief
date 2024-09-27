@@ -9,6 +9,12 @@ data_server <- function(id,
                         time_series = TRUE) {
   shiny::moduleServer(id, function(input, output, session) {
     geo_filters <- geo_filter_server("geo_filter", geo_df)
+    observeEvent(input$clear_filters, {
+      shiny::updateSelectizeInput(
+        inputId = "org_level",
+        selected = "501(c)(3) Public Charities"
+      )
+    })
     observeEvent(input$process_data, {
       # Gather all inputs
       inputs <- list(
