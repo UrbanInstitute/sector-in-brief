@@ -38,7 +38,7 @@ data_server <- function(id,
         subtitle <- plot_subtitle(inputs)
         shiny::withProgress(min = 1, max = 5, {
           setProgress(1, message = "Filtering Data...")
-          query <- query_builder(inputs)
+          query <- query_builder(inputs, geo_df)
           filtered_data <- filter_data(data = data, filter_ls = query$filters)
           setProgress(2, message = "Creating Tables...")
           tables <- summarise_data(

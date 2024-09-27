@@ -1,5 +1,5 @@
 # This function creates a named list of queries for the data
-query_builder <- function(inputs) {
+query_builder <- function(inputs, geo_df) {
   # Load params
   org_level <- inputs$org_level
   other_orgs <- inputs$other_orgs
@@ -13,11 +13,12 @@ query_builder <- function(inputs) {
   size <- inputs$size
   year_range <- inputs$year_range
   year_var <- inputs$year_var
+  time_series <- inputs$time_series
   # Create query list
   filter_ls <- list()
   # Organization Type
   if (! is.null(org_level)){
-    filter_ls[["Organization Type"]] = org_level
+    filter_ls[["Organization Type"]] <- org_level
     if (org_level == "501(c)(4) Social Welfare Organizations") {
       filter_ls[["Organization Type"]] <- "501(c)(4)"
     } else if (org_level == "Other Organizations") {
@@ -47,7 +48,7 @@ query_builder <- function(inputs) {
   # Asset Size
   filter_ls[["Asset Size"]] <- size
   # Date Range
-  if (length(year_range) > 0) {
+  if (time_series == TRUE) {
     years <- seq(year_range[1], year_range[2])
     filter_ls[[year_var]] <- years
   }
