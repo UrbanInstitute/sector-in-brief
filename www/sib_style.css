@@ -1,7 +1,7 @@
 /* Custom css template for Sector In Brief Dashboard /*
 /* Programmer Name: Thiyaghessan tpoongundranar@urban.org /*
 /* Date Created: 2024-08-23 /*
-/* Date Last Modified: 2024-08-23 */
+/* Date Last Modified: 2024-09-27 */
 
 .body {
     font-family: 'Lato';
@@ -9,9 +9,18 @@
     text-align: center;
 }
 .card-header { 
-        background-color: #a2d4ec; 
-        color: black;
-        font-size: 16px;
+  background-color: white; 
+  color: black;
+  font-size: 16px;
+  font-family: 'Lato';
+}
+.nav-menu {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+  background-color: #cfe8f3;
 }
 .header {
     font-family: 'Lato'; /* Use the Lato font */
@@ -88,4 +97,81 @@
   font-family: 'Lato';
   font-size: 0.8rem;
   background-color: white;
+}
+.var-header {
+  font-family: 'Lato';
+  font-size: 2em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+}
+.var-sub-header {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  color: #696969;
+  text-align: left;
+}
+.var-title-card {
+  background-color: white;
+}
+.var-select-header {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  padding: 0.8rem;
+  color: black;
+  text-align: left;
+  background-color: #cfe8f3;
+}
+.viz-header {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+  background-color: white;
+  padding: 0.8rem;
+  padding-left: 1.5rem;
+}
+.nav-menu {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+  background-color: #cfe8f3;
+}
+.h3 {
+  font-size: 1.5em;
+  color: black;
+  text-align: center;
+}
+.p {
+  font-size: 1em;
+  color: black;
+  text-align: left;
+  margin-left: 0px;
+  margin:0;
+}
+.tableheader {
+  font-family: 'Lato';
+  font-size: 1.3em;
+  font-weight: bold;
+  color: black;
+  text-align: left;
+  padding-top: 20px;
+}
+.btn-download {
+color: #ffffff;
+background-color: #1696d2;
+border-color: #1696d2;
+font-size: 18px;
+font-family: 'Lato';
+border-radius: 0;
+margin: auto;
+}
+.btn-download:hover {
+color: #ffffff;
+background-color: #46abdb;
+border-color: #46abdb;
 }
