@@ -1,4 +1,6 @@
-urbanpalette <- c(
+# Function to programmatically extend the Urban color palette
+
+urbnpalette <- c(
   "#1696d2",
   "#d2d2d2",
   "#000000",
@@ -9,4 +11,9 @@ urbanpalette <- c(
   "#db2b27"
 )
 
-colorpalette <- grDevices::colorRampPalette(urbanpalette)(60)
+colorpalette <- function(num_colors, palette=urbnpalette){
+  colors <- grDevices::colorRampPalette(palette)(num_colors)
+  return(colors)
+}
+  
+  
