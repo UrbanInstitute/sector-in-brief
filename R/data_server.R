@@ -14,6 +14,22 @@ data_server <- function(id,
         inputId = "org_level",
         selected = "501(c)(3) Public Charities"
       )
+      shiny::updateSliderInput(
+        inputId = "date_range",
+        value = c(2000, 2020)
+      )
+      shiny::updateCheckboxGroupInput(
+        inputId = "subsector_select",
+        selected = ""
+      )
+      shiny::updateCheckboxGroupInput(
+        inputId = "size_filter",
+        selected = ""
+      )
+      shiny::updateSelectizeInput(
+        inputId = "geo_level",
+        selected = "Entire USA"
+      )
     })
     observeEvent(input$process_data, {
       # Gather all inputs
