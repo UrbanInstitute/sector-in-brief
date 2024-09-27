@@ -7,33 +7,14 @@ navpanel_wrapper <- function(title, panel_header, panel_desc, panelid) {
     bslib::card(
       card_header("Select Your Variables"),
       title = "",
-      if (title %in% c("Number", "Assets")){
-        bslib::layout_column_wrap(
-          all_cards[["org_card"]],
-          all_cards[["date_card"]],
-          all_cards[["subsector_card"]],
-          all_cards[["size_card"]],
-          all_cards[["geo_card"]]
-        )
-      } else if (grepl("PF", title)){
-        bslib::layout_column_wrap(
-          all_cards[["date_card"]],
-          all_cards[["subsector_card"]],
-          all_cards[["size_card"]],
-          all_cards[["geo_card"]],
-        )
-      } else if (grepl("DAF", title)){
-        bslib::layout_column_wrap(
-          all_cards[["subsector_card"]],
-          all_cards[["size_card"]],
-          all_cards[["geo_card"]]
-        )
+      if (title %in% c("Number", "Assets")) {
+        bslib::layout_column_wrap(all_cards[["org_card"]], all_cards[["date_card"]], all_cards[["subsector_card"]], all_cards[["size_card"]], all_cards[["geo_card"]])
+      } else if (grepl("PF", title)) {
+        bslib::layout_column_wrap(all_cards[["date_card"]], all_cards[["subsector_card"]], all_cards[["size_card"]], all_cards[["geo_card"]], )
+      } else if (grepl("DAF", title)) {
+        bslib::layout_column_wrap(all_cards[["subsector_card"]], all_cards[["size_card"]], all_cards[["geo_card"]])
       },
-      bslib::layout_column_wrap(
-        width = 1/2,
-        all_cards[["process_button"]],
-        all_cards[["clear_button"]]
-      )
+      all_cards[["process_button"]]
     ),
     plot_ui(panelid)
   )
