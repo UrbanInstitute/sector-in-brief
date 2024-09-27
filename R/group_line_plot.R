@@ -25,6 +25,7 @@ group_line_plot <- function(table,
     ) +
     scale_color_manual(values = colorpalette(num_colors = num_groups)) +
     plot_scales +
+    ggplot2::scale_x_continuous(breaks = seq(1990, 2024, 4)) +
     labs(
       subtitle = subtitle,
       x = xtitle,
