@@ -13,9 +13,9 @@ group_col_plot <- function(table,
     fill = !!sym(groupby_var)
   )) +
     ggiraph::geom_col_interactive(aes(tooltip = tooltip_text(table, 
-                                                             groupby_var, 
                                                              yvar, 
-                                                             xvar)),
+                                                             xvar,
+                                                             groupby_var)),
                                   width = 0.9,
                                   hover_nearest = TRUE,
     ) +

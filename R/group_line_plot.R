@@ -16,7 +16,7 @@ group_line_plot <- function(table,
               )) +
     ggiraph::geom_line_interactive(size = 1.5, hover_nearest = FALSE) +
     ggiraph::geom_point_interactive(
-      aes(tooltip = tooltip_text(table, groupby_var, yvar, xvar)),
+      aes(tooltip = tooltip_text(table, yvar, xvar, groupby_var)),
       size = 3,
       fill = "white",
       shape = 21,
