@@ -40,14 +40,18 @@ navpanels <- tibble::tribble(
   ~title, ~panel_header, ~panel_desc, ~panelid,
   "Number", "Total Number of Nonprofits", "The number of organizations that are registered with the Internal Revenue Service (IRS).", "number",
   "Assets", "Total Assets", "The aggregate value of everything nonprofits own", "assets",
-  "PF_Number", "Total Number of Grants", "Private foundations are charitable organizations that typically receive most of their funding from a single source and primarily exist to make grants, rather than operate programs.", "pf_number",
-  "PF_Median", "Median Grant Size", "Private foundations are charitable organizations that typically receive most of their funding from a single source and primarily exist to make grants, rather than operate programs.", "pf_median",
-  "PF_Amount", "Total Amount of Grants Paid", "Private foundations are charitable organizations that typically receive most of their funding from a single source and primarily exist to make grants, rather than operate programs.", "pf_amount",
-  "DAF_number", "Total Number of Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_number",
-  "DAF_contributions", "Total Contributions to Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_contributions",
-  "DAF_grants", "Total Grants from Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_grants",
-  "DAF_value", "Total Value of Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_value",
-  "DAF_proportion", "Percentage of nonprofits that maintain a DAF", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_proportion"
+  "Revenues", "Total Revenues", "The total amount of money that nonprofits receive", "revenues",
+  "Expenses", "Total Expenses", "The total amount of money that nonprofits spend", "expenses",
+  "Benefits", "Total Benefits", "The aggregate value of salaries, wages, benefits, and pension plan contributions nonprofits and private foundations pay to/on behalf of employees.", "benefits",
+  "Payroll Taxes", "Total Payroll Taxes", "The estimated aggregate value of the taxes nonprofits and private foundations pay on employee earnings.", "payroll",
+  "Number of Grants", "Total Number of Grants", "Private foundations are charitable organizations that typically receive most of their funding from a single source and primarily exist to make grants, rather than operate programs.", "pf_number",
+  "Median Grant Amount", "Median Grant Size", "Private foundations are charitable organizations that typically receive most of their funding from a single source and primarily exist to make grants, rather than operate programs.", "pf_median",
+  "Total Grant Amount", "Total Amount of Grants Paid", "Private foundations are charitable organizations that typically receive most of their funding from a single source and primarily exist to make grants, rather than operate programs.", "pf_amount",
+  "Number of DAFs", "Total Number of Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_number",
+  "DAF Contributions", "Total Contributions to Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_contributions",
+  "DAF Grants", "Total Grants from Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_grants",
+  "DAF Value", "Total Value of Donor Advised Funds", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_value",
+  "DAF Proportion", "Percentage of nonprofits that maintain a DAF", "Donor-advised funds (DAFs) are charitable giving accounts that allow donors to receive an immediate tax benefit and recommend grants from the fund over time.", "daf_proportion"
 )
                  
   
