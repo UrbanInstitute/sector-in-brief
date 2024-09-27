@@ -1,7 +1,23 @@
-# num_nonprofit_data <- arrow::read_parquet("data/number_nonprofits.parquet")
-geo_df <- arrow::read_csv_arrow("data/nested_geographies.csv")
-#daf <- arrow::read_parquet("data/daf.parquet")
-# assets <- arrow::read_parquet("data/Total_Assets.parquet")
-#revenue <- arrow::read_parquet("data/Total_Revenues.parquet")
-#expenses <- arrow::read_parquet("data/Total_Expenses.parquet")
-#pf_grants <- arrow::read_parquet("data/pf_grants.parquet")
+# Script to download raw data if it doesn't exist
+options(timeout = max(300, getOption("timeout")))
+
+
+current_files <- list.files("data/")
+
+files <- c(
+  "number_nonprofits.parquet",
+  "daf.parquet",
+  "finances.parquet",
+  "pf_grants.parquet",
+  "nested_geographies.csv"
+)
+
+for (file in files){
+  if (! file %in% current_files){
+    message(paste0("Downloading ", file))
+    url <- paste0("https://nccsdata.s3.amazonaws.com/dataexplorer/visuals/", 
+                  file)
+    destfile <- paste0("data/", file)
+    download.file(url = url, destfile = destfile)
+  }
+}
