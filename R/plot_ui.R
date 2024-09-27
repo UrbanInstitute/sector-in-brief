@@ -9,8 +9,12 @@ plot_ui <- function(id, selected_geographies) {
         heigh = 650,
         style = htmltools::css(grid_template_columns = "3fr 1fr"),
         bslib::card(
-          bslib::card_body(shinycssloaders::withSpinner(plotOutput(NS(id, "plot_overall"),
-                                                                   height = "500px"))),
+          bslib::card_body(
+            shinycssloaders::withSpinner(
+              ggiraph::girafeOutput(NS(id, "plot_overall"), width = "100%"),
+              type = 1
+            )
+          ),
           plot_footer
         ),
         bslib::card(
@@ -28,10 +32,11 @@ plot_ui <- function(id, selected_geographies) {
         height = 650,
         style = htmltools::css(grid_template_columns = "3fr 1fr"),
         bslib::card(
-          bslib::layout_sidebar(
-            sidebar = highlight_ui(NS(id, "subsector_highlight")),
-            bslib::card_body(shinycssloaders::withSpinner(plotOutput(NS(id, "plot_subsector"),
-                                                                     height = "500px")))
+          bslib::card_body(
+            shinycssloaders::withSpinner(
+              ggiraph::girafeOutput(NS(id, "plot_subsector"), width = "100%"),
+              type = 1
+            )
           ),
           plot_footer
         ),
@@ -50,10 +55,11 @@ plot_ui <- function(id, selected_geographies) {
         height = 650,
         style = htmltools::css(grid_template_columns = "3fr 1fr"),
         bslib::card(
-          bslib::layout_sidebar(
-            sidebar = highlight_ui(NS(id, "geo_highlight")),
-            bslib::card_body(shinycssloaders::withSpinner(plotOutput(NS(id, "plot_geo"),
-                                                                     height = "500px"))),
+          bslib::card_body(
+            shinycssloaders::withSpinner(
+              ggiraph::girafeOutput(NS(id, "plot_geo"), width = "100%"),
+              type = 1
+            )
           ),
           plot_footer
         ),
@@ -72,10 +78,11 @@ plot_ui <- function(id, selected_geographies) {
         height = 650,
         style = htmltools::css(grid_template_columns = "3fr 1fr"),
         bslib::card(
-          bslib::layout_sidebar(
-            sidebar = highlight_ui(NS(id, "size_highlight")),
-            bslib::card_body(shinycssloaders::withSpinner(plotOutput(NS(id, "plot_size"),
-                                                                     height = "500px")))
+          bslib::card_body(
+            shinycssloaders::withSpinner(
+              ggiraph::girafeOutput(NS(id, "plot_size"), width = "100%"),
+              type = 1
+            )
           ),
           plot_footer
         ),
