@@ -27,8 +27,8 @@ query_builder <- function(inputs, geo_df) {
   }
   # Geographies
   if (geo_level == "all") {
-    geo_level <- "Census State"
-    geo_selection <- unique(geo_df[["Census State"]])
+    geo_level <- "Census Region"
+    geo_selection <- c("Northeast", "Midwest", "South", "West")
   } else if (geo_level == "Census Region") {
     geo_selection <- paste(region, collapse = ", ")
   } else if (geo_level == "Census State") {
