@@ -75,3 +75,17 @@
     margin-top: 0;
     padding-top: 20px;
 }
+.summary-table-title {
+  font-family: 'Lato';
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+  background-color: #000000;
+  color: white;
+  font-size: 1rem;
+  font-weight: 400;
+}
+.summary-table-row {
+  font-family: 'Lato';
+  font-size: 0.8rem;
+  background-color: white;
+}
