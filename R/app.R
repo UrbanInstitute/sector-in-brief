@@ -1,59 +1,13 @@
 app <- function(...) {
   navpanels <- purrr::pmap(navpanels, navpanel_wrapper)
+  geo_df <- read.csv("data/nested_geographies.csv")
   ui <- bslib::page_navbar(
-    title = "Nonprofit Sector In Brief",
+    title = "NCCS | 990 Data Explorer",
     id = "tabs",
-    bg = "#a2d4ec",
+    bg = "black",
     fillable = FALSE,
     htmltools::tags$head(
-      htmltools::includeCSS("www/sib_style.css"),
-      htmltools::tags$style(
-        htmltools::HTML(
-          "
-        .pageheader {
-          font-size: 2em;
-          color: black;
-          text-decoration: underline;
-          text-underline-offset: 8px;
-          text-align: center;
-        }
-        h3 {
-          font-size: 1.5em;
-          color: black;
-          text-align: center;
-        }
-        p {
-          font-size: 1em;
-          color: black;
-          text-align: left;
-          margin-left: 0px;
-          margin:0;
-        }
-        .tableheader {
-          font-family: 'Lato';
-          font-size: 1.3em;
-          font-weight: bold;
-          color: black;
-          text-align: left;
-          padding-top: 20px;
-        }
-        .btn-download {
-        color: #ffffff;
-        background-color: #1696d2;
-        border-color: #1696d2;
-        font-size: 18px;
-        font-family: 'Lato';
-        border-radius: 0;
-        margin: auto;
-        }
-        .btn-download:hover {
-        color: #ffffff;
-        background-color: #46abdb;
-        border-color: #46abdb;
-        }
-        "
-        )
-      )
+      htmltools::includeCSS("www/sib_style.css")
     ),
     exec_summary,
     bslib::nav_menu(
