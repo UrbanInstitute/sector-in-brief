@@ -29,8 +29,11 @@ navpanel_wrapper <- function(title, panel_header, panel_desc, panelid) {
           all_cards[["geo_card"]]
         )
       },
-      all_cards[["process_button"]],
-      all_cards[["clear_button"]]
+      bslib::layout_column_wrap(
+        width = 1/2,
+        all_cards[["process_button"]],
+        all_cards[["clear_button"]]
+      )
     ),
     plot_ui(panelid)
   )
