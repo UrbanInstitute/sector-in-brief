@@ -5,10 +5,10 @@ query_builder <- function(inputs, geo_df) {
   other_orgs <- inputs$other_orgs
   geo_level <- inputs$geo_level
   region <- inputs$region
-  state_single <- inputs$state_single
-  state_mult <- inputs$state_mult
-  county <- inputs$county
-  cbsa <- inputs$cbsa
+  state_single <- inputs$geo_state_single
+  state_mult <- inputs$geo_state_multi
+  county <- inputs$geo_county
+  cbsa <- inputs$geocbsa
   subsector <- inputs$subsector
   size <- inputs$size
   year_range <- inputs$year_range
@@ -33,14 +33,14 @@ query_builder <- function(inputs, geo_df) {
     geo_selection <- paste(region, collapse = ", ")
   } else if (geo_level == "Census State") {
     if (length(state_mult) > 0) {
-      geo_selection <- paste(state_mult, collapse = ", ")
+      geo_selection <- paste(state_mult)
     } else {
       geo_selection <- state_single
     }
   } else if (geo_level == "Census County") {
-    geo_selection <- paste(county, collapse = ", ")
+    geo_selection <- paste(county)
   } else if (geo_level == "Census CBSA") {
-    geo_selection <- paste(cbsa, collapse = ", ")
+    geo_selection <- paste(cbsa)
   }
   filter_ls[[geo_level]] <- geo_selection
   # Subsector
