@@ -5,9 +5,9 @@ navpanel_wrapper <- function(title, panel_header, panel_desc, panelid) {
     title = title,
     page_header_card(panel_header, panel_desc),
     bslib::card(
-      card_header("Select Your Variables"),
+      bslib::card_title("Select Your Filters", class = "var-select-header"),
       title = "",
-      if (title %in% c("Number", "Assets")) {
+      if (title %in% c("Number", "Assets", "Revenues", "Expenses", "Benefits", "Payroll Taxes")) {
         bslib::layout_column_wrap(all_cards[["org_card"]], all_cards[["date_card"]], all_cards[["subsector_card"]], all_cards[["size_card"]], all_cards[["geo_card"]])
       } else if (grepl("PF", title)) {
         bslib::layout_column_wrap(all_cards[["date_card"]], all_cards[["subsector_card"]], all_cards[["size_card"]], all_cards[["geo_card"]], )
