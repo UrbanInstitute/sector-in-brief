@@ -149,7 +149,7 @@ app <- function(...) {
       else if(input$tabs == "Donor Advised Funds"){
         data <- dataloader("data/daf.parquet",
                            cols = var_ls[[input$tabs]])
-        data <- data |> dplyr::mutatte(`Tax Year` = 2021)
+        data <- data |> dplyr::mutate(`Tax Year` = 2021)
         print(head(data))
         data_server(
           id = "daf_number",
