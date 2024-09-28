@@ -2,13 +2,13 @@ plot_subtitle <- function(inputs) {
   # Params
   subtitle <- ""
   geo_level <- inputs$geo_level
-  region_selector <- inputs$region
-  state_selector_single <- inputs$state_single
-  state_selector_multi <- inputs$state_mult
-  county_selector <- inputs$county
-  cbsa_selector <- inputs$cbsa
-  subsector_select <- inputs$subsector_select
-  size_select <- inputs$size_filter
+  region_selector <- inputs$geo_region
+  state_selector_single <- inputs$geo_state_single
+  state_selector_multi <- inputs$geo_state_multi
+  county_selector <- inputs$geo_county
+  cbsa_selector <- inputs$geo_cbsa
+  subsector_select <- inputs$subsector
+  size_select <- inputs$size
   
   if (geo_level == "Census Region") {
     subtitle <- paste("Region(s):", paste(region_selector, collapse = ", "), "\n")
