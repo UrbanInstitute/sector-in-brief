@@ -1,7 +1,8 @@
 plot_ui <- function(id, selected_geographies) {
   bslib::navset_card_tab(
-    title =   "View Results",
+    title =   "",
     height = "100%",
+    bslib::card_title("Visualize Your Results", class = "viz-header"),
     bslib::nav_panel(
       "Overall",
       layout_column_wrap(
