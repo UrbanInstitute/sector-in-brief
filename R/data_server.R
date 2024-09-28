@@ -9,26 +9,28 @@ data_server <- function(id,
                         time_series = TRUE) {
   shiny::moduleServer(id, function(input, output, session) {
     geo_filters <- geo_filter_server("geo_filter", geo_df)
-    observeEvent(input$clear_filters, {
+    shiny::observeEvent(input$org_reset, {
       shiny::updateSelectizeInput(
         inputId = "org_level",
         selected = "501(c)(3) Public Charities"
       )
-      shiny::updateSliderInput(
-        inputId = "date_range",
-        value = c(2000, 2020)
-      )
+    })
+    shiny::observeEvent(input$subsector_reset, {
       shiny::updateCheckboxGroupInput(
         inputId = "subsector_select",
         selected = ""
       )
+    })
+    shiny::observeEvent(input$size_reset, {
       shiny::updateCheckboxGroupInput(
         inputId = "size_filter",
         selected = ""
       )
-      shiny::updateSelectizeInput(
-        inputId = "geo_level",
-        selected = "Entire USA"
+    })
+    shiny::observeEvent(input$date_reset, {
+      shiny::updateSliderInput(
+        inputId = "date_range",
+        value = c(2000, 2020)
       )
     })
     observeEvent(input$process_data, {
