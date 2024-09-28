@@ -4,16 +4,16 @@ subsector_level_choices <- list(
 )
 
 subsector_choices <- list(
-  "Arts, Culture, and Humanities" = "ART", 
-  "Education (minus Universities)" = "EDU",
-  "Health (minus Hospitals)" = "HEL",
-  "Human Services" = "HMS",
-  "International, Foreign Affairs" = "IFA",
-  "Public, Societal Benefit" = "PSB",
-  "Religion Related" = "REL",
-  "Mutual/Membership Benefit" = "MMB",
-  "Universities" = "UNI",
-  "Hospitals" = "HOS"
+  "Arts, Culture, and Humanities - ART" = "ART", 
+  "Education (minus Universities) - EDU" = "EDU",
+  "Health (minus Hospitals) - HEL" = "HEL",
+  "Human Services - HMS" = "HMS",
+  "International, Foreign Affairs - IFA" = "IFA",
+  "Public, Societal Benefit - PSB" = "PSB",
+  "Religion Related - REL" = "REL",
+  "Mutual/Membership Benefit - MMB" = "MMB",
+  "Universities - UNI" = "UNI",
+  "Hospitals - HOS" = "HOS"
 )
 
 radio_button_vars <- tibble::tribble(
