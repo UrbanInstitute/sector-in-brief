@@ -11,7 +11,7 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
 
 geo_filter_ui <- function(id, state_choices) {
   bslib::card(
-    card_header("Geography", shiny::actionLink(shiny::NS(id, "geo_reset"), "Reset", style = "float: right;")),
+    bslib::card_header("Geography", shiny::actionLink(shiny::NS(id, "geo_reset"), "Reset", style = "float: right;")),
     htmltools::div(
       class = "filter-options",
       radioButtons(
