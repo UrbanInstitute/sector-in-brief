@@ -5,7 +5,7 @@ plot_theme <- ggplot2::theme_classic() +
     plot.subtitle = ggplot2::element_text(
       size = 16,
       hjust = 0,
-      margin = margin(b = 20)
+      margin = ggplot2::margin(b = 20)
     ),
     axis.text = ggplot2::element_text(size = 12, color = "#000000"),
     axis.title.y = ggplot2::element_text(
