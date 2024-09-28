@@ -1,5 +1,6 @@
 app <- function(...) {
-  navpanels <- purrr::pmap(navpanels, navpanel_wrapper)
+  # Load elements
+  visualpanels <- visualpanel_mapper(visualpanel_args)
   geo_df <- read.csv("data/nested_geographies.csv")
   ui <- bslib::page_navbar(
     title = "NCCS | 990 Data Explorer",
@@ -12,32 +13,30 @@ app <- function(...) {
     exec_summary,
     bslib::nav_menu(
       title = "Visualise Data",
-      navpanels[[1]],
+      visualpanels[["Number"]],
       bslib::nav_panel(
         title = "Finances",
         bslib::navset_card_pill(
           id = "finances",
-          navpanels[[2]],
-          navpanels[[3]],
-          navpanels[[4]],
-          navpanels[[5]],
-          navpanels[[6]]
-        )
+          visualpanels[["Assets"]],
+          visualpanels[["Revenues"]],
+          visualpanels[["Expenses"]],
+          visualpanels[["Benefits"]],
+          visualpanels[["Payroll Taxes"]]        )
       ),
       bslib::nav_panel(
         title = "Private Foundations",
-        navpanels[[7]]
+        visualpanels[["Total Grant Amount"]]
       ),
       bslib::nav_panel(
         title = "Donor Advised Funds",
         bslib::navset_card_pill(
           id = "daf",
-          navpanels[[8]],
-          navpanels[[9]],
-          navpanels[[10]],
-          navpanels[[11]],
-          navpanels[[12]]
-        )
+          visualpanels[["Number of DAFs"]],
+          visualpanels[["DAF Contributions"]],
+          visualpanels[["DAF Grants"]],
+          visualpanels[["DAF Value"]],
+          visualpanels[["DAF Proportion"]]        )
       )
     ),
     bslib::nav_panel(title = "Download Data",
