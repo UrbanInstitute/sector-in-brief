@@ -11,7 +11,7 @@
 .card-header { 
   background-color: white; 
   color: black;
-  font-size: 16px;
+  font-size: 1.5em;
   font-family: 'Lato';
 }
 .nav-menu {
@@ -174,4 +174,19 @@ margin: auto;
 color: #ffffff;
 background-color: #46abdb;
 border-color: #46abdb;
+}
+.selectize-input {
+  font-family: 'Lato';
+  font-size: 1em;
+  color: black;
+}
+.filter-options {
+  font-family: 'Lato';
+  font-size: 1.0em;
+  color: black;
+}
+.slider {
+  font-family: 'Lato';
+  font-size: 1.0em;
+  color: black;
 }
