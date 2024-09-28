@@ -26,20 +26,17 @@ app <- function(...) {
       ),
       bslib::nav_panel(
         title = "Private Foundations",
-        bslib::navset_card_pill(
-          navpanels[[7]],
-          navpanels[[8]],
-          navpanels[[9]]
-        )
+        navpanels[[7]]
       ),
       bslib::nav_panel(
         title = "Donor Advised Funds",
         bslib::navset_card_pill(
+          id = "daf",
+          navpanels[[8]],
+          navpanels[[9]],
           navpanels[[10]],
           navpanels[[11]],
-          navpanels[[12]],
-          navpanels[[13]],
-          navpanels[[14]]
+          navpanels[[12]]
         )
       )
     ),
@@ -136,28 +133,8 @@ app <- function(...) {
           }
         })
       } else if (input$tabs == "Private Foundations"){
-        data <- dataloader("data/pf_grants.parquet") |>
-          dplyr::select(! EIN2)
-        data_server(
-          id = "pf_number",
-          geo_df = geo_df,
-          data = data,
-          groupby_var = "Tax Year",
-          sum_var = "Number of Grants",
-          ytitle = "Total Number of Grants",
-          xtitle = "Tax Year",
-          title_prefix = "Number of Private Foundation Grants For"
-        )
-        data_server(
-          id = "pf_median",
-          geo_df = geo_df,
-          data = data,
-          groupby_var = "Tax Year",
-          sum_var = "Median Grant Size",
-          ytitle = "Dollars",
-          xtitle = "Year",
-          title_prefix = "Median Grant Size For"
-        )
+        data <- dataloader("data/pf_grants.parquet",
+                           cols = var_ls[[input$tabs]])
         data_server(
           id = "pf_amount",
           geo_df = geo_df,
@@ -170,8 +147,10 @@ app <- function(...) {
         )
       }
       else if(input$tabs == "Donor Advised Funds"){
-        data <- dataloader("data/daf.parquet") |>
-          dplyr::mutate(`Tax Year` = 2021)
+        data <- dataloader("data/daf.parquet",
+                           cols = var_ls[[input$tabs]])
+        data <- data |> dplyr::mutatte(`Tax Year` = 2021)
+        print(head(data))
         data_server(
           id = "daf_number",
           geo_df = geo_df,
