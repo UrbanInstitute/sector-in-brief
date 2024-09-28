@@ -1,6 +1,6 @@
 # Module for data processing in Shiny App
 data_ui <- function(id, org_type_choices, date) {
-  tagList(
+  htmltools::tagList(
     org_card = bslib::card(
       bslib::card_header("Organization Type", 
                          shiny::actionLink(shiny::NS(id, "org_reset"), "Reset", style = "float: right;")),
@@ -42,7 +42,7 @@ data_ui <- function(id, org_type_choices, date) {
       )
     ),
     size_card = bslib::card(
-      card_header("Asset Size", shiny::actionLink(shiny::NS(id, "size_reset"), "Reset", style = "float: right;")),
+      bslib::card_header("Asset Size", shiny::actionLink(shiny::NS(id, "size_reset"), "Reset", style = "float: right;")),
       htmltools::div(
         class = "filter-options",
         shiny::checkboxGroupInput(
@@ -55,7 +55,7 @@ data_ui <- function(id, org_type_choices, date) {
       )
     ),
     date_card = bslib::card(
-      card_header("Date Range", shiny::actionLink(shiny::NS(id, "date_reset"), "Reset", style = "float: right;")),
+      bslib::card_header("Date Range", shiny::actionLink(shiny::NS(id, "date_reset"), "Reset", style = "float: right;")),
       htmltools::div(
        class = "slider",
        shiny::sliderInput(
