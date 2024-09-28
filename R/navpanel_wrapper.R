@@ -1,5 +1,5 @@
-# Function to create nav panels
-navpanel_wrapper <- function(title, panel_header, panel_desc, panelid) {
+# Function to create nav panel template for each visual page
+visualpanel_builder <- function(title, panel_header, panel_desc, panelid) {
   all_cards <- data_ui(panelid, org_type_choices, date = TRUE)
   panel <- bslib::nav_panel(
     title = title,
@@ -21,7 +21,7 @@ navpanel_wrapper <- function(title, panel_header, panel_desc, panelid) {
   return(panel)
 }
 
-navpanels <- tibble::tribble(
+visualpanel_args <- tibble::tribble(
   ~title, ~panel_header, ~panel_desc, ~panelid,
   "Number", "Total Number of Nonprofits", "The number of organizations that are registered with the Internal Revenue Service (IRS).", "number",
   "Assets", "Total Assets", "The aggregate value of everything nonprofits own", "assets",
