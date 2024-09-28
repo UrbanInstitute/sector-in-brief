@@ -22,5 +22,5 @@ selectize_vars <- tibble::tribble(
   "size_select", NULL, size_choices, TRUE, list(maxItems = 5)
 )
 
-size_level_filter <- build_filters(shiny::radioButtons, radio_button_vars)
-size_select_filter <- build_filters(shiny::selectizeInput, selectize_vars)
+#size_level_filter <- build_filters(shiny::radioButtons, radio_button_vars)
+#size_select_filter <- build_filters(shiny::selectizeInput, selectize_vars)
