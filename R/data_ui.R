@@ -27,7 +27,7 @@ data_ui <- function(id, org_type_choices, date) {
         ns = shiny::NS(id)
       )
     ),
-    geo_card = geo_filter_ui(NS(id, "geo_filter"), state_choices),
+    geo_card = geo_filter_ui(shiny::NS(id, "geo_filter"), state_choices),
     subsector_card = bslib::card(
       bslib::card_header("Subsector", shiny::actionLink(shiny::NS(id, "subsector_reset"), "Reset", style = "float: right;")),
       htmltools::div(
