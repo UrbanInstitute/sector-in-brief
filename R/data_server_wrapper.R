@@ -10,6 +10,7 @@ data_server_wrapper <- function(page, data_server_args, geo_df){
     agg_var = data_server_args[[page]][["agg_var"]],
     ytitle = data_server_args[[page]][["ytitle"]],
     xtitle = data_server_args[[page]][["xtitle"]],
-    title_prefix = data_server_args[[page]][["title_prefix"]]
+    title_prefix = data_server_args[[page]][["title_prefix"]],
+    time_series = data_server_args[[page]][["time_series"]]
   )
 }
