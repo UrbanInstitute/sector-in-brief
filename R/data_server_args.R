@@ -9,20 +9,10 @@ default_vars <- c(
   "Census CBSA"
 )
 
-
-daf_vars <- c(
-  "Number of Nonprofits",
-  "Has DAF",
-  "Number of DAFs",
-  "Total Contributions",
-  "Total Grants",
-  "Total Value",
-  "Proportion With DAFs"
-)
-
 data_server_args <- list(
   "Number" = list(
-    "vars" = c(default_vars, "Number of Nonprofits", "Year"),
+    path = "data/number_nonprofits.parquet",
+    vars = c(default_vars, "Number of Nonprofits", "Year"),
     id = "number",
     year_var = "Year",
     agg_var = "Number of Nonprofits",
@@ -31,7 +21,8 @@ data_server_args <- list(
     title_prefix = "Number of",
   ),
   "Assets" = list(
-    "vars" = c(default_vars, "Total Assets", "Year"),
+    path = "data/finances.parquet",
+    vars = c(default_vars, "Total Assets", "Year"),
     id = "assets",
     year_var = "Tax Year",
     agg_var = "Total Assets",
@@ -40,7 +31,8 @@ data_server_args <- list(
     title_prefix = "Total Assets for",
   ),
   "Revenues" = list(
-    "vars" = c(default_vars, "Total Revenues", "Year"),
+    path = "data/finances.parquet",
+    vars = c(default_vars, "Total Revenues", "Year"),
     id = "revenues",
     year_var = "Tax Year",
     agg_var = "Total Revenues",
@@ -49,7 +41,8 @@ data_server_args <- list(
     title_prefix = "Total Revenues for",
   ),
   "Expenses" = list(
-    "vars" = c(default_vars, "Total Expenses", "Year"),
+    path = "data/finances.parquet",
+    vars = c(default_vars, "Total Expenses", "Year"),
     id = "expenses",
     year_var = "Tax Year",
     agg_var = "Total Expenses",
@@ -58,7 +51,8 @@ data_server_args <- list(
     title_prefix = "Total Expenses for",
   ),
   "Benefits" = list(
-    "vars" = c(default_vars, "Total Benefits", "Year"),
+    path = "data/finances.parquet",
+    vars = c(default_vars, "Total Benefits", "Year"),
     id = "benefits",
     year_var = "Tax Year",
     agg_var = "Total Benefits",
@@ -67,7 +61,8 @@ data_server_args <- list(
     title_prefix = "Total Benefits for",
   ),
   "Payroll Taxes" = list(
-    "vars" = c(default_vars, "Total Payroll Taxes", "Year"),
+    path = "data/finances.parquet",
+    vars = c(default_vars, "Total Payroll Taxes", "Year"),
     id = "payroll_taxes",
     year_var = "Tax Year",
     agg_var = "Total Payroll Taxes",
@@ -76,7 +71,8 @@ data_server_args <- list(
     title_prefix = "Total Payroll Taxes for",
   ),
   "Private Foundations" = list(
-    "vars" = c(default_vars, "Total Contributions", "Year"),
+    path = "data/pf_grants.parquet",
+    vars = c(default_vars, "Total Contributions", "Year"),
     id = "private_foundations",
     year_var = "Tax Year",
     agg_var = "Total Contributions",
@@ -85,7 +81,8 @@ data_server_args <- list(
     title_prefix = "Total Contributions for",
   ),
   "Number of DAFs" = list(
-    "vars" = c(default_vars, "Number of DAFs", "Year"),
+    path = "data/daf.parquet",
+    vars = c(default_vars, "Number of DAFs", "Year"),
     id = "daf_number",
     year_var = "Tax Year",
     agg_var = "Number of DAFs",
@@ -94,7 +91,8 @@ data_server_args <- list(
     title_prefix = "Number of DAFs for",
   ),
   "DAF Contributions" = list(
-    "vars" = c(default_vars, "Total Contributions", "Year"),
+    path = "data/daf.parquet",
+    vars = c(default_vars, "Total Contributions", "Year"),
     id = "daf_contributions",
     year_var = "Tax Year",
     agg_var = "Total Contributions",
@@ -103,7 +101,8 @@ data_server_args <- list(
     title_prefix = "Total DAF Contributions for",
   ),
   "DAF Grants" = list(
-    "vars" = c(default_vars, "Total Grants", "Year"),
+    path = "data/daf.parquet",
+    vars = c(default_vars, "Total Grants", "Year"),
     id = "daf_grants",
     year_var = "Tax Year",
     agg_var = "Total Grants",
@@ -112,7 +111,8 @@ data_server_args <- list(
     title_prefix = "Total DAF Grants for",
   ),
   "DAF Value" = list(
-    "vars" = c(default_vars, "Total Value", "Year"),
+    path = "data/daf.parquet",
+    vars = c(default_vars, "Total Value", "Year"),
     id = "daf_value",
     year_var = "Tax Year",
     agg_var = "Total Value",
@@ -121,7 +121,8 @@ data_server_args <- list(
     title_prefix = "Total Value of DAFs for",
   ),
   "DAF Proportion" = list(
-    "vars" = c(default_vars, "Has DAF", "Number of DAFs", "Year"),
+    path = "data/daf.parquet",
+    vars = c(default_vars, "Has DAF", "Number of DAFs", "Year"),
     id = "daf_proportion",
     year_var = "Tax Year",
     agg_var = "Proportion With DAFs",
