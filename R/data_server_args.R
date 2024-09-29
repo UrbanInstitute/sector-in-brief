@@ -1,9 +1,9 @@
 # List of vars to load for each data set
 default_vars <- c(
-  "Organization Type", 
-  "Subsector", 
-  "Asset Size", 
-  "Census Region", 
+  "Organization Type",
+  "Subsector",
+  "Asset Size",
+  "Census Region",
   "Census State",
   "Census County",
   "Census CBSA"
@@ -18,7 +18,7 @@ data_server_args <- list(
     agg_var = "Number of Nonprofits",
     ytitle = "Number of Nonprofits",
     xtitle = "Year",
-    title_prefix = "Number of",
+    title_prefix = "Number of"
   ),
   "Assets" = list(
     path = "data/finances.parquet",
@@ -28,7 +28,7 @@ data_server_args <- list(
     agg_var = "Total Assets",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Assets for",
+    title_prefix = "Total Assets for"
   ),
   "Revenues" = list(
     path = "data/finances.parquet",
@@ -38,7 +38,7 @@ data_server_args <- list(
     agg_var = "Total Revenues",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Revenues for",
+    title_prefix = "Total Revenues for"
   ),
   "Expenses" = list(
     path = "data/finances.parquet",
@@ -48,7 +48,7 @@ data_server_args <- list(
     agg_var = "Total Expenses",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Expenses for",
+    title_prefix = "Total Expenses for"
   ),
   "Benefits" = list(
     path = "data/finances.parquet",
@@ -58,7 +58,7 @@ data_server_args <- list(
     agg_var = "Total Benefits",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Benefits for",
+    title_prefix = "Total Benefits for"
   ),
   "Payroll Taxes" = list(
     path = "data/finances.parquet",
@@ -68,7 +68,7 @@ data_server_args <- list(
     agg_var = "Total Payroll Taxes",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Payroll Taxes for",
+    title_prefix = "Total Payroll Taxes for"
   ),
   "Private Foundations" = list(
     path = "data/pf_grants.parquet",
@@ -78,7 +78,7 @@ data_server_args <- list(
     agg_var = "Total Contributions",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Contributions for",
+    title_prefix = "Total Contributions for"
   ),
   "Number of DAFs" = list(
     path = "data/daf.parquet",
@@ -88,7 +88,7 @@ data_server_args <- list(
     agg_var = "Number of DAFs",
     ytitle = "Number of DAFs",
     xtitle = "Tax Year",
-    title_prefix = "Number of DAFs for",
+    title_prefix = "Number of DAFs for"
   ),
   "DAF Contributions" = list(
     path = "data/daf.parquet",
@@ -98,7 +98,7 @@ data_server_args <- list(
     agg_var = "Total Contributions",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total DAF Contributions for",
+    title_prefix = "Total DAF Contributions for"
   ),
   "DAF Grants" = list(
     path = "data/daf.parquet",
@@ -108,7 +108,7 @@ data_server_args <- list(
     agg_var = "Total Grants",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total DAF Grants for",
+    title_prefix = "Total DAF Grants for"
   ),
   "DAF Value" = list(
     path = "data/daf.parquet",
@@ -118,7 +118,7 @@ data_server_args <- list(
     agg_var = "Total Value",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Value of DAFs for",
+    title_prefix = "Total Value of DAFs for"
   ),
   "DAF Proportion" = list(
     path = "data/daf.parquet",
@@ -128,6 +128,6 @@ data_server_args <- list(
     agg_var = "Proportion With DAFs",
     ytitle = "Percentage",
     xtitle = "Tax Year",
-    title_prefix = "Percentage with DAFs for",
+    title_prefix = "Percentage with DAFs for"
   )
 )
