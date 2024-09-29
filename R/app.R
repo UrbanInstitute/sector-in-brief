@@ -24,7 +24,7 @@ app <- function(...) {
           visualpanels[["Benefits"]],
           visualpanels[["Payroll Taxes"]]        )
       ),
-      visualpanels[["Total Grant Amount"]],
+      visualpanels[["Private Foundation Grants"]],
       bslib::nav_panel(
         title = "Donor Advised Funds",
         bslib::navset_card_pill(
@@ -53,7 +53,7 @@ app <- function(...) {
         observeEvent(input$daf, {
           data_server_wrapper(input$daf, data_server_args, geo_df)
         })
-      } else if (input$tabs %in% c("Number", "Total Grant Amount")){
+      } else if (input$tabs %in% c("Number", "Private Foundation Grants")){
         data_server_wrapper(input$tabs, data_server_args, geo_df)
       }
     })
