@@ -1,8 +1,8 @@
 data_server <- function(id,
                         geo_df,
                         data,
-                        groupby_var,
-                        sum_var,
+                        year_var,
+                        agg_var,
                         title_prefix,
                         ytitle,
                         xtitle,
@@ -49,7 +49,7 @@ data_server <- function(id,
         year_range = input$date_range,
         time_series = time_series,
         title_prefix = title_prefix,
-        year_var = groupby_var
+        year_var = year_var
       )
       # Validate inputs
       input_validation_msg <- validate_inputs(inputs)
@@ -67,8 +67,8 @@ data_server <- function(id,
           setProgress(2, message = "Creating Tables...")
           tables <- summarise_data(
             data = filtered_data,
-            groupby_var = groupby_var,
-            sum_var = sum_var,
+            groupby_var = year_var,
+            sum_var = agg_var,
             query = query
           )
           setProgress(3, message = "Creating Graphs...")
@@ -77,11 +77,11 @@ data_server <- function(id,
             groupby_vars = list(NULL, query$geo_level, "Subsector", "Asset Size"),
             title = title,
             subtitle = subtitle,
-            yvar = sum_var,
-            xvar = groupby_var,
+            yvar = agg_var,
+            xvar = year_var,
             ytitle = ytitle,
             xtitle = xtitle,
-            year_var = groupby_var
+            year_var = agg_var
           )
           setProgress(4, message = "Displaying Results...")
           output_plots <- render_plots(plots)
