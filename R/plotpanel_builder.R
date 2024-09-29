@@ -1,4 +1,4 @@
-plotpanel_wrapper <- function(id, title, plot_id, table_id, download_id){
+plotpanel_builder <- function(id, title, plot_id, table_id, download_id){
   bslib::nav_panel(
     title = title,
     layout_column_wrap(
