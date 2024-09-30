@@ -10,7 +10,7 @@ plots_build_all <- function(tables_ls,
   purrr::map2(
     tables_ls,
     groupby_vars,
-    plots_build_single,
+    purrr::possibly(plots_build_single, blank_plot()),
     title = title,
     subtitle = subtitle,
     yvar = yvar,
