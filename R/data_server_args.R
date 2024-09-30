@@ -77,7 +77,7 @@ data_server_args <- list(
     time_series = TRUE
   ),
   "Private Foundation Grants" = list(
-    path = "data/pf_grants_grouped.parquet",
+    path = "data/pf_grants.parquet",
     vars = c(default_vars, "Total Contributions", "Tax Year"),
     id = "pf_amount",
     year_var = "Tax Year",
