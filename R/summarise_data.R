@@ -10,7 +10,7 @@ summarise_data <- function(data, groupby_var, sum_var, query) {
   if (sum_var == "Proportion with DAFs") {
     table_ls <- purrr::map(
       groupby_ls,
-      table_builder_proportion,
+      purrr::possibly(table_builder_proportion, otherwise = blank_table()),
       data = data,
       groupby_var = groupby_var,
       sum_var = "Has DAF",
@@ -20,7 +20,7 @@ summarise_data <- function(data, groupby_var, sum_var, query) {
   } else {
     table_ls <- purrr::map(
       groupby_ls,
-      table_builder,
+      purrr::possibly(table_builder, otherwise = blank_table()),
       data = data,
       groupby_var = groupby_var,
       sum_var = sum_var

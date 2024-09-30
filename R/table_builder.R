@@ -25,6 +25,17 @@ table_builder <- function(data, groupby_var, groupby_var_2, sum_var) {
           dplyr::collect()
       }
     }
+    if (sum_var == "Total Contributions"){
+      table <- table |>
+        dplyr::mutate(
+          `Total Contributions` = dplyr::if_else(
+            `Tax Year` %in% c(2016, 2017, 2018),
+            NA,
+            `Total Contributions`
+          )
+        ) |>
+        dplyr::collect()
+    }
     return(table)
   }, error = function(e) {
     table <- tibble::tribble( ~ `No Data Available`, NULL)
