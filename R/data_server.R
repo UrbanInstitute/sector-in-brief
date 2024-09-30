@@ -71,7 +71,6 @@ data_server <- function(id,
             sum_var = agg_var,
             query = query
           )
-          print(tables[["default"]])
           setProgress(3, message = "Creating Graphs...")
           plots <- plots_build_all(
             tables_ls = tables,
