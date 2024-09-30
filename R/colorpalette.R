@@ -12,8 +12,12 @@ urbnpalette <- c(
 )
 
 colorpalette <- function(num_colors, palette=urbnpalette){
-  colors <- grDevices::colorRampPalette(palette)(num_colors)
-  return(colors)
+  if (num_colors <= 8){
+    return(palette)
+  } else {
+    colors <- grDevices::colorRampPalette(palette)(num_colors)
+    return(colors)
+  }
 }
   
   
