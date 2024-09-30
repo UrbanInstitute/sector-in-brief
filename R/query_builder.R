@@ -8,7 +8,7 @@ query_builder <- function(inputs, geo_df) {
   state_single <- inputs$geo_state_single
   state_mult <- inputs$geo_state_multi
   county <- inputs$geo_county
-  cbsa <- inputs$geocbsa
+  cbsa <- inputs$geo_cbsa
   subsector <- inputs$subsector
   size <- inputs$size
   year_range <- inputs$year_range
