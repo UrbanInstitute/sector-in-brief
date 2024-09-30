@@ -57,14 +57,6 @@ app <- function(...) {
         data_server_wrapper(input$tabs, data_server_args, geo_df)
       }
     })
-
-    output$downloadData <- downloadHandler(
-      filename = "nonprofit.csv",
-      content = function(file) {
-        write.csv(tables[["default"]], file)
-      }
-    )
-    
     dataRequestServer("data_download")
   }
   shinyApp(ui = ui, server = server)
