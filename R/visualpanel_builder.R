@@ -1,6 +1,6 @@
 # Function to create nav panel template for each visual page
-visualpanel_builder <- function(title, panel_header, panel_desc, panelid) {
-  all_cards <- data_ui(panelid, org_type_choices, date = TRUE)
+visualpanel_builder <- function(title, panel_header, panel_desc, panelid, start_year, end_year) {
+  all_cards <- data_ui(panelid, org_type_choices, start_year, end_year)
   panel <- bslib::nav_panel(
     title = title,
     page_header_card(panel_header, panel_desc),

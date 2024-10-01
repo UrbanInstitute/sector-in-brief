@@ -1,5 +1,5 @@
 # Module for data processing in Shiny App
-data_ui <- function(id, org_type_choices, date) {
+data_ui <- function(id, org_type_choices, start_year, end_year) {
   htmltools::tagList(
     org_card = bslib::card(
       bslib::card_header("Organization Type", 
@@ -61,9 +61,9 @@ data_ui <- function(id, org_type_choices, date) {
        shiny::sliderInput(
          inputId = shiny::NS(id, "date_range"),
          label = NULL,
-         min = 1989,
-         max = 2024,
-         value = c(1989, 2024),
+         min = start_year,
+         max = end_year,
+         value = c(start_year, end_year),
          step = NULL,
          ticks = FALSE,
          sep = "",
