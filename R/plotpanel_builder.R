@@ -11,8 +11,7 @@ plotpanel_builder <- function(id, title, plot_id, table_id, download_id){
             ggiraph::girafeOutput(NS(id, plot_id), width = "100%"),
             type = 1
           )
-        ),
-        plot_footer
+        )
       ),
       bslib::card(
         bslib::card_body(reactable::reactableOutput(NS(id, table_id))),
