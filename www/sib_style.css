@@ -22,23 +22,39 @@
   text-align: left;
   background-color: #cfe8f3;
 }
-.header {
-    font-family: 'Lato'; /* Use the Lato font */
-    font-size: 14px; /* Set the font size to large */
+.text-5xl {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 2.25rem; /* Set the font size to large */
+  color: #000000;
+  font-weight: 700;
 }
-.title {
-    font-family: 'Lato', sans-serif; /* Use the Lato font */
-    font-size: 50px; /* Set the font size to large */
-    font-weight: 700; /* Set font weight to bold */
-    color: black; /* Set text color to black */
-    height: 400px;
-    text-align: center; /* Center align the text */
-    margin: 0; /* Remove default margin */
-    padding: 40px; /* Add some padding around the title */
-    background-image: url('pexels-scottwebb-1029615.jpg');
-    background-size: cover; /* Ensure the background image covers the entire area */
-    background-position: center; /* Center the background image */
-    background-repeat: no-repeat; /* Prevent the background image from repeating */
+.leading-relaxed {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 1.25rem; /* Set the font size to large */
+  color: #696969;
+}
+.welcome-header {
+    box-sizing: border-box;
+    width: 50%;
+    background-color: #ffffff;
+    margin: auto;
+    flex-direction: column;
+}
+.welcome-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    background-image: url('pattern-square-dot.png');
+    background-size: 12px; /* Ensure the background image covers the entire area */
+    background-repeat: repeat; /* Prevent the background image from repeating */
+}
+.banner-light {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    background-color: #ffffff;
 }
 .container {
     max-width: 1200px;
@@ -68,11 +84,10 @@
     margin-top: 0;
 }
 .footer {
-    background-color: #333;
+    background-color: #0a4c6a;
     color: #fff;
     text-align: center;
     padding: 10px 0;
-    position: absolute;
     width: 100%;
     bottom: 0;
 }

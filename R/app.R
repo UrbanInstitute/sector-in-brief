@@ -12,7 +12,7 @@ app <- function(...) {
       htmltools::includeCSS("www/sib_style.css")
     ),
     bslib::nav_spacer(),
-    exec_summary,
+    welcome,
     bslib::nav_menu(
       title = "Visualise Data",
       visualpanels[["Number"]],
@@ -43,8 +43,12 @@ app <- function(...) {
       page_header_card(header = "Nonprofit Data at Your Fingertips", 
                        subheader = data_download_subheader()),
       dataRequestUI("data_download", geo_df)
+    ),
+    footer = htmltools::div(
+      class = "footer",
+      "© 2024 National Center for Charitable Statistics"
     )
-    )
+  )
   
   server <- function(input, output, session) {
     # Server modules to update county and cbsa options based on State
