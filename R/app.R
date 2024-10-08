@@ -6,7 +6,7 @@ app <- function(...) {
     id = "tabs",
     title = navbar_title(title = "     | National Center for Charitable Statistics", 
                          height="60px"),
-    bg = "#1696d2",
+    bg = "#0096d2",
     fillable = FALSE,
     htmltools::tags$head(
       htmltools::includeCSS("www/sib_style.css")
