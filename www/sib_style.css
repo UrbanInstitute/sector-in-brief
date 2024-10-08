@@ -190,3 +190,102 @@ border-color: #46abdb;
   font-size: 1.0em;
   color: black;
 }
+.form-text {
+  font-family: 'Lato';
+  font-size: 1.2em;
+  color: #696969;
+  text-align: justify;
+  margin: auto;
+}
+.form-header {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  text-align: justify;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.form-header-text {
+  font-family: 'Lato';
+  font-size: 1.2rem;
+  color: #696969;
+  text-align: justify;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.form-choice-header {
+  font-family: 'Lato';
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000000;
+  text-align: justify;
+  margin: auto;
+  text-transform: uppercase;
+}
+.btn-urban {
+  color: #ffffff;
+  background-color: #1696d2;
+  border-color: #1696d2;
+  font-size: 18px;
+  font-family: 'Lato';
+  border-radius: 0;
+  display: flex;
+  margin: auto;
+}
+.btn-urban:hover {
+  color: #ffffff;
+  background-color: #062635;
+  border-color: #062635;
+  font-size: 18px;
+  font-family: 'Lato';
+  border-radius: 0;
+  display: flex;
+  margin: auto;
+}
+.btn-radio-header {
+  font-family: 'Lato';
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000000;
+  text-align: justify;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.urbn-checkbox {
+  font-family: 'Lato';
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.urbn-navbar-title {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 10px;
+  padding-bottom: 0;
+}
+.nav-link, .nav-underline {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 10px;
+  padding-bottom: 0;
+}
+.nav-underline .nav-link.active, 
+.nav-underline :where(ul.nav.navbar-nav > li)>a.active {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 10px;
+  padding-bottom: 0;
+}
