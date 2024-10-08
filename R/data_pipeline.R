@@ -48,7 +48,8 @@ data_pipeline <- function(input,
       render_outputs(plots = plots, 
                      tables = tables, 
                      output = output, 
-                     query = query)
+                     query = query,
+                     agg_var = agg_var)
       setProgress(5, message = "Done!")
     })
   }
