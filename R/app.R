@@ -3,13 +3,15 @@ app <- function(...) {
   visualpanels <- visualpanel_mapper(visualpanel_args)
   geo_df <- read.csv("data/nested_geographies.csv")
   ui <- bslib::page_navbar(
-    title = "NCCS | 990 Data Explorer",
     id = "tabs",
-    bg = "black",
+    title = navbar_title(title = "     National Center for Charitable Statistics", 
+                         height="60px"),
+    bg = "#1696d2",
     fillable = FALSE,
     htmltools::tags$head(
       htmltools::includeCSS("www/sib_style.css")
     ),
+    bslib::nav_spacer(),
     exec_summary,
     bslib::nav_menu(
       title = "Visualise Data",
@@ -36,9 +38,13 @@ app <- function(...) {
           visualpanels[["DAF Proportion"]]        )
       )
     ),
-    bslib::nav_panel(title = "Download Data",
-                     dataRequestUI("data_download"))
-  )
+    bslib::nav_panel(
+      title = "Download Data",
+      page_header_card(header = "Nonprofit Data at Your Fingertips", 
+                       subheader = data_download_subheader()),
+      dataRequestUI("data_download", geo_df)
+    )
+    )
   
   server <- function(input, output, session) {
     # Server modules to update county and cbsa options based on State
@@ -57,7 +63,7 @@ app <- function(...) {
         data_server_wrapper(input$tabs, data_server_args, geo_df)
       }
     })
-    dataRequestServer("data_download")
+    dataRequestServer("data_download", geo_df)
   }
   shinyApp(ui = ui, server = server)
 }
