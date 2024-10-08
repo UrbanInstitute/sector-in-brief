@@ -4,7 +4,7 @@ app <- function(...) {
   geo_df <- read.csv("data/nested_geographies.csv")
   ui <- bslib::page_navbar(
     id = "tabs",
-    title = navbar_title(title = "     National Center for Charitable Statistics", 
+    title = navbar_title(title = "     | National Center for Charitable Statistics", 
                          height="60px"),
     bg = "#1696d2",
     fillable = FALSE,
