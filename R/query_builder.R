@@ -4,7 +4,7 @@ query_builder <- function(inputs, geo_df) {
   org_level <- inputs$org_level
   other_orgs <- inputs$other_orgs
   geo_level <- inputs$geo_level
-  region <- inputs$region
+  region <- inputs$geo_region
   state_single <- inputs$geo_state_single
   state_mult <- inputs$geo_state_multi
   county <- inputs$geo_county
@@ -30,7 +30,7 @@ query_builder <- function(inputs, geo_df) {
     geo_level <- "Census Region"
     geo_selection <- c("Northeast", "Midwest", "South", "West")
   } else if (geo_level == "Census Region") {
-    geo_selection <- paste(region, collapse = ", ")
+    geo_selection <- paste(region)
   } else if (geo_level == "Census State") {
     if (length(state_mult) > 0) {
       geo_selection <- paste(state_mult)
