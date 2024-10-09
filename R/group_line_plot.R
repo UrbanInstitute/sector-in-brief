@@ -1,7 +1,6 @@
 group_line_plot <- function(table,
                             groupby_var,
                             title,
-                            subtitle,
                             caption,
                             yvar,
                             xvar,
@@ -41,7 +40,7 @@ group_line_plot <- function(table,
     ggplot2::scale_x_continuous(breaks = seq(1990, 2024, 4)) +
     labs(
       title = title,
-      subtitle = subtitle,
+      subtitle = plot_subtitle(groupby_var),
       caption = caption,
       x = xtitle,
       y = ytitle
