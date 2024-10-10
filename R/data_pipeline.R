@@ -1,3 +1,16 @@
+#' @title pipeline for server side data processing
+#' @param input list of input values
+#' @param geo_filters list of geo filters
+#' @param time_series boolean. If TRUE, the data is time series
+#' @param title_prefix character scalar. The prefix for the plot title
+#' @param agg_var character scalar. The variable to aggregate
+#' @param year_var character scalar. The variable to use as year
+#' @param ytitle character scalar. The title for the y-axis
+#' @param xtitle character scalar. The title for the x-axis
+#' @param data arrow table. The filtered data to render in output tables and plots
+#' @param geo_df data.frame. data set of nested geographies
+#' @param output list of shiny outputs
+#' @return list of shiny outputs
 data_pipeline <- function(input,
                           geo_filters,
                           time_series,
