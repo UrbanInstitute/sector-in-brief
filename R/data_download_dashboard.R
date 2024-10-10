@@ -1,5 +1,8 @@
 dataRequestUI <- function(id, geo_df) {
   ns <- NS(id)
+  choices <- choice_builder("download")
+  size <- names(choices$size)
+  subsector <- choices$subsector
   bslib::card(
     bslib::card_title("Ready To Get Started?", class = "var-select-header"),
     urban_button(ns, "start_form", "REQUEST DATA"),
@@ -63,7 +66,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("size_select"),
               label = "Value of Assets",
-              choices = names(size_choices),
+              choices = size,
               multiple = TRUE,
               options = list(`actions-box` = TRUE)
             )
@@ -73,7 +76,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("subsector_select"),
               label = "Subsector(s)",
-              choices = subsector_choices,
+              choices = subsector,
               multiple = TRUE,
               options = list(`actions-box` = TRUE)
             )
