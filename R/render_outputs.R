@@ -1,3 +1,11 @@
+#' @title Render outputs
+#' @param plots list of plots
+#' @param tables list of tables
+#' @param output list of shiny outputs
+#' @param query list query
+#' @param agg_var character scalar. The variable to aggregate
+#' @param year_var character scalar. The variable to use as year
+#' @return list of shiny outputs
 render_outputs <- function(plots, tables, output, query, agg_var, year_var){
   output_plots <- render_plots(plots)
   output_tables <- render_tables(tables,
