@@ -14,55 +14,34 @@ data_ui <- function(id, choices, start_year, end_year) {
     ),
     geo_card = geo_filter_ui(shiny::NS(id, "geo_filter"), state_choices),
     subsector_card = bslib::card(
-      bslib::card_header("Subsector", shiny::actionLink(shiny::NS(id, "subsector_reset"), "Reset", style = "float: right;")),
-      htmltools::div(
-        class = "filter-options",
-        shiny::checkboxGroupInput(
-          inputId = shiny::NS(id, "subsector_select"),
-          label = NULL,
-          choices = subsector_choices,
-          selected = subsector_choices,
-          inline = FALSE
-        )
+      bslib::card_header(
+        "Subsector",
+        shiny::actionLink(shiny::NS(id, "subsector_reset"), "Reset", style = "float: right;")
+      ),
+      urbn_checkboxgroup(
+        ns = ns,
+        id = "subsector",
+        choices = choices$subsector,
+        selected = choices$subsector
       )
-    ),
+    ), 
     size_card = bslib::card(
       bslib::card_header("Asset Size", shiny::actionLink(shiny::NS(id, "size_reset"), "Reset", style = "float: right;")),
-      htmltools::div(
-        class = "filter-options",
-        shiny::checkboxGroupInput(
-          inputId = shiny::NS(id, "size_filter"),
-          label = NULL,
-          inline = FALSE,
-          choices = size_choices,
-          selected = size_choices
-        )
+      urbn_checkboxgroup(
+        ns = ns,
+        id = "size",
+        choices = choices$size,
+        selected = choices$size
       )
     ),
     date_card = bslib::card(
       bslib::card_header("Date Range", shiny::actionLink(shiny::NS(id, "date_reset"), "Reset", style = "float: right;")),
-      htmltools::div(
-       class = "slider",
-       shiny::sliderInput(
-         inputId = shiny::NS(id, "date_range"),
-         label = NULL,
-         min = start_year,
-         max = end_year,
-         value = c(start_year, end_year),
-         step = NULL,
-         ticks = FALSE,
-         sep = "",
-         dragRange = TRUE,
-         width = "100%"
-       )
-      )
+      urbn_slider(ns, "date_range", start_year, end_year)
     ),
-    process_button = bslib::input_task_button(
-      id = shiny::NS(id, "process_data"),
-      style = "border-radius: 0; font-size: 18px; color: #ffffff; margin: auto; background-color: #1696d2; border-color: #1696d2;",
-      label = "RETRIEVE DATA",
-      label_busy = "UPDATING PLOTS",
-      type = "primary"
-    )
+    process_button = urbn_task_button(
+      ns = ns,
+      id = "process_data",
+      label = "VISUALIZE DATA",
+      label_busy = "VISUALIZING...")
   )
 }
