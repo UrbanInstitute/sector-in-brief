@@ -1,151 +1,466 @@
-org_types <- org_type_choices
-geo_data <- list(
-  "Northeast" = c("New York", "Massachusetts"),
-  "West" = c("California", "Washington")
-)
-subsectors <- list(
-  "Arts, Culture, and Humanities" = "ART", 
-  "Education (minus Universities)" = "EDU",
-  "Health (minus Hospitals)" = "HEL",
-  "Human Services" = "HMS",
-  "International, Foreign Affairs" = "IFA",
-  "Public, Societal Benefit" = "PSB",
-  "Religion Related" = "REL",
-  "Mutual/Membership Benefit" = "MMB",
-  "Universities" = "UNI",
-  "Hospitals" = "HOS"
-)
-
-# UI function for the module
-dataRequestUI <- function(id) {
+dataRequestUI <- function(id, geo_df) {
   ns <- NS(id)
-  fluidPage(
-    
-    h1("Data Request Form"),
-    
-    fluidRow(
-      column(8,
-             card(
-               card_header("User Details"),
-               card_body(
-                 textInput(ns("name"), "Name", placeholder = "Firstname Lastname"),
-                 textInput(ns("email"), "Email", placeholder = "firstname.lastname@gmail.com"),
-                 textInput(ns("organization"), "Organization", placeholder = "Organization Name"),
-                 textInput(ns("role"), "Role", placeholder = "Role in Organization")
-               )
-             ),
-             card(
-               card_header("Data Selection"),
-               card_body(
-                 # Step 1: Organization Type
-                 selectizeInput(ns("org_type"), 
-                                "1. Select Organization Type", 
-                                 choices = c("Select" = "", org_types),
-                                 multiple = TRUE),
-                 
-                 # Step 2: Geography
-                 conditionalPanel(
-                   condition = paste0("input['", ns("org_type"), "'] != ''"),
-                   geo_filter_ui("dd_geo", state_choices)
-                 ),
-                 
-                 # Step 3: Subsector
-                 conditionalPanel(
-                   condition = paste0("input['", ns("dd_geo"), "'] != ''"),
-                   selectInput(ns("subsector"), "3. Select Subsector", choices = c("Select" = "", subsectors))
-                 ),
-                 
-                 # Step 4: Asset Size
-                 conditionalPanel(
-                   condition = paste0("input['", ns("subsector"), "'] != ''"),
-                   selectInput(ns("asset_size"), "4. Select Asset Size", choices = c("Select" = "", asset_sizes))
-                 ),
-                 
-                 # Step 5: Date Range
-                 conditionalPanel(
-                   condition = paste0("input['", ns("asset_size"), "'] != ''"),
-                   dateRangeInput(ns("date_range"), "5. Select Date Range")
-                 ),
-                 
-                 # Step 6: Variables
-                 conditionalPanel(
-                   condition = paste0("input['", ns("asset_size"), "'] != ''"),
-                   checkboxGroupInput(ns("variables"), "6. Select Variables",
-                                      choices = c("Summary", "Revenues",
-                                                  "Expenses", "Balance Sheet"),
-                                      inline = TRUE)
-                 ),
-                 conditionalPanel(
-                   condition = paste0("input['", ns("variables"), "'] != ''"),
-                   checkboxGroupInput(ns("scope"), "7. Form Scope",
-                                      choices = c("PC", "PZ"),
-                                      inline = TRUE)
-                 )
-               )
-             )
+  bslib::card(
+    bslib::card_title("Ready To Get Started?", class = "var-select-header"),
+    urban_button(ns, "start_form", "REQUEST DATA"),
+    bslib::accordion(
+      id = ns("accordion"),
+      open = FALSE,
+      bslib::accordion_panel(
+        title = "Select Form Type",
+        htmltools::div(
+          class = "form-text",
+          "Historically, nonprofits have been required to file Form 990. Since 2012, 
+           Nonprofits with assets less than $200,000 and gross receipts less than $500,000
+          have been eligible to file Form 990EZ. The Form 990 option allows you to select 
+          tax return data from all Form 990s filed since 1989. 
+          The Form 990EZ + Form 990 option offers variables common to both Form 
+          990 and Form 990EZ filed since 2012."
+        ),
+        htmltools::br(),
+        htmltools::div(
+          class = "form-header",
+          "What Type of Data Are You Interested In?"
+        ),
+        htmltools::br(),
+        htmltools::div(
+          class = "btn-radio-header",
+          shiny::radioButtons(
+            inputId = ns("form_select"),
+            label = NULL,
+            choices = c("Data from Form 990", 
+                        "Data from both Form 990 and Form 990EZ"),
+            inline = TRUE
+          )
+        ),
+        htmltools::br(),
+        urban_button(ns, "next_type", "NEXT")
       ),
-      column(4,
-             card(
-               card_header("Request Summary"),
-               card_body(
-                 textOutput(ns("user_name")),
-                 textOutput(ns("user_email")),
-                 textOutput(ns("user_organization")),
-                 hr(),
-                 textOutput(ns("selected_org_type")),
-                 textOutput(ns("selected_geography")),
-                 textOutput(ns("selected_subsector")),
-                 textOutput(ns("selected_asset_size")),
-                 textOutput(ns("selected_date_range")),
-                 textOutput(ns("selected_variables")),
-                 hr(),
-                 textOutput(ns("file_size")),
-                 actionButton(ns("submit"), "Submit Data Request", class = "btn-primary btn-block mt-4")
-               )
-             )
+      bslib::accordion_panel(
+        title = "Organization, Subsector, and Size",
+        htmltools::div(
+          class = "form-header",
+          "What Type of Nonprofit Are You Interested In?"
+        ),
+        htmltools::br(),
+        bslib::layout_column_wrap(
+          htmltools::div(
+            class = "form-choice-header",
+            shinyWidgets::pickerInput(
+              inputId = ns("org_select"),
+              label = "501(c) Types",
+              choices = ctype_full,
+              multiple = TRUE,
+              options = list(`actions-box` = TRUE,
+                             "size" = 5),
+              choicesOpt = list(
+                content = choice_formatter(ctype_full, 100)
+              )
+            )
+          ),
+          htmltools::div(
+            class = "form-choice-header",
+            shinyWidgets::pickerInput(
+              inputId = ns("size_select"),
+              label = "Value of Assets",
+              choices = names(size_choices),
+              multiple = TRUE,
+              options = list(`actions-box` = TRUE)
+            )
+          ),
+          htmltools::div(
+            class = "form-choice-header",
+            shinyWidgets::pickerInput(
+              inputId = ns("subsector_select"),
+              label = "Subsector(s)",
+              choices = subsector_choices,
+              multiple = TRUE,
+              options = list(`actions-box` = TRUE)
+            )
+          )
+        ),
+        htmltools::br(),
+        urban_button(ns, "next_geo", "NEXT")
+      ),
+      bslib::accordion_panel(
+        title = "Geographic Scope",
+        htmltools::div(
+          class = "form-header",
+          "What Is Your Geographic Scope?"
+        ),
+        bslib::layout_column_wrap(
+          urban_virtualselect(ns, "geo_select", "Select State(s)", unique(geo_df[["Census.State"]])),
+          shiny::conditionalPanel(
+            condition = "input.geo_select.length > 0",
+            shinyWidgets::virtualSelectInput(
+              inputId = ns("county_select"),
+              label = "Optional - Select Specific County(s)",
+              choices = unique(geo_df[["Census.County"]]),
+              showValueAsTags = TRUE,
+              search = TRUE,
+              multiple = TRUE
+            ),
+            ns = ns
+          ),
+          shiny::conditionalPanel(
+            condition = "input.geo_select.length > 0",
+            shinyWidgets::virtualSelectInput(
+              inputId = ns("cbsa_select"),
+              label = "Optional - Select Specific Metro Area(s)",
+              choices = unique(geo_df[["Census.CBSA"]]),
+              showValueAsTags = TRUE,
+              search = TRUE,
+              multiple = TRUE
+            ),
+            ns = ns
+          )
+        ),
+        htmltools::br(),
+        urban_button(ns, "next_time", "NEXT")
+      ),
+      bslib::accordion_panel(
+        title = "Time Frame",
+        htmltools::div(
+          class = "form-header",
+          "Which Tax Years Are You Interested In?"
+        ),
+        bslib::layout_column_wrap(
+          htmltools::div(
+            class = "form-choice-header",
+            shinyWidgets::pickerInput(
+              inputId = ns("start_year"),
+              label = "Staring Tax Year",
+              choices = c(1989:2022),
+              multiple = FALSE,
+              options = list(`actions-box` = TRUE)
+            )
+          ),
+          htmltools::div(
+            class = "form-choice-header",
+            shinyWidgets::pickerInput(
+              inputId = ns("end_year"),
+              label = "End Tax Year",
+              choices = c(1989:2022),
+              multiple = FALSE,
+              options = list(`actions-box` = TRUE)
+            )
+          )
+        ),
+        htmltools::br(),
+        urban_button(ns, "next_data", "NEXT")
+      ),
+      bslib::accordion_panel(
+        title = "Retrieve 990 Data On",
+        htmltools::div(
+          class = "form-text",
+          "The Form 990 has over a thousand fields. 
+          We have grouped them into several categories to help make this data 
+          more accessible. By default, all data requests come pre-appended with
+          organizational information such as EIN, Name, Address, Tax Year and available
+          summary statistics on revenues, expenses and assets.
+          However, for a deeper dive into specific areas of interest, you can select
+          from the following categories. Each data request will return a CSV file
+          and an accompanying custom data dictionary with information on the 
+          variables requested.
+          A full data dictionary is available at this link:"
+        ),
+        htmltools::br(),
+        htmltools::div(
+          class = "form-header",
+          "Which Form 990 Fields Are You Interested In?"
+        ),
+        htmltools::br(),
+        htmltools::div(
+          class = "form-header",
+          bslib::input_switch(ns("all_data"), "All Data", TRUE)
+        ),
+        bslib::layout_column_wrap(
+          htmltools::div(),
+          htmltools::div(
+            class = "urbn-checkbox",
+            shiny::checkboxGroupInput(
+              inputId = ns("data_select"),
+              label = NULL,
+              width = "100%",
+              choices = c(
+                "Program Service Accomplishments - Information on the major programs and services",
+                "Required Schedules - Schedules required by the IRS",
+                "Statements - Tax compliance statements reported to the IRS",
+                "Governance - Information on the board of directors and governance structure",
+                "Compensation - Compensation for key individuals reported to the IRS",
+                "Revenue Statement - A breakdown of revenue sourced reported to the IRS",
+                "Functional Expenses - An accounting of all expenses reported to the IRS.",
+                "Balance Sheet - An accounting of asssets and liabilities.",
+                "Public Charity Status - Information on the organization's public charity status",
+                "Lobbying - Information on lobbying activities"
+              ),
+              inline = FALSE
+            )
+          ),
+          htmltools::div()
+        ),
+        htmltools::br(),
+        urban_button(ns, "next_user", "NEXT")
+      ),
+      bslib::accordion_panel(
+        title = "Tell Us About You",
+        htmltools::div(
+          class = "form-text",
+          "We're excited to customize your experience. 
+          To help us tailor the data to your needs, 
+          we'd love to know a little more about you. Your information helps us
+          address you by name, send updates to the right email address, and
+          helps us understand our user base better."
+        ),
+        htmltools::br(),
+        htmltools::div(
+          class = "form-choice-header",
+          bslib::layout_column_wrap(
+            width = 0.5,
+            shiny::textInput(
+              inputId = ns("first_name"),
+              label = "First Name",
+              placeholder = "First Name",
+              value = ""
+            ),
+            shiny::textInput(
+              inputId = ns("last_name"),
+              label = "Last Name",
+              placeholder = "Last Name",
+              value = ""
+            ),
+            shiny::textInput(
+              inputId = ns("email"),
+              label = "Email",
+              placeholder = "Email",
+              value = ""
+            ),
+            shiny::textInput(
+              inputId = ns("organization"),
+              label = "Organization",
+              placeholder = "Organization",
+              value = ""
+            ),
+            shiny::textInput(
+              inputId = ns("purpose"),
+              label = "Role",
+              placeholder = "Purpose",
+              value = ""
+            )
+          )
+        ),
+        htmltools::br(),
+        urban_button(ns, "next_review", "NEXT")
+      ),
+      bslib::accordion_panel(
+        title = "Review Your Request",
+        htmltools::div(
+          class = "form-text",
+          "Please review your request before submitting. 
+          If you need to make any changes, you can navigate back to the 
+          appropriate section using the drop-down menus above."
+        ),
+        htmltools::br(),
+        bslib::layout_column_wrap(
+          width = 1/3,
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "Form"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_form"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "Organization Type"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_org"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "Asset Size"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_size"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "Subsector(s)"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_subsector"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "State(s)"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_state"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "County(s)"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_county"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "Metro Area(s)"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_cbsa"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "Timeframe"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_timeframe"))
+            )
+          ),
+          htmltools::div(
+            htmltools::div(
+              class = "form-header",
+              "Variables"
+            ),
+            htmltools::div(
+              class = "form-header-text",
+              shiny::textOutput(ns("selected_variables"))
+            )
+          )
+        ),
+        htmltools::br(),
+        urban_button(ns, "start_data_download", "SUBMIT REQUEST")
       )
     )
   )
 }
 
 # Server function for the module
-dataRequestServer <- function(id) {
+dataRequestServer <- function(id, geo_df) {
   moduleServer(id, function(input, output, session) {
-    # Update state choices based on selected region
-    observeEvent(input$region, {
-      if (input$region != "") {
-        updateSelectInput(session, "state", 
-                          choices = c("Select" = "", geo_data[[input$region]]))
-      } else {
-        updateSelectInput(session, "state", choices = c("Select" = ""))
+    # Update the open panel
+    observeEvent(input$start_form, {
+      bslib::accordion_panel_set(id = "accordion", value = "Select Form Type")
+    })
+    observeEvent(input$next_type, {
+      bslib::accordion_panel_set(id = "accordion", value = "Organization, Subsector, and Size")
+    })
+    observeEvent(input$next_geo, {
+      bslib::accordion_panel_set(id = "accordion", value = "Geographic Scope")
+    })
+    observeEvent(input$next_time, {
+      bslib::accordion_panel_set(id = "accordion", value = "Time Frame")
+    })
+    observeEvent(input$next_data, {
+      bslib::accordion_panel_set(id = "accordion", value = "Retrieve 990 Data On")
+    })
+    observeEvent(input$next_user, {
+      bslib::accordion_panel_set(id = "accordion", value = "Tell Us About You")
+    })
+    observeEvent(input$next_review, {
+      bslib::accordion_panel_set(id = "accordion", value = "Review Your Request")
+    })
+    
+    # Update CBSA/County Inputs
+    observeEvent(input$geo_select, {
+      if (length(input$geo_select) > 0) {
+        shinyWidgets::updateVirtualSelect(
+          inputId = "county_select",
+          choices = unique(geo_df[["Census.County"]][geo_df[["Census.State"]] %in% input$geo_select])
+        )
+        shinyWidgets::updateVirtualSelect(
+          inputId = "cbsa_select",
+          choices = unique(geo_df[["Census.CBSA"]][geo_df[["Census.State"]] %in% input$geo_select])
+        )
       }
     })
     
-    # Display request summary
-    output$user_name <- renderText({ paste("Name:", input$name) })
-    output$user_email <- renderText({ paste("Email:", input$email) })
-    output$user_organization <- renderText({ paste("Organization:", input$organization) })
-    output$user_role <- renderText({ paste("Role:", input$role) })
-    output$selected_org_type <- renderText({ paste("Organization Type:", input$org_type) })
-    output$selected_subsector <- renderText({ paste("Subsector:", input$subsector) })
-    output$selected_asset_size <- renderText({ paste("Asset Size:", input$asset_size) })
-    output$selected_date_range <- renderText({ 
-      paste("Date Range:", paste(input$date_range, collapse = " to "))
-    })
-    output$selected_variables <- renderText({ 
-      paste("Variables:", paste(input$variables, collapse = ", "))
+    # Select all variables
+    observeEvent(input$all_data, {
+      if (input$all_data) {
+        shiny::updateCheckboxGroupInput(
+          session = session,
+          inputId = "data_select",
+          selected = c(
+            "Program Service Accomplishments - Information on the major programs and services",
+            "Required Schedules - Schedules required by the IRS",
+            "Statements - Tax compliance statements reported to the IRS",
+            "Governance - Information on the board of directors and governance structure",
+            "Compensation - Compensation for key individuals reported to the IRS",
+            "Revenue Statement - A breakdown of revenue sourced reported to the IRS",
+            "Functional Expenses - An accounting of all expenses reported to the IRS.",
+            "Balance Sheet - An accounting of asssets and liabilities.",
+            "Public Charity Status - Information on the organization's public charity status",
+            "Lobbying - Information on lobbying activities"
+          )
+        )
+      }
     })
     
-    # Placeholder for file size estimation
-    output$file_size <- renderText({
-      "Estimated file size: N/A"
+    output$selected_form <- renderText({
+      input$form_select
     })
-    
-    # Handle submit button click
-    observeEvent(input$submit, {
-      # Here you would typically process the data request
-      # For this example, we'll just show a notification
-      showNotification("Data request submitted!", type = "message")
+    output$selected_org <- renderText({
+      paste(input$org_select, collapse = ", ")
     })
-  })
+    output$selected_size <- renderText({
+      paste(input$size_select, collapse = ", ")
+    })
+    output$selected_subsector <- renderText({
+      paste(input$subsector_select, collapse = ", ")
+    })
+    output$selected_state <- renderText({
+      paste(input$geo_select, collapse = ", ")
+    })
+    output$selected_county <- renderText({
+      if (length(input$county_select) == 0) {
+        "All Counties"
+      } else {
+      paste(input$county_select, collapse = ", ")
+      }
+    })
+    output$selected_cbsa <- renderText({
+      if (length(input$cbsa_select) == 0) {
+        "All Metro Areas"
+      } else {
+      paste(input$cbsa_select, collapse = ", ")
+      }
+    })
+    output$selected_timeframe <- renderText({
+      paste(input$start_year, input$end_year, sep = " - ")
+    })
+    output$selected_variables <- renderText({
+      if (input$all_data) {
+        "All Data"
+      } else {
+        paste(input$data_select, collapse = ", ")
+      }
+    })
+ })
 }
