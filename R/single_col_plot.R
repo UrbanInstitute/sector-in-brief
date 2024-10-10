@@ -1,10 +1,11 @@
 single_col_plot <- function(table,
                             title,
-                            subtitle,
+                            caption,
                             yvar,
                             xvar,
                             xtitle,
                             ytitle) {
+  subtitle <- plot_subtitle(groupby_var=NULL)
   p <- ggplot(table, mapping = aes(x = "Total", y = !!sym(yvar))) +
     ggiraph::geom_col_interactive(
       aes(tooltip = tooltip_text(table, yvar, xvar)),
@@ -14,9 +15,10 @@ single_col_plot <- function(table,
     ) +
     plot_scales +
     labs(
-      subtitle = subtitle,
-      x = xtitle,
       title = title,
+      subtitle = subtitle,
+      caption = caption,
+      x = xtitle,
       y = ytitle
     ) +
     coord_flip() +
