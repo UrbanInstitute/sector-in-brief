@@ -1,10 +1,11 @@
 single_line_plot <- function(table,
                              title,
-                             subtitle,
+                             caption,
                              yvar,
                              xvar,
                              xtitle,
                              ytitle) {
+  subtitle <- plot_subtitle(groupby_var=NULL)
   p <- ggplot(table, aes(x = !!sym(xvar), y = !!sym(yvar))) +
     ggiraph::geom_line_interactive(size = 1.5,
                                    hover_nearest = FALSE,
@@ -31,9 +32,10 @@ single_line_plot <- function(table,
     ) +
     plot_scales +
     labs(
-      subtitle = subtitle,
-      x = xtitle,
       title = title,
+      subtitle = subtitle,
+      caption = caption,
+      x = xtitle,
       y = ytitle
     ) +
     scale_x_continuous(breaks = seq(1990, 2024, 4)) +
