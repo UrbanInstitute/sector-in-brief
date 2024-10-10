@@ -1,30 +1,15 @@
 # Module for data processing in Shiny App
-data_ui <- function(id, org_type_choices, start_year, end_year) {
+data_ui <- function(id, choices, start_year, end_year) {
+  ns <- shiny::NS(id)
   htmltools::tagList(
     org_card = bslib::card(
       bslib::card_header("Organization Type", 
                          shiny::actionLink(shiny::NS(id, "org_reset"), "Reset", style = "float: right;")),
-      shiny::selectizeInput(
-        inputId = shiny::NS(id, "org_level"),
-        label = NULL,
-        choices = c(
-          "501(c)(3) Public Charities",
-          "501(c)(3) Private Foundations",
-          "501(c)(4) Social Welfare Organizations",
-          "Other Nonprofits",
-          "All Nonprofits"
-        ),
-        width = "500px"
-      ),
+      selectize_wrapper(ns, "ctype_level1", NULL, choices$ctype_level1, "500px"),
       shiny::conditionalPanel(
-        shiny::selectizeInput(
-          inputId = shiny::NS(id, "other_orgs"),
-          label = "Other 501(c) Types",
-          choices = org_type_choices,
-          width = "500px"
-        ),
-        condition = "input.org_level == 'Other Nonprofits'",
-        ns = shiny::NS(id)
+        selectize_wrapper(ns, "ctype_level2", NULL, choices$ctype_level2, "500px"),
+        condition = "input.ctype_level1 == 'Other Nonprofits'",
+        ns = ns
       )
     ),
     geo_card = geo_filter_ui(shiny::NS(id, "geo_filter"), state_choices),
