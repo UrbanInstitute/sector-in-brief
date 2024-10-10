@@ -23,6 +23,11 @@ query_builder <- function(inputs, geo_df) {
       filter_ls[["Organization Type"]] <- "501(c)(4)"
     } else if (org_level == "Other Organizations") {
       filter_ls[["Organization Type"]] <- other_orgs
+    } else if (org_level == "501(c)(3)"){
+      filter_ls[["Organization Type"]] <- c(
+        "501(c)(3) Public Charities",
+        "501(c)(3) Private Foundations"
+      )
     }
   }
   # Geographies
