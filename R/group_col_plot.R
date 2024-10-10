@@ -1,12 +1,13 @@
 group_col_plot <- function(table,
                            groupby_var,
                            title,
-                           subtitle,
+                           caption,
                            yvar,
                            xvar,
                            ytitle,
                            xtitle,
                            num_groups) {
+  subtitle <- plot_subtitle(groupby_var)
   p <- ggplot(table, aes(
     x = !!sym(groupby_var),
     y = !!sym(yvar),
@@ -22,9 +23,10 @@ group_col_plot <- function(table,
     scale_fill_manual(values = colorpalette(num_colors = num_groups)) +
     plot_scales +
     labs(
-      subtitle = subtitle,
-      x = groupby_var,
       title = title,
+      subtitle = subtitle,
+      caption = caption,
+      x = groupby_var,
       y = ytitle
     ) +
     coord_flip() +
