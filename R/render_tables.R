@@ -2,9 +2,14 @@
 #' @param tables A list of data frames
 #' @param groupbys A list of character vectors defining groupby columns
 #' @param agg_var A character vector defining the column to sum
-render_tables <- function(tables, groupbys, agg_var) {
+#' @param year_var A character vector defining the column to group by
+#' @return A list of reactable objects
+render_tables <- function(tables, groupbys, agg_var, year_var) {
   #' @title Convert data.frame to reactable object
-  format_reactable <- function(table, groupby, agg_var) {
+  format_reactable <- function(table, groupby, agg_var, year_var) {
+    if (length(unique(table[[year_var]])) == 1){
+      groupby <- NULL
+    }
     reactable::renderReactable({
       reactable(
         data = table,
@@ -22,7 +27,8 @@ render_tables <- function(tables, groupbys, agg_var) {
     tables,
     groupbys,
     .f = format_reactable,
-    agg_var = agg_var
+    agg_var = agg_var,
+    year_var = year_var
   )
 }
 

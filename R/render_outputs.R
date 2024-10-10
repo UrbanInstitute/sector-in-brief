@@ -1,8 +1,9 @@
-render_outputs <- function(plots, tables, output, query, agg_var){
+render_outputs <- function(plots, tables, output, query, agg_var, year_var){
   output_plots <- render_plots(plots)
   output_tables <- render_tables(tables,
                                  agg_var = agg_var,
-                                 groupbys = list(NULL, query$geo_level, "Subsector", "Asset Size"))
+                                 groupbys = list(NULL, query$geo_level, "Subsector", "Asset Size"),
+                                 year_var = year_var)
   output_downloads <- render_download(tables)
   output$plot_overall <- output_plots$default
   output$plot_subsector <- output_plots$by_subsector

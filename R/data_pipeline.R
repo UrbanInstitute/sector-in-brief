@@ -13,14 +13,15 @@ data_pipeline <- function(input,
                          geo_filters = geo_filters, 
                          time_series = time_series, 
                          title_prefix = title_prefix, 
-                         year_var = year_var)
+                         year_var = year_var,
+                         agg_var = agg_var)
   input_validation_msg <- validate_inputs(inputs)
   if (input_validation_msg != TRUE) {
     shiny::showModal(modal(input_validation_msg))
   }
   else {
     title <- plot_title(inputs)
-    subtitle <- plot_subtitle(inputs)
+    caption <- plot_caption(inputs)
     shiny::withProgress(min = 1, max = 5, {
       setProgress(1, message = "Filtering Data...")
       query <- query_builder(inputs, geo_df)
@@ -37,7 +38,7 @@ data_pipeline <- function(input,
         tables_ls = tables,
         groupby_vars = list(NULL, query$geo_level, "Subsector", "Asset Size"),
         title = title,
-        subtitle = subtitle,
+        caption = caption,
         yvar = agg_var,
         xvar = year_var,
         ytitle = ytitle,
@@ -49,7 +50,8 @@ data_pipeline <- function(input,
                      tables = tables, 
                      output = output, 
                      query = query,
-                     agg_var = agg_var)
+                     agg_var = agg_var,
+                     year_var = year_var)
       setProgress(5, message = "Done!")
     })
   }
