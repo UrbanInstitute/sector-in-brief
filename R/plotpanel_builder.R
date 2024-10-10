@@ -2,9 +2,8 @@ plotpanel_builder <- function(id, title, plot_id, table_id, download_id){
   bslib::nav_panel(
     title = title,
     layout_column_wrap(
-      width = NULL,
-      heigh = 650,
-      style = htmltools::css(grid_template_columns = "3fr 1fr"),
+      width = 1,
+      heights_equal = "row",
       bslib::card(
         bslib::card_body(
           shinycssloaders::withSpinner(
