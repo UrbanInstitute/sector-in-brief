@@ -39,6 +39,26 @@ choice_builder <- function(panelid){
       "501(f) - Cooperative Service Organizations of Operating Educational Organizations" = "501(f)",
       "501(k) - Child Care Organizations" = "501(k)",
       "521(a) - Farmers' Cooperative Associations" = "521(a)"
+    ),
+    subsector = list(
+      "Arts, Culture, and Humanities - ART" = "ART", 
+      "Education (minus Universities) - EDU" = "EDU",
+      "Health (minus Hospitals) - HEL" = "HEL",
+      "Human Services - HMS" = "HMS",
+      "International, Foreign Affairs - IFA" = "IFA",
+      "Public, Societal Benefit - PSB" = "PSB",
+      "Religion Related - REL" = "REL",
+      "Mutual/Membership Benefit - MMB" = "MMB",
+      "Universities - UNI" = "UNI",
+      "Hospitals - HOS" = "HOS"
+    ),
+    size = list(
+      "Under $100,000" = 1,
+      "$100,000 - $499,999" = 2,
+      "$500,000 - $999,999" = 3,
+      "$1 Million - $4.99 Million" = 4,
+      "$5 Million - $9.99 Million" = 5,
+      "Above $10 Million" = 6
     )
   )
   if (panelid %in% c("pf_amount")){
