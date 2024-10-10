@@ -1,8 +1,8 @@
 /* Custom css template for Sector In Brief Dashboard /*
 /* Programmer Name: Thiyaghessan tpoongundranar@urban.org /*
 /* Date Created: 2024-08-23 /*
-/* Date Last Modified: 2024-09-27 */
-
+/* Date Last Modified: 2024-10-10 */
+/* Naming conventions follow BEM naming convention */
 .body {
     font-family: 'Lato';
     font-size: 16px;
@@ -244,12 +244,7 @@ border-color: #46abdb;
   font-size: 1em;
   color: black;
 }
-.filter-options {
-  font-family: 'Lato';
-  font-size: 1.0em;
-  color: black;
-}
-.slider {
+.filter__text {
   font-family: 'Lato';
   font-size: 1.0em;
   color: black;
