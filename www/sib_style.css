@@ -22,13 +22,30 @@
   text-align: left;
   background-color: #cfe8f3;
 }
-.text-5xl {
+.text-3xl {
   font-family: 'Lato'; /* Use the Lato font */
-  font-size: 2.25rem; /* Set the font size to large */
+  font-size: 3rem; /* Set the font size to large */
   color: #000000;
   font-weight: 700;
 }
+.text-2xl {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 2rem; /* Set the font size to large */
+  color: #000000;
+  font-weight: 700;
+}
+.text-3xl-cyan {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 3rem; /* Set the font size to large */
+  color: #1696d2;
+  font-weight: 700;
+}
 .leading-relaxed {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 2.25rem; /* Set the font size to large */
+  color: #696969;
+}
+.leading {
   font-family: 'Lato'; /* Use the Lato font */
   font-size: 1.25rem; /* Set the font size to large */
   color: #696969;
@@ -36,10 +53,42 @@
 .welcome-header {
     box-sizing: border-box;
     width: 50%;
-    background-color: #ffffff;
-    margin: auto;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.8) 100%);
+    padding: 75px 75px 75px 75px;
     flex-direction: column;
 }
+.flex-box--row {
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+  box-sizing: border-box;
+}
+.flex-box--column {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: center;
+  width: 50%;
+  box-sizing: border-box;
+}
+.img-box {
+  padding: 75px 75px 75px 75px;
+  height: 80%;
+  width: 50%;
+}
+.header--md {
+  font-family: 'Lato';
+  font-size: 2rem;
+  color: #000000;
+  font-weight: 700;
+}
+.subheader {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  color: #696969;
+  text-align: left;
+}
+
 .welcome-banner {
     display: flex;
     align-items: center;
