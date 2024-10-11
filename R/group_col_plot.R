@@ -31,8 +31,6 @@ group_col_plot <- function(table,
     ) +
     coord_flip() +
     plot_theme
-  p <- ggiraph::girafe(ggobj = p,
-                       width_svg = 20,
-                       options = ggiraph_options)
+  p <- girafer_wrapper(p)
   return(p)
 }

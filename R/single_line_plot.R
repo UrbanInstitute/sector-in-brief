@@ -40,9 +40,6 @@ single_line_plot <- function(table,
     ) +
     scale_x_continuous(breaks = seq(1990, 2024, 4)) +
     plot_theme
-  p <- ggiraph::girafe(ggobj = p,
-                       width_svg = 16,
-                       height_svg = 9,
-                       options = ggiraph_options)
+  p <- girafe_wrapper(p)
   return(p)
 }
