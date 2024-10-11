@@ -8,8 +8,6 @@ blank_plot <- function() {
       y = ""
     ) +
     plot_theme
-  p <- ggiraph::girafe(ggobj = p,
-                       width_svg = 20,
-                       options = ggiraph_options)
+  p <- girafe_wrapper(p)
   return(p)
 }
