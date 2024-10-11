@@ -1,10 +1,10 @@
 plot_title <- function(inputs) {
   title <- inputs$title_prefix
-  if (! is.null(inputs$org_level)){
-    if (inputs$org_level == "Other Nonprofits") {
-      title <- paste(title, inputs$other_orgs)
+  if (! is.null(inputs$ctype_level1)){
+    if (inputs$ctype_level1 == "Other Nonprofits") {
+      title <- paste(title, inputs$ctype_level2)
     } else {
-      title <- paste(title, inputs$org_level)
+      title <- paste(title, inputs$ctype_level1)
     } 
   }
   if (inputs$time_series){
