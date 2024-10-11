@@ -5,11 +5,11 @@
 #' @param choices The choices of the selectizeInput
 #' @param width The width of the selectizeInput
 #' @return A selectizeInput
-selectize_wrapper <- function(ns, id, label, choices, width){
+selectize_wrapper <- function(ns, id, label, choices, ...){
   shiny::selectizeInput(
     inputId = ns(id),
     label = label,
     choices = choices,
-    width = width
+    ...
   )
 }
