@@ -6,7 +6,7 @@ query_builder <- function(inputs, geo_df) {
   geo_level <- inputs$geo_level
   region <- inputs$geo_region
   state_single <- inputs$geo_state_single
-  state_mult <- inputs$geo_state_multi
+  state_mult <- inputs$geo_state_mult
   county <- inputs$geo_county
   cbsa <- inputs$geo_cbsa
   subsector <- inputs$subsector
@@ -31,7 +31,7 @@ query_builder <- function(inputs, geo_df) {
     }
   }
   # Geographies
-  if (geo_level == "all") {
+  if (geo_level == "National") {
     geo_level <- "Census Region"
     geo_selection <- c("Northeast", "Midwest", "South", "West")
   } else if (geo_level == "Census Region") {
