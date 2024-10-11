@@ -6,7 +6,7 @@ validate_inputs <- function(inputs){
     }
   }
   if (inputs$geo_level == "Census State"){
-    if (length(inputs$geo_state_multi) == 0){
+    if (length(inputs$geo_state_mult) == 0){
       message <- "Please select at least one state."
     }
   }
