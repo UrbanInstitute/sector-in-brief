@@ -26,6 +26,7 @@ geo_filter_ui <- function(id, state_choices) {
     ),
     shiny::conditionalPanel(
       selectize_wrapper(
+        ns = ns,
         id = "region",
         label = "Select Region(s)",
         choices = c("Northeast", "South", "Midwest", "West"),
@@ -36,6 +37,7 @@ geo_filter_ui <- function(id, state_choices) {
     ),
     shiny::conditionalPanel(
       selectize_wrapper(
+        ns = ns,
         id = "state_mult",
         label = "Select State(s)",
         choices = choices$states,
@@ -46,6 +48,7 @@ geo_filter_ui <- function(id, state_choices) {
     ),
     shiny::conditionalPanel(
       selectize_wrapper(
+        ns = ns,
         id = "state_single",
         label = "Select State",
         choices = choices$states,
@@ -56,6 +59,7 @@ geo_filter_ui <- function(id, state_choices) {
     ),
     shiny::conditionalPanel(
       selectize_wrapper(
+        ns = ns,
         id = "county",
         label = "Select Counties",
         choices = NULL,
@@ -67,6 +71,7 @@ geo_filter_ui <- function(id, state_choices) {
     ),
     shiny::conditionalPanel(
       selectize_wrapper(
+        ns = ns,
         id = "cbsa",
         label = "Select Metro/Micro Area(s)",
         choices = NULL,
@@ -81,22 +86,22 @@ geo_filter_ui <- function(id, state_choices) {
 
 geo_filter_server <- function(id, geo_df) {
   shiny::moduleServer(id, function(input, output, session) {
-    observeEvent(input$state_selector_single, {
+    observeEvent(input$state_single, {
       substate_filter(
         session,
         "county",
-        input$state_selector_single,
+        input$state_single,
         geo_df,
         "Census.County"
       )
       substate_filter(session,
                       "cbsa",
-                      input$state_selector_single,
+                      input$state_single,
                       geo_df,
                       "Census.CBSA")
     })
     shiny::observeEvent(input$geo_reset, {
-      shiny::updateSelectizeInput(inputId = "geo_level", selected = "all")
+      shiny::updateSelectizeInput(inputId = "geo_level", selected = "National")
     })
     list(
       state_single = reactive(input$state_single),
