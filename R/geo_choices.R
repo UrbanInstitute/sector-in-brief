@@ -9,7 +9,7 @@ geo_choices <- function(){
       "County" = "Census County",
       "Metro/Micro Area" = "Census CBSA"
     ),
-    states <- list(
+    states = list(
       "Alabama" = "AL",
       "Alaska" = "AK", 
       "Arizona" = "AZ",
@@ -63,4 +63,5 @@ geo_choices <- function(){
       "Wyoming" = "WY"
     )
   )
+  return(choices)
 }
