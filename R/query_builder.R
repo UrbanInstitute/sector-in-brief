@@ -1,8 +1,8 @@
 # This function creates a named list of queries for the data
 query_builder <- function(inputs, geo_df) {
   # Load params
-  org_level <- inputs$org_level
-  other_orgs <- inputs$other_orgs
+  ctype_level1 <- inputs$ctype_level1
+  ctype_level2 <- inputs$ctype_level2
   geo_level <- inputs$geo_level
   region <- inputs$geo_region
   state_single <- inputs$geo_state_single
@@ -17,19 +17,7 @@ query_builder <- function(inputs, geo_df) {
   # Create query list
   filter_ls <- list()
   # Organization Type
-  if (! is.null(org_level)){
-    filter_ls[["Organization Type"]] <- org_level
-    if (org_level == "501(c)(4) Social Welfare Organizations") {
-      filter_ls[["Organization Type"]] <- "501(c)(4)"
-    } else if (org_level == "Other Nonprofits") {
-      filter_ls[["Organization Type"]] <- other_orgs
-    } else if (org_level == "501(c)(3)"){
-      filter_ls[["Organization Type"]] <- c(
-        "501(c)(3) Public Charities",
-        "501(c)(3) Private Foundations"
-      )
-    }
-  }
+  filter_ls <- ctype_query(filter_ls, ctype_level1, ctype_level2)
   # Geographies
   if (geo_level == "National") {
     geo_level <- "Census Region"
