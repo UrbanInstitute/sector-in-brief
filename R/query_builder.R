@@ -19,23 +19,13 @@ query_builder <- function(inputs, geo_df) {
   # Organization Type
   filter_ls <- ctype_query(filter_ls, ctype_level1, ctype_level2)
   # Geographies
-  if (geo_level == "National") {
-    geo_level <- "Census Region"
-    geo_selection <- c("Northeast", "Midwest", "South", "West")
-  } else if (geo_level == "Census Region") {
-    geo_selection <- paste(region)
-  } else if (geo_level == "Census State") {
-    if (length(state_mult) > 0) {
-      geo_selection <- paste(state_mult)
-    } else {
-      geo_selection <- state_single
-    }
-  } else if (geo_level == "Census County") {
-    geo_selection <- paste(county)
-  } else if (geo_level == "Census CBSA") {
-    geo_selection <- paste(cbsa)
-  }
-  filter_ls[[geo_level]] <- geo_selection
+  filter_ls <- geo_query(filter_ls,
+                         geo_level,
+                         region,
+                         state_single,
+                         state_mult,
+                         county,
+                         cbsa)
   # Subsector
   filter_ls[["Subsector"]] <- subsector
   # Asset Size
