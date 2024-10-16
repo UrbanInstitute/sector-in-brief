@@ -13,11 +13,7 @@ geo_query <- function(filter_ls,
                       state_mult,
                       county,
                       cbsa) {
-  if (level == "National"){
-    level <- "Census Region"
-    filter_ls[[level]] <- c("Northeast", "Midwest", "South", "West")
-  }
-  else if (level == "Census Region") {
+  if (level == "Census Region") {
     filter_ls[[level]] <- region
   } else if (level == "Census State") {
     if (length(state_mult) > 0) {

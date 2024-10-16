@@ -19,6 +19,10 @@ query_builder <- function(inputs, geo_df) {
   # Organization Type
   filter_ls <- ctype_query(filter_ls, ctype_level1, ctype_level2)
   # Geographies
+  if (geo_level == "National") {
+    geo_level <- "Census Region"
+    region <- c("Northeast", "Midwest", "South", "West")
+  }
   filter_ls <- geo_query(filter_ls,
                          geo_level,
                          region,
