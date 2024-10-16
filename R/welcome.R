@@ -30,7 +30,7 @@ welcome <- bslib::nav_panel(
                    directly from the Form 990."))
       ),
       htmltools::img(class = "img-box",
-                     src = "ui-logo-rgb.png")
+                     src = "visual_ss.png")
     )
   ),
   htmltools::div(
@@ -46,7 +46,7 @@ welcome <- bslib::nav_panel(
                       Form 990 data.")
       ),
       htmltools::img(class = "img-box",
-                     src = "ui-logo-rgb.png")
+                     src = "download_ss.png")
     )
   )
 )
