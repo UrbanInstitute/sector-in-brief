@@ -31,6 +31,6 @@ group_col_plot <- function(table,
     ) +
     coord_flip() +
     plot_theme
-  p <- girafer_wrapper(p)
+  p <- girafe_wrapper(p)
   return(p)
 }
