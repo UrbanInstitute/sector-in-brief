@@ -225,20 +225,6 @@
   text-align: left;
   padding-top: 20px;
 }
-.btn-download {
-color: #ffffff;
-background-color: #1696d2;
-border-color: #1696d2;
-font-size: 18px;
-font-family: 'Lato';
-border-radius: 0;
-margin: auto;
-}
-.btn-download:hover {
-color: #ffffff;
-background-color: #46abdb;
-border-color: #46abdb;
-}
 .selectize-input {
   font-family: 'Lato';
   font-size: 1em;
@@ -303,6 +289,24 @@ border-color: #46abdb;
   border-radius: 0;
   display: flex;
   margin: auto;
+}
+.btn-download {
+  color: #ffffff;
+  background-color: #1696d2;
+  border-color: #1696d2;
+  font-size: 18px;
+  font-family: 'Lato';
+  border-radius: 0;
+  margin: auto;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+}
+.btn-download:hover {
+  color: #ffffff;
+  background-color: #062635;
+  border-color: #062635;
 }
 .btn-radio-header {
   font-family: 'Lato';

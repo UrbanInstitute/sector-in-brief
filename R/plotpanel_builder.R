@@ -12,11 +12,18 @@ plotpanel_builder <- function(id, title, plot_id, table_id, download_id){
           )
         )
       ),
-      bslib::card(
-        bslib::card_body(reactable::reactableOutput(NS(id, table_id))),
-        bslib::card_body(
+      bslib::accordion(
+        bslib::accordion_panel(
+          title = "View Data",
+          id = "reactable",
+          htmltools::div(
+            class = "form-header",
+            "Plot Data"
+          ),
+          reactable::reactableOutput(NS(id, table_id)),
           downloadButton(NS(id, download_id), "DOWNLOAD", class = "btn-download", icon = NULL)
-        )
+        ),
+        open = FALSE
       )
     )
   )
