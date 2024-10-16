@@ -11,6 +11,8 @@ ctype_query <- function(filter_ls, ctype_level1, ctype_level2){
     filter_ls[["Organization Type"]] <- "501(c)(4)"
   } else if (ctype_level1 == "Other Nonprofits") {
     filter_ls[["Organization Type"]] <- ctype_level2
+  } else {
+    filter_ls[["Organization Type"]] <- ctype_level1
   }
   return(filter_ls)
 }
