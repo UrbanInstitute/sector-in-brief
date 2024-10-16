@@ -63,13 +63,13 @@ choice_builder <- function(panelid){
   )
   if (panelid %in% c("pf_amount")){
     choice_ls$ctype_level1 <- list(
-      "501(c)(3) - Private Foundations" = "501(c)(3) PRIVATE FOUNDATIONS"
+      "501(c)(3) - Private Foundations" = "501(c)(3) Private Foundations"
     )
     choice_ls$ctype_level2 <- NULL
   }
   if (stringr::str_starts(panelid, "daf")){
     choice_ls$ctype_level1 <- list(
-      "501(c)(3) - Public Charities" = "501(c)(3) PUBLIC CHARITIES"    
+      "501(c)(3) - Public Charities" = "501(c)(3) Public Charities"    
     )
     choice_ls$ctype_level2 <- NULL
   }
