@@ -3,6 +3,9 @@
 /* Date Created: 2024-08-23 /*
 /* Date Last Modified: 2024-10-10 */
 /* Naming conventions follow BEM naming convention */
+.irs--shiny .irs-to, .irs--shiny .irs-from {
+  background-color: #0a4c6a;
+}
 .body {
     font-family: 'Lato';
     font-size: 16px;
