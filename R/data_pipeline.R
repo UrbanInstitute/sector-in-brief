@@ -64,7 +64,8 @@ data_pipeline <- function(input,
                      output = output, 
                      query = query,
                      agg_var = agg_var,
-                     year_var = year_var)
+                     year_var = year_var,
+                     table_title_prefix = title)
       setProgress(5, message = "Done!")
     })
   }

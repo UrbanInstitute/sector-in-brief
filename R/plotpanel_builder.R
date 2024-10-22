@@ -1,4 +1,4 @@
-plotpanel_builder <- function(id, title, plot_id, table_id, download_id){
+plotpanel_builder <- function(id, title, plot_id, table_id, download_id, table_title_id){
   bslib::nav_panel(
     title = title,
     layout_column_wrap(
@@ -18,7 +18,7 @@ plotpanel_builder <- function(id, title, plot_id, table_id, download_id){
           id = "reactable",
           htmltools::div(
             class = "form-header",
-            "Plot Data"
+            shiny::textOutput(NS(id, table_title_id))
           ),
           reactable::reactableOutput(NS(id, table_id)),
           downloadButton(NS(id, download_id), "DOWNLOAD", class = "btn-download", icon = NULL)

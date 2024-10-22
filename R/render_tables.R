@@ -10,16 +10,17 @@ render_tables <- function(tables, groupbys, agg_var, year_var) {
     if (length(unique(table[[year_var]])) == 1){
       groupby <- NULL
     }
+    table <- reactable(
+      data = table,
+      columns = format_reactable_columns(agg_var),
+      groupBy = groupby,
+      outlined = TRUE,
+      defaultPageSize = 10,
+      defaultColDef = colDef(align = "left", headerClass = "summary-table-title"),
+      rowClass = "summary-table-row"
+    )
     reactable::renderReactable({
-      reactable(
-        data = table,
-        columns = format_reactable_columns(agg_var),
-        groupBy = groupby,
-        outlined = TRUE,
-        defaultPageSize = 10,
-        defaultColDef = colDef(align = "left", headerClass = "summary-table-title"),
-        rowClass = "summary-table-row"
-      )
+      table
     })
   }
   
