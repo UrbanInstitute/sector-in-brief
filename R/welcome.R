@@ -5,12 +5,17 @@ welcome <- bslib::nav_panel(
     class = "welcome-banner",
     htmltools::div(
       class = "welcome-header",
-     htmltools::h1(class = "text-3xl",
-                   "Welcome to the National Center for Charitable Statistic's", 
-                   htmltools::p(class = "text-3xl-cyan", "Sector In Brief")),
-     htmltools::p(class = "leading-relaxed",
-                   "A research tool for policymakers to visualize and download panel data 
-                    derived directly from the IRS' Form 990.")
+     welcome_title,
+     welcome_subtitle
+    )
+  ),
+  htmltools::div(
+    class = "banner-light",
+    htmltools::div(
+      class = "flex-box--column",
+      welcome_para_1,
+      welcome_para_2,
+      welcome_para_3
     )
   ),
   htmltools::div(
@@ -19,16 +24,8 @@ welcome <- bslib::nav_panel(
       class = "flex-box--row",
       htmltools::div(
         class = "flex-box--column",
-        htmltools::h1(class = "header--md",
-                      "Visualize"),
-        htmltools::p(
-          class = "subheader",
-          htmltools::HTML(
-            "Visualize data on the number of nonprofits, nonprofit financials,
-             private foundation grantmaking, and donor advised funds extracted
-             directly from the Form 990."
-          )
-        )
+        welcome_visual_header,
+        welcome_visual_para
       ), 
       htmltools::img(class = "img-box",
                      src = "visual_ss.png")
@@ -40,11 +37,8 @@ welcome <- bslib::nav_panel(
       class = "flex-box--row",
       htmltools::div(
         class = "flex-box--column",
-        htmltools::h1(class = "header--md",
-                      "Download"),
-        htmltools::p(class = "subheader",
-                     "Assemble custom panel data sets from NCCS' archive of 
-                      Form 990 data.")
+        welcome_download_header,
+        welcome_download_para
       ),
       htmltools::img(class = "img-box",
                      src = "download_ss.png")
