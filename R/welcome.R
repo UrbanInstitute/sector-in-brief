@@ -21,14 +21,15 @@ welcome <- bslib::nav_panel(
         class = "flex-box--column",
         htmltools::h1(class = "header--md",
                       "Visualize"),
-        htmltools::p(class = "subheader",
-                     htmltools::HTML("Visualize data on the <span style='color: #fdbf11'>
-                     number of nonprofits</span>, <span style='color: #ec008b'>
-                     nonprofit financials</span>,<span style='color: #55b748'>
-                   private foundation grantmaking</span>, and 
-                   <span style='color: #db2b27'>donor advised funds</span> extracted
-                   directly from the Form 990."))
-      ),
+        htmltools::p(
+          class = "subheader",
+          htmltools::HTML(
+            "Visualize data on the number of nonprofits, nonprofit financials,
+             private foundation grantmaking, and donor advised funds extracted
+             directly from the Form 990."
+          )
+        )
+      ), 
       htmltools::img(class = "img-box",
                      src = "visual_ss.png")
     )
