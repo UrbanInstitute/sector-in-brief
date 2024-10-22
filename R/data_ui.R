@@ -4,7 +4,7 @@ data_ui <- function(id, choices, start_year, end_year) {
   htmltools::tagList(
     org_card = bslib::card(
       bslib::card_header("Organization Type", 
-                         shiny::actionLink(shiny::NS(id, "org_reset"), "Reset", style = "float: right;")),
+                         shiny::actionLink(shiny::NS(id, "org_reset"), "Reset", style = "float: right; color: #0a4c6a")),
       selectize_wrapper(ns, "ctype_level1", NULL, choices$ctype_level1, "500px"),
       shiny::conditionalPanel(
         selectize_wrapper(ns, "ctype_level2", NULL, choices$ctype_level2, "500px"),
@@ -16,7 +16,7 @@ data_ui <- function(id, choices, start_year, end_year) {
     subsector_card = bslib::card(
       bslib::card_header(
         "Subsector",
-        shiny::actionLink(shiny::NS(id, "subsector_reset"), "Reset", style = "float: right;")
+        shiny::actionLink(shiny::NS(id, "subsector_reset"), "Reset", style = "float: right;  color: #0a4c6a")
       ),
       urbn_checkboxgroup(
         ns = ns,
@@ -26,7 +26,7 @@ data_ui <- function(id, choices, start_year, end_year) {
       )
     ), 
     size_card = bslib::card(
-      bslib::card_header("Asset Size", shiny::actionLink(shiny::NS(id, "size_reset"), "Reset", style = "float: right;")),
+      bslib::card_header("Asset Size", shiny::actionLink(shiny::NS(id, "size_reset"), "Reset", style = "float: right; color: #0a4c6a")),
       urbn_checkboxgroup(
         ns = ns,
         id = "size",
@@ -35,7 +35,7 @@ data_ui <- function(id, choices, start_year, end_year) {
       )
     ),
     date_card = bslib::card(
-      bslib::card_header("Date Range", shiny::actionLink(shiny::NS(id, "date_reset"), "Reset", style = "float: right;")),
+      bslib::card_header("Date Range", shiny::actionLink(shiny::NS(id, "date_reset"), "Reset", style = "float: right; color: #0a4c6a")),
       urbn_slider(ns, "date_range", start_year, end_year)
     ),
     process_button = urbn_task_button(
