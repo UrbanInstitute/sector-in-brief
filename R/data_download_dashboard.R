@@ -11,20 +11,13 @@ dataRequestUI <- function(id, geo_df) {
       open = FALSE,
       bslib::accordion_panel(
         title = "Select Form Type",
+        download_formtype_para,
         htmltools::div(
-          class = "form-text",
-          "Historically, nonprofits have been required to file Form 990. Since 2012, 
-           Nonprofits with assets less than $200,000 and gross receipts less than $500,000
-          have been eligible to file Form 990EZ. The Form 990 option allows you to select 
-          tax return data from all Form 990s filed since 1989. 
-          The Form 990EZ + Form 990 option offers variables common to both Form 
-          990 and Form 990EZ filed since 2012."
+          class = "banner-light__small",
+          download_table
         ),
         htmltools::br(),
-        htmltools::div(
-          class = "form-header",
-          "What Type of Data Are You Interested In?"
-        ),
+        download_formtype_qn,
         htmltools::br(),
         htmltools::div(
           class = "btn-radio-header",
@@ -41,11 +34,12 @@ dataRequestUI <- function(id, geo_df) {
       ),
       bslib::accordion_panel(
         title = "Organization, Subsector, and Size",
+        download_orgtype_para,
+        htmltools::br(),
         htmltools::div(
           class = "form-header",
           "What Type of Nonprofit Are You Interested In?"
         ),
-        htmltools::br(),
         bslib::layout_column_wrap(
           htmltools::div(
             class = "form-choice-header",
@@ -87,12 +81,10 @@ dataRequestUI <- function(id, geo_df) {
       ),
       bslib::accordion_panel(
         title = "Geographic Scope",
-        htmltools::div(
-          class = "form-header",
-          "What Is Your Geographic Scope?"
-        ),
+        download_geo_para,
+        download_geo_qn,
         bslib::layout_column_wrap(
-          urban_virtualselect(ns, "geo_select", "Select State(s)", unique(geo_df[["Census.State"]])),
+          urban_virtualselect(ns, "geo_select", "Select State(s) First", unique(geo_df[["Census.State"]])),
           shiny::conditionalPanel(
             condition = "input.geo_select.length > 0",
             shinyWidgets::virtualSelectInput(
@@ -122,7 +114,8 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_time", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Time Frame",
+        title = "Date Range",
+        download_date_para,
         htmltools::div(
           class = "form-header",
           "Which Tax Years Are You Interested In?"
@@ -153,20 +146,8 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_data", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Retrieve 990 Data On",
-        htmltools::div(
-          class = "form-text",
-          "The Form 990 has over a thousand fields. 
-          We have grouped them into several categories to help make this data 
-          more accessible. By default, all data requests come pre-appended with
-          organizational information such as EIN, Name, Address, Tax Year and available
-          summary statistics on revenues, expenses and assets.
-          However, for a deeper dive into specific areas of interest, you can select
-          from the following categories. Each data request will return a CSV file
-          and an accompanying custom data dictionary with information on the 
-          variables requested.
-          A full data dictionary is available at this link:"
-        ),
+        title = "Form 990 Fields",
+        download_fields_para,
         htmltools::br(),
         htmltools::div(
           class = "form-header",
@@ -206,14 +187,10 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_user", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Tell Us About You",
+        title = "Contact Information",
         htmltools::div(
           class = "form-text",
-          "We're excited to customize your experience. 
-          To help us tailor the data to your needs, 
-          we'd love to know a little more about you. Your information helps us
-          address you by name, send updates to the right email address, and
-          helps us understand our user base better."
+          "A link to the requested data will be sent to your email address. Information on your use-case will help us both understand who uses the Nonprofit Sector-In-Brief Explorer and improve future use."
         ),
         htmltools::br(),
         htmltools::div(
@@ -259,9 +236,7 @@ dataRequestUI <- function(id, geo_df) {
         title = "Review Your Request",
         htmltools::div(
           class = "form-text",
-          "Please review your request before submitting. 
-          If you need to make any changes, you can navigate back to the 
-          appropriate section using the drop-down menus above."
+          "Please review your request before submitting. If you need to make any changes, you can navigate back to the appropriate section using the drop-down menus above."
         ),
         htmltools::br(),
         bslib::layout_column_wrap(
@@ -378,13 +353,13 @@ dataRequestServer <- function(id, geo_df) {
       bslib::accordion_panel_set(id = "accordion", value = "Geographic Scope")
     })
     observeEvent(input$next_time, {
-      bslib::accordion_panel_set(id = "accordion", value = "Time Frame")
+      bslib::accordion_panel_set(id = "accordion", value = "Date Range")
     })
     observeEvent(input$next_data, {
-      bslib::accordion_panel_set(id = "accordion", value = "Retrieve 990 Data On")
+      bslib::accordion_panel_set(id = "accordion", value = "Form 990 Fields")
     })
     observeEvent(input$next_user, {
-      bslib::accordion_panel_set(id = "accordion", value = "Tell Us About You")
+      bslib::accordion_panel_set(id = "accordion", value = "Contact Information")
     })
     observeEvent(input$next_review, {
       bslib::accordion_panel_set(id = "accordion", value = "Review Your Request")
