@@ -84,7 +84,18 @@ data_server_args <- list(
     agg_var = "Total Contributions",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Contributions for",
+    title_prefix = "Total Grants for",
+    time_series = TRUE
+  ),
+  "Average Foundation Grantmaking" = list(
+    path = "data/pf_grants.parquet",
+    vars = c(default_vars, "Total Contributions", "Tax Year"),
+    id = "pf_avg",
+    year_var = "Tax Year",
+    agg_var = "Total Contributions",
+    ytitle = "Dollars",
+    xtitle = "Tax Year",
+    title_prefix = "Average Grantmaking for",
     time_series = TRUE
   ),
   "Number of DAFs" = list(
