@@ -9,5 +9,6 @@ library(ggplot2)
 library(reactable)
 library(ggiraph)
 library(shinyWidgets)
+library(rlang)
 
 app()
