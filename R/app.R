@@ -18,6 +18,7 @@ app <- function(...) {
       visualpanels[["Number"]],
       bslib::nav_panel(
         title = "Finances",
+        finance_header,
         bslib::navset_card_pill(
           id = "finances",
           visualpanels[["Assets"]],
@@ -26,9 +27,18 @@ app <- function(...) {
           visualpanels[["Benefits"]],
           visualpanels[["Payroll Taxes"]]        )
       ),
-      visualpanels[["Private Foundation Grants"]],
+      bslib::nav_panel(
+        title = "Private Foundation Grantmaking",
+        pf_header,
+        bslib::navset_card_pill(
+          id = "private_foundation_grants",
+          visualpanels[["Private Foundation Grants"]],
+          visualpanels[["Average Foundation Grantmaking"]]
+        )
+      ),
       bslib::nav_panel(
         title = "Donor Advised Funds",
+        daf_header,
         bslib::navset_card_pill(
           id = "daf",
           visualpanels[["Number of DAFs"]],
@@ -40,8 +50,8 @@ app <- function(...) {
     ),
     bslib::nav_panel(
       title = "Download Data",
-      page_header_card(header = "Nonprofit Data at Your Fingertips", 
-                       subheader = data_download_subheader()),
+      page_header_card(header = download_title, 
+                       subheader = download_subtitle),
       dataRequestUI("data_download", geo_df)
     ),
     footer = htmltools::div(
@@ -63,7 +73,11 @@ app <- function(...) {
         observeEvent(input$daf, {
           data_server_wrapper(input$daf, data_server_args, geo_df)
         })
-      } else if (input$tabs %in% c("Number", "Private Foundation Grants")){
+      } else if (input$tabs == "Private Foundation Grantmaking") {
+        observeEvent(input$private_foundation_grants, {
+          data_server_wrapper(input$private_foundation_grants, data_server_args, geo_df)
+        })    
+      } else if (input$tabs == "Number"){
         data_server_wrapper(input$tabs, data_server_args, geo_df)
       }
     })
