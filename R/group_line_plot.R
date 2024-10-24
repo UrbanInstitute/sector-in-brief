@@ -16,15 +16,13 @@ group_line_plot <- function(table,
                 data_id = !!sym(groupby_var)
               )) +
     ggiraph::geom_line_interactive(size = 1.5, hover_nearest = FALSE)
-  if (yvar == "Total Contributions") {
-    p <- p +
-      ggiraph::geom_line_interactive(
-        data = dplyr::filter(table, is.na(!!sym(yvar)) == FALSE),
-        size = 1.5,
-        hover_nearest = FALSE,
-        linetype = "dashed"
-      )
-  }
+  p <- p +
+    ggiraph::geom_line_interactive(
+      data = dplyr::filter(table, is.na(!!sym(yvar)) == FALSE),
+      size = 1.5,
+      hover_nearest = FALSE,
+      linetype = "dashed"
+    )
   p <- p +
     ggiraph::geom_point_interactive(
       aes(tooltip = tooltip_text(table, yvar, xvar, groupby_var)),

@@ -10,16 +10,14 @@ single_line_plot <- function(table,
     ggiraph::geom_line_interactive(size = 1.5,
                                    hover_nearest = FALSE,
                                    color = "#1696d2")
-  if (yvar == "Total Contributions") {
-    p <- p +
-      ggiraph::geom_line_interactive(
-        data = dplyr::filter(table, is.na(!!sym(yvar)) == FALSE),
-        size = 1.5,
-        hover_nearest = FALSE,
-        linetype = "dashed",
-        color = "#1696d2"
-      )
-  }
+  p <- p +
+    ggiraph::geom_line_interactive(
+      data = dplyr::filter(table, is.na(!!sym(yvar)) == FALSE),
+      size = 1.5,
+      hover_nearest = FALSE,
+      linetype = "dashed",
+      color = "#1696d2"
+    )
   p <- p +
     ggiraph::geom_point_interactive(
       aes(tooltip = tooltip_text(table, yvar, xvar)),
