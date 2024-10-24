@@ -6,6 +6,11 @@ summarise_data <- function(data, groupby_var, sum_var, query) {
                      "by_geo" = geo_level,
                      "by_subsector" = "Subsector",
                      "by_asset_size" = "Asset Size")
+  if (query[["filters"]][["Organization Type"]] == "501(c)(3) Private Foundations") {
+    is_pf <- TRUE
+  } else {
+    is_pf <- FALSE
+  }
   # Create tables
   if (sum_var == "Proportion with DAFs") {
     table_ls <- purrr::map(
@@ -23,7 +28,8 @@ summarise_data <- function(data, groupby_var, sum_var, query) {
       purrr::possibly(table_builder, otherwise = blank_table()),
       data = data,
       groupby_var = groupby_var,
-      sum_var = sum_var
+      sum_var = sum_var,
+      is_pf = is_pf
     )
   }
   return(table_ls)
