@@ -34,5 +34,14 @@ plot_caption <- function(inputs) {
   caption <- caption_daf(caption, agg_var)
   # Year Notes
   caption <- caption_year(caption, year_var)
+  caption <- paste(
+    caption,
+    "\n",
+    "•	All data is derived directly from IRS tax records and are thus subject to changes in IRS reporting requirements. Minor anomalies in the Year-Over-Year values are likely due to changes in these requirements.",
+    "\n",
+    "•	The graphs only include data until 2021 because the IRS has only partially released tax records for tax year 2022. These figures will be updated with 2022 data once those records have been made fully available.",
+    "\n",
+    "•	Tax years with missing data from the IRS are represented by points connected with a dotted line."
+  )
   return(caption)
 }
