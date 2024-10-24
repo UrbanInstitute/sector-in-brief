@@ -31,9 +31,13 @@ query_builder <- function(inputs, geo_df) {
                          county,
                          cbsa)
   # Subsector
-  filter_ls[["Subsector"]] <- subsector
+  if (length(subsector) < 12){
+    filter_ls[["Subsector"]] <- subsector
+  }
   # Asset Size
-  filter_ls[["Asset Size"]] <- size
+  if (length(size) < 6) {
+    filter_ls[["Asset Size"]] <- size
+  }
   # Date Range
   if (time_series == TRUE) {
     years <- seq(year_range[1], year_range[2])
