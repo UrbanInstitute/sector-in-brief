@@ -50,7 +50,9 @@ choice_builder <- function(panelid){
       "Religion Related - REL" = "REL",
       "Mutual/Membership Benefit - MMB" = "MMB",
       "Universities - UNI" = "UNI",
-      "Hospitals - HOS" = "HOS"
+      "Hospitals - HOS" = "HOS",
+      "Environment and Animals - ENV" = "ENV",
+      "Other" = "UNU"
     ),
     size = list(
       "Under $100,000" = 1,
