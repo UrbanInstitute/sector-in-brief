@@ -1,5 +1,6 @@
 # This function creates a named list of queries for the data
 query_builder <- function(inputs, geo_df) {
+  # TODO: Figure out why private foundation code is being transformed incorrectly
   # Load params
   ctype_level1 <- inputs$ctype_level1
   ctype_level2 <- inputs$ctype_level2
