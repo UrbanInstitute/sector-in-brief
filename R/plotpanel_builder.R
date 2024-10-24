@@ -21,6 +21,7 @@ plotpanel_builder <- function(id, title, plot_id, table_id, download_id, table_t
             shiny::textOutput(NS(id, table_title_id))
           ),
           reactable::reactableOutput(NS(id, table_id)),
+          htmltools::br(),
           downloadButton(NS(id, download_id), "DOWNLOAD TABLE", class = "btn-download", icon = NULL)
         ),
         open = FALSE
