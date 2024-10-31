@@ -1,12 +1,8 @@
+#' @title Function to create plot title
+#' @param inputs list of inputs
+#' @return title for plot
 plot_title <- function(inputs) {
   title <- inputs$title_prefix
-  if (! is.null(inputs$ctype_level1)){
-    if (inputs$ctype_level1 == "Other Nonprofits") {
-      title <- paste(title, inputs$ctype_level2)
-    } else {
-      title <- paste(title, inputs$ctype_level1)
-    } 
-  }
   if (inputs$time_series){
     start_year <- inputs$year_range[1]
     end_year <- inputs$year_range[2]
