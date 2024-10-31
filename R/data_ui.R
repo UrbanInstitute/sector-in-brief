@@ -5,10 +5,16 @@ data_ui <- function(id, choices, start_year, end_year) {
     org_card = bslib::card(
       bslib::card_header("Organization Type", 
                          shiny::actionLink(shiny::NS(id, "org_reset"), "Reset", style = "float: right; color: #0a4c6a")),
-      selectize_wrapper(ns, "ctype_level1", NULL, choices$ctype_level1, "500px"),
+      urbn_checkboxgroup(
+        ns = ns,
+        id = "ctype_level1",
+        choices = choices$ctype_level1,
+        selected = c("501(c)(3) Public Charities", "501(c)(3) Private Foundations"),
+        width = "500px"
+      ),     
       shiny::conditionalPanel(
-        selectize_wrapper(ns, "ctype_level2", NULL, choices$ctype_level2, "500px"),
-        condition = "input.ctype_level1 == 'Other Nonprofits'",
+        selectize_wrapper(ns, "ctype_level2", "Other 501(c) Types", choices$ctype_level2, "500px", multiple = TRUE),
+        condition = "input.ctype_level1.includes('Other Nonprofits')",
         ns = ns
       )
     ),
