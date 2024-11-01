@@ -159,7 +159,12 @@
     width: 100%;
     bottom: 0;
 }
-
+.footer_text {
+  font-family: 'Lato';
+  font-size: 0.8em;
+  color: #000000;
+  text-align: center;
+}
 .body .h2 {
     font-family: 'Lato';
     font-size: 30px;
@@ -288,6 +293,13 @@
   text-align: justify;
   margin: auto;
   text-transform: uppercase;
+}
+.form-choice-text {
+  font-family: 'Lato';
+  font-size: 1rem;
+  color: #000000;
+  text-align: justify;
+  margin: auto;
 }
 .btn-urban {
   color: #ffffff;
