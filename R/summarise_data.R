@@ -3,10 +3,11 @@ summarise_data <- function(data, groupby_var, sum_var, query) {
   # Params
   geo_level <- query$geo_level
   groupby_ls <- list("default" = NULL,
+                     "by_ctype" = "Organization Type",
                      "by_geo" = geo_level,
                      "by_subsector" = "Subsector",
                      "by_asset_size" = "Asset Size")
-  if (query[["filters"]][["Organization Type"]] == "501(c)(3) Private Foundations") {
+  if ("501(c)(3) Private Foundations" %in% query[["filters"]][["Organization Type"]]) {
     is_pf <- TRUE
   } else {
     is_pf <- FALSE
