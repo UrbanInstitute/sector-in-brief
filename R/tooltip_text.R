@@ -1,15 +1,13 @@
-tooltip_text <- function(table, yvar, xvar, groupby_var=NULL) {
+tooltip_text <- function(table, yvar, xvar, groupby_var = NULL) {
   if (is.null(groupby_var)) {
-    text <- paste(
-      "<b>",
-      yvar,
-      "</b>: ",
-      scales::comma(table[[yvar]]),
-      "<br><b>",
-      xvar,
-      "</b>: ",
-      table[[xvar]]
-    )
+    text <- paste("<b>",
+                  yvar,
+                  "</b>: ",
+                  scales::comma(table[[yvar]]),
+                  "<br><b>",
+                  xvar,
+                  "</b>: ",
+                  table[[xvar]])
   } else {
     text <- paste(
       "<b>",
@@ -24,7 +22,7 @@ tooltip_text <- function(table, yvar, xvar, groupby_var=NULL) {
       xvar,
       "</b>: ",
       table[[xvar]]
-    ) 
+    )
   }
   return(text)
 }
