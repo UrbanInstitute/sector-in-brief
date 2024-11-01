@@ -15,7 +15,8 @@ welcome <- bslib::nav_panel(
       class = "flex-box--column",
       welcome_para_1,
       welcome_para_2,
-      welcome_para_3
+      welcome_para_3,
+      welcome_para_4
     )
   ),
   htmltools::div(
@@ -42,6 +43,14 @@ welcome <- bslib::nav_panel(
       ),
       htmltools::img(class = "img-box",
                      src = "download_ss.png")
+    )
+  ),
+  htmltools::div(
+    class = "banner-light",
+    htmltools::div(
+      class = "flex-box--column",
+      welcome_credits,
+      welcome_about
     )
   )
 )
