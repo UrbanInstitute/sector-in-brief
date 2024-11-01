@@ -4,7 +4,7 @@
 #' @param choices The choices of the checkboxgroup
 #' @param selected The selected choices of the checkboxgroup
 #' @return A html div tag containing a shiny checkboxgroup
-urbn_checkboxgroup <- function(ns, id, choices, selected){
+urbn_checkboxgroup <- function(ns, id, choices, selected, ...){
   htmltools::div(
     class = "filter__text",
     shiny::checkboxGroupInput(
@@ -12,7 +12,8 @@ urbn_checkboxgroup <- function(ns, id, choices, selected){
       label = NULL,
       choices = choices,
       selected = selected,
-      inline = FALSE
+      inline = FALSE,
+      ...
     )
   )
 }
