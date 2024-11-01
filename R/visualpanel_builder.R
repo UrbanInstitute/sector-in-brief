@@ -16,7 +16,6 @@ visualpanel_builder <- function(title,
   panel <- bslib::nav_panel(
     title = title,
     page_header_card(panel_header, panel_desc),
-    plot_ui(panelid),
     bslib::card(
       bslib::card_title("Select Your Filters", class = "var-select-header"),
       title = "",
@@ -28,7 +27,8 @@ visualpanel_builder <- function(title,
         all_cards[["date_card"]]
       ),
       all_cards[["process_button"]]
-    )
+    ),
+    plot_ui(panelid)
   )
   return(panel)
 }
