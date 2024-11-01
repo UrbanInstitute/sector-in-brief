@@ -7,18 +7,31 @@ single_col_plot <- function(table,
                             ytitle) {
   subtitle <- plot_subtitle(groupby_var=NULL)
   p <- ggplot(table, mapping = aes(x = "Total", y = !!sym(yvar))) +
-    ggiraph::geom_col_interactive(
-      aes(tooltip = tooltip_text(table, yvar, xvar)),
-      width = 0.9,
+    ggiraph::geom_segment_interactive(
+      aes(x = "Total", 
+          xend = "Total",
+          y = 0,
+          yend = !!sym(yvar)),
+      color = "lightgrey",
+      lwd = 5
+    ) +
+    ggiraph::geom_point_interactive(
+      aes(tooltip = tooltip_text(table, 
+                                 yvar, 
+                                 xvar)),
+      size = 10,
       fill = "#1696d2",
-      hover_nearest = TRUE,
+      shape = 21,
+      stroke = 1.2,
+      color = "#1696d2",
+      hover_nearest = TRUE
     ) +
     plot_scales +
     labs(
       title = title,
       subtitle = subtitle,
       caption = caption,
-      x = xtitle,
+      x = NULL,
       y = ytitle
     ) +
     coord_flip() +
