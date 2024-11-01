@@ -38,6 +38,15 @@ plots_build_single <- function(table,
                       ytitle = ytitle, 
                       xtitle = xtitle)
     }
+    else if (length(unique(table[[groupby_var]])) == 1) {
+      single_col_plot(table = table, 
+                      title = title, 
+                      caption = caption, 
+                      yvar = yvar, 
+                      xvar = xvar, 
+                      ytitle = ytitle, 
+                      xtitle = xtitle)
+    }
     else {
       group_col_plot(table = table,
                      groupby_var = groupby_var,
