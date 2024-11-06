@@ -32,8 +32,7 @@ app <- function(...) {
         pf_header,
         bslib::navset_card_pill(
           id = "private_foundation_grants",
-          visualpanels[["Private Foundation Grants"]],
-          visualpanels[["Average Foundation Grantmaking"]]
+          visualpanels[["Private Foundation Grants"]]
         )
       ),
       bslib::nav_panel(
