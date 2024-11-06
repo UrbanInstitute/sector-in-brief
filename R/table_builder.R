@@ -7,7 +7,6 @@ table_builder <- function(data, groupby_var, groupby_var_2, sum_var, is_pf) {
         dplyr::collect()
     } else {
       table <- data |>
-        na.omit() |>
         group_by(!!sym(groupby_var), !!sym(groupby_var_2)) |>
         summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
         dplyr::collect()
