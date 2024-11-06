@@ -49,7 +49,7 @@ data_pipeline <- function(input,
       setProgress(3, message = "Creating Graphs...")
       plots <- plots_build_all(
         tables_ls = tables,
-        groupby_vars = list(NULL, query$geo_level, "Subsector", "Asset Size"),
+        groupby_vars = list(NULL, "Organization Type", query$geo_level, "Subsector", "Asset Size"),
         title = title,
         caption = caption,
         yvar = agg_var,
