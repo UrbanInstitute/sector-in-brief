@@ -10,22 +10,21 @@ dataRequestUI <- function(id, geo_df) {
       id = ns("accordion"),
       open = FALSE,
       bslib::accordion_panel(
-        title = "Select Form Type",
+        title = "Option 1: Form Type",
         download_formtype_para,
+        htmltools::br(),
         htmltools::div(
           class = "banner-light__small",
           download_table
         ),
-        htmltools::br(),
-        download_formtype_qn,
         htmltools::br(),
         htmltools::div(
           class = "btn-radio-header",
           shiny::radioButtons(
             inputId = ns("form_select"),
             label = NULL,
-            choices = c("Data from Form 990", 
-                        "Data from both Form 990 and Form 990EZ"),
+            choices = c("Form 990 Filers", 
+                        "Form 990 and Form 990-EZ Filers"),
             inline = TRUE
           )
         ),
@@ -33,19 +32,17 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_type", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Organization, Subsector, and Size",
-        download_orgtype_para,
+        title = "Option 2: Organization, Subsector, and Size",
         htmltools::br(),
-        htmltools::div(
-          class = "form-header",
-          "What Type of Nonprofit Are You Interested In?"
-        ),
         bslib::layout_column_wrap(
           htmltools::div(
-            class = "form-choice-header",
+            class = "form-choice-text",
             shinyWidgets::pickerInput(
               inputId = ns("org_select"),
-              label = "501(c) Types",
+              label = htmltools::div(
+                htmltools::tags$b("ORGANIZATION TYPE"),
+                htmltools::p("Section 501(c) of the Internal Revenue Code")
+              ),
               choices = ctype_full,
               multiple = TRUE,
               options = list(`actions-box` = TRUE,
@@ -56,21 +53,27 @@ dataRequestUI <- function(id, geo_df) {
             )
           ),
           htmltools::div(
-            class = "form-choice-header",
+            class = "form-choice-text",
             shinyWidgets::pickerInput(
-              inputId = ns("size_select"),
-              label = "Value of Assets",
-              choices = size,
+              inputId = ns("subsector_select"),
+              label = htmltools::div(
+                htmltools::tags$b("SUBSECTOR"),
+                htmltools::p("National Taxonomy of Exempt Entities (NTEE) codes")
+              ),
+              choices = subsector,
               multiple = TRUE,
               options = list(`actions-box` = TRUE)
             )
           ),
           htmltools::div(
-            class = "form-choice-header",
+            class = "form-choice-text",
             shinyWidgets::pickerInput(
-              inputId = ns("subsector_select"),
-              label = "Subsector(s)",
-              choices = subsector,
+              inputId = ns("size_select"),
+              label = htmltools::div(
+                htmltools::tags$b("ASSET SIZE"),
+                htmltools::p("Total assets reported to the IRS")
+              ),
+              choices = size,
               multiple = TRUE,
               options = list(`actions-box` = TRUE)
             )
@@ -80,11 +83,11 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_geo", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Geographic Scope",
+        title = "Option 3: Geographic Scope",
         download_geo_para,
-        download_geo_qn,
+        htmltools::br(),
         bslib::layout_column_wrap(
-          urban_virtualselect(ns, "geo_select", "Select State(s) First", unique(geo_df[["Census.State"]])),
+          urban_virtualselect(ns, "geo_select", "Select State(s) First", state_choices),
           shiny::conditionalPanel(
             condition = "input.geo_select.length > 0",
             shinyWidgets::virtualSelectInput(
@@ -114,18 +117,15 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_time", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Date Range",
+        title = "Option 4: Date Range",
         download_date_para,
-        htmltools::div(
-          class = "form-header",
-          "Which Tax Years Are You Interested In?"
-        ),
+        htmltools::br(),
         bslib::layout_column_wrap(
           htmltools::div(
             class = "form-choice-header",
             shinyWidgets::pickerInput(
               inputId = ns("start_year"),
-              label = "Staring Tax Year",
+              label = "From Tax Year",
               choices = c(1989:2022),
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -135,7 +135,7 @@ dataRequestUI <- function(id, geo_df) {
             class = "form-choice-header",
             shinyWidgets::pickerInput(
               inputId = ns("end_year"),
-              label = "End Tax Year",
+              label = "Through Tax Year",
               choices = c(1989:2022),
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -146,13 +146,9 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_data", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Form 990 Fields",
+        title = "Option 5: Variables",
         download_fields_para,
         htmltools::br(),
-        htmltools::div(
-          class = "form-header",
-          "Which Form 990 Fields Are You Interested In?"
-        ),
         htmltools::br(),
         htmltools::div(
           class = "form-header",
@@ -190,7 +186,7 @@ dataRequestUI <- function(id, geo_df) {
         title = "Contact Information",
         htmltools::div(
           class = "form-text",
-          "A link to the requested data will be sent to your email address. Information on your use-case will help us both understand who uses the Nonprofit Sector-In-Brief Explorer and improve future use."
+          "A link to the requested data will be sent to your email address."
         ),
         htmltools::br(),
         htmltools::div(
@@ -223,8 +219,8 @@ dataRequestUI <- function(id, geo_df) {
             ),
             shiny::textInput(
               inputId = ns("purpose"),
-              label = "Role",
-              placeholder = "Purpose",
+              label = "Title",
+              placeholder = "Job Title",
               value = ""
             )
           )
@@ -236,7 +232,7 @@ dataRequestUI <- function(id, geo_df) {
         title = "Review Your Request",
         htmltools::div(
           class = "form-text",
-          "Please review your request before submitting. If you need to make any changes, you can navigate back to the appropriate section using the drop-down menus above."
+          "If you need to make any changes, you can navigate back to the appropriate section using the drop-down menus above."
         ),
         htmltools::br(),
         bslib::layout_column_wrap(
@@ -344,19 +340,19 @@ dataRequestServer <- function(id, geo_df) {
   moduleServer(id, function(input, output, session) {
     # Update the open panel
     observeEvent(input$start_form, {
-      bslib::accordion_panel_set(id = "accordion", value = "Select Form Type")
+      bslib::accordion_panel_set(id = "accordion", value = "Option 1: Form Type")
     })
     observeEvent(input$next_type, {
-      bslib::accordion_panel_set(id = "accordion", value = "Organization, Subsector, and Size")
+      bslib::accordion_panel_set(id = "accordion", value = "Option 2: Organization, Subsector, and Size")
     })
     observeEvent(input$next_geo, {
-      bslib::accordion_panel_set(id = "accordion", value = "Geographic Scope")
+      bslib::accordion_panel_set(id = "accordion", value = "Option 3: Geographic Scope")
     })
     observeEvent(input$next_time, {
-      bslib::accordion_panel_set(id = "accordion", value = "Date Range")
+      bslib::accordion_panel_set(id = "accordion", value = "Option 4: Date Range")
     })
     observeEvent(input$next_data, {
-      bslib::accordion_panel_set(id = "accordion", value = "Form 990 Fields")
+      bslib::accordion_panel_set(id = "accordion", value = "Option 5: Variables")
     })
     observeEvent(input$next_user, {
       bslib::accordion_panel_set(id = "accordion", value = "Contact Information")
@@ -439,6 +435,15 @@ dataRequestServer <- function(id, geo_df) {
       } else {
         paste(input$data_select, collapse = ", ")
       }
+    })
+    shinyWidgets::useSweetAlert()
+    observeEvent(input$start_data_download, {
+      sendSweetAlert(
+        session = session,
+        title = "Request Successful!",
+        text = "An email will be sent to you shortly with a link to download your data.",
+        type = "success"
+      )
     })
  })
 }
