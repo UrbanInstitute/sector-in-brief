@@ -5,7 +5,6 @@ choice_builder <- function(panelid){
     ctype_level1 = list(
       "501(c)(3) - Public Charities" = "501(c)(3) Public Charities",
       "501(c)(3) - Private Foundations" = "501(c)(3) Private Foundations",
-      "501(c)(3) Public Charities and Private Foundations" = "501(c)(3)",
       "501(c)(4) - Social Welfare Organizations" = "501(c)(4)",
       "Other Nonprofits" = "Other Nonprofits"
     ),
