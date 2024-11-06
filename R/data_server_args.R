@@ -84,7 +84,7 @@ data_server_args <- list(
     agg_var = "Total Contributions",
     ytitle = "Dollars",
     xtitle = "Tax Year",
-    title_prefix = "Total Grants",
+    title_prefix = "Total Grants Made By Private Foundations",
     time_series = TRUE
   ),
   "Average Foundation Grantmaking" = list(
