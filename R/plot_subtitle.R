@@ -5,7 +5,11 @@ plot_subtitle <- function(groupby_var){
   if (is.null(groupby_var)) {
     subtitle <- ""
   } else {
-    subtitle <- paste("By ", groupby_var) 
+    if (groupby_var == "Census CBSA"){
+      subtitle <- "From Census Metro (more than 50,000 people) and Micro (10,000 - 50,000 people) Areas"
+    } else {
+      subtitle <- paste("By ", groupby_var) 
+    }
   }
   return(subtitle)
 }
