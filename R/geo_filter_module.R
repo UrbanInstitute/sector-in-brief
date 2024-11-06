@@ -11,7 +11,6 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
 
 geo_filter_ui <- function(id, state_choices) {
   ns <- shiny::NS(id)
-  choices <- geo_choices()
   bslib::card(
     bslib::card_header(
       "Geography",
@@ -21,7 +20,7 @@ geo_filter_ui <- function(id, state_choices) {
       ns,
       id = "geo_level",
       label = "Select Geographic Level",
-      choices = choices$geo_level,
+      choices = geo_level,
       selected = "National"
     ),
     shiny::conditionalPanel(
@@ -40,7 +39,7 @@ geo_filter_ui <- function(id, state_choices) {
         ns = ns,
         id = "state_mult",
         label = "Select State(s)",
-        choices = choices$states,
+        choices = states,
         multiple = TRUE
       ),
       condition = "input.geo_level == 'Census State'",
@@ -51,7 +50,7 @@ geo_filter_ui <- function(id, state_choices) {
         ns = ns,
         id = "state_single",
         label = "Select State",
-        choices = choices$states,
+        choices = states,
         multiple = FALSE
       ),
       condition = "input.geo_level == 'Census County' | input.geo_level == 'Census CBSA'",
