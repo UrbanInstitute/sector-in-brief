@@ -9,7 +9,9 @@ data_ui <- function(id, choices, start_year, end_year) {
         ns = ns,
         id = "ctype_level1",
         choices = choices$ctype_level1,
-        selected = c("501(c)(3) Public Charities", "501(c)(3) Private Foundations"),
+        selected = c("501(c)(3) Public Charities", 
+                     "501(c)(3) Private Foundations",
+                     "501(c)(4) - Social Welfare Organizations"),
         width = "500px"
       ),     
       shiny::conditionalPanel(
