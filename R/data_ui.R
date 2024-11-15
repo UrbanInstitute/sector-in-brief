@@ -4,27 +4,26 @@ data_ui <- function(id, choices, start_year, end_year) {
   htmltools::tagList(
     org_card = bslib::card(
       bslib::card_header("Organization Type", 
-                         shiny::actionLink(shiny::NS(id, "org_reset"), "Reset", style = "float: right; color: #0a4c6a")),
-      urbn_checkboxgroup(
+                         bslib::tooltip(
+                           bsicons::bs_icon("question-circle"),
+                           "Section 501(c) of the Internal Revenue Code. Subsector"
+                         )),
+      urbn_tree(
         ns = ns,
-        id = "ctype_level1",
-        choices = choices$ctype_level1,
-        selected = c("501(c)(3) Public Charities", 
-                     "501(c)(3) Private Foundations",
-                     "501(c)(4) - Social Welfare Organizations"),
+        id = "ctype",
+        choice_df = choices$ctype_tree_df,
+        selected = choices$ctype,
         width = "500px"
-      ),     
-      shiny::conditionalPanel(
-        selectize_wrapper(ns, "ctype_level2", "Other 501(c) Types", choices$ctype_level2, "500px", multiple = TRUE),
-        condition = "input.ctype_level1.includes('Other Nonprofits')",
-        ns = ns
       )
     ),
     geo_card = geo_filter_ui(shiny::NS(id, "geo_filter"), state_choices),
     subsector_card = bslib::card(
       bslib::card_header(
         "Subsector",
-        shiny::actionLink(shiny::NS(id, "subsector_reset"), "Reset", style = "float: right;  color: #0a4c6a")
+        bslib::tooltip(
+          bsicons::bs_icon("question-circle"),
+          htmltools::HTML("12 general categories of the <a href='https://urbaninstitute.github.io/nccs-legacy/ntee/ntee-history.html'>National Taxonomy of Exempt Entities</a> (NTEE) code system. Asset Size")
+        )
       ),
       urbn_checkboxgroup(
         ns = ns,
@@ -34,7 +33,11 @@ data_ui <- function(id, choices, start_year, end_year) {
       )
     ), 
     size_card = bslib::card(
-      bslib::card_header("Asset Size", shiny::actionLink(shiny::NS(id, "size_reset"), "Reset", style = "float: right; color: #0a4c6a")),
+      bslib::card_header("Asset Size", 
+                         bslib::tooltip(
+                           bsicons::bs_icon("question-circle"),
+                           "Total assets from the IRS Business Master File grouped in five categories."
+                         )),
       urbn_checkboxgroup(
         ns = ns,
         id = "size",
@@ -43,13 +46,17 @@ data_ui <- function(id, choices, start_year, end_year) {
       )
     ),
     date_card = bslib::card(
-      bslib::card_header("Date Range", shiny::actionLink(shiny::NS(id, "date_reset"), "Reset", style = "float: right; color: #0a4c6a")),
+      bslib::card_header("Date Range", 
+                         bslib::tooltip(
+                           bsicons::bs_icon("question-circle"),
+                           "Tax years, defined as the 12-month period beginning in a given calendar year, used to calculate annual financial statements"
+                         )),
       urbn_slider(ns, "date_range", start_year, end_year)
     ),
     process_button = urbn_task_button(
       ns = ns,
       id = "process_data",
-      label = "VISUALIZE DATA",
+      label = "UPDATE DATA",
       label_busy = "VISUALIZING...")
   )
 }
