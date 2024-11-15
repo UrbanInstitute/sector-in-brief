@@ -1,5 +1,6 @@
 #' @title Function to create plot title
 #' @param inputs list of inputs
+#' @param groupby_var character string of the variable to group by
 #' @return title for plot
 plot_title <- function(inputs) {
   title <- inputs$title_prefix
