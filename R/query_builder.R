@@ -2,8 +2,7 @@
 query_builder <- function(inputs, geo_df) {
   # TODO: Figure out why private foundation code is being transformed incorrectly
   # Load params
-  ctype_level1 <- inputs$ctype_level1
-  ctype_level2 <- inputs$ctype_level2
+  ctype <- inputs$ctype
   geo_level <- inputs$geo_level
   region <- inputs$geo_region
   state_single <- inputs$geo_state_single
@@ -18,7 +17,7 @@ query_builder <- function(inputs, geo_df) {
   # Create query list
   filter_ls <- list()
   # Organization Type
-  filter_ls <- ctype_query(filter_ls, ctype_level1, ctype_level2)
+  filter_ls <- ctype_query(filter_ls, ctype)
   # Geographies
   if (geo_level == "National") {
     geo_level <- "Census Region"
