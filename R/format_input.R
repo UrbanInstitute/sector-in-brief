@@ -13,8 +13,7 @@ format_input <- function(input,
                          year_var,
                          agg_var) {
   inputs <- list(
-    ctype_level1 = input$ctype_level1,
-    ctype_level2 = input$ctype_level2,
+    ctype = input$ctype,
     geo_level = geo_filters$geo_level(),
     geo_region = geo_filters$region(),
     geo_state_single = geo_filters$state_single(),
