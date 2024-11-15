@@ -13,6 +13,7 @@ render_tables <- function(tables, groupbys, agg_var, year_var) {
     table <- reactable(
       data = table,
       columns = format_reactable_columns(agg_var),
+      defaultSorted = year_var,
       groupBy = groupby,
       outlined = TRUE,
       defaultPageSize = 10,
