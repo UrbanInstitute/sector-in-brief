@@ -1,43 +1,126 @@
+# Choices for filters - excludes geo filters
+ctype_tree_df <- tibble::tribble(
+  ~level1, ~level2,
+  "501(c)(3) Organizations", "501(c)(3) - Public Charities",
+  "501(c)(3) Organizations", "501(c)(3) - Private Foundations",
+  "501(c)(4) - Social Welfare Organizations", NA,
+  "Other Nonprofits", "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)",
+  "Other Nonprofits", "501(c)(2) - Title Holding Corporations for Exempt Organizations",
+  "Other Nonprofits", "501(c)(5) - Labor, Agricultural, and Horticultural Organizations",
+  "Other Nonprofits", "501(c)(6) - Business Leagues, etc.",
+  "Other Nonprofits", "501(c)(7) - Social and Recreation Clubs",
+  "Other Nonprofits", "501(c)(8) - Fraternal Beneficiary Societies",
+  "Other Nonprofits", "501(c)(9) - Voluntary Employees' Beneficiary Associations",
+  "Other Nonprofits", "501(c)(10) - Domestic Fraternal Societies",
+  "Other Nonprofits", "501(c)(11) - Teachers' Retirement Fund Associations",
+  "Other Nonprofits", "501(c)(12) - Benevolent Life Insurance Associations, Mutual Ditch or Irrigation Companies, Mutual or Cooperative Telephone Companies, or Like Organizations (if 85 percent or more of the organization's income consists of amounts collected from members for the sole purpose of meeting losses and expenses)",
+  "Other Nonprofits", "501(c)(13) - Cemetery Companies (owned and operated exclusively for the benefit of their members or which are not operated for profit)",
+  "Other Nonprofits", "501(c)(14) - State Chartered Credit Unions, Mutual Reserve Funds",
+  "Other Nonprofits", "501(c)(15) - Mutual Insurance Companies or Associations",
+  "Other Nonprofits", "501(c)(16) - Cooperative Organizations to Finance Crop Operations",
+  "Other Nonprofits", "501(c)(17) - Supplemental Unemployment Benefit Trusts",
+  "Other Nonprofits", "501(c)(18) - 501(c)(18) - Employee Funded Pension Trusts (created before June 25, 1959)",
+  "Other Nonprofits", "501(c)(19) - Veterans' Organizations",
+  "Other Nonprofits", "501(c)(20) - Group Legal Services Plan Organizations",
+  "Other Nonprofits", "501(c)(21) - Black Lung Benefit Trusts",
+  "Other Nonprofits", "501(c)(23) - Veterans' Organizations (created before 1880)",
+  "Other Nonprofits", "501(c)(24) - Section 4049 ERISA Trusts",
+  "Other Nonprofits", "501(c)(25) - Title Holding Corporations or Trusts with Multiple Parents",
+  "Other Nonprofits", "501(c)(26) - State-Sponsored High-Risk Health Coverage Organizations",
+  "Other Nonprofits", "501(c)(27) - State-Sponsored Worker's Compensation Reinsurance Organizations",
+  "Other Nonprofits", "501(c)(29) - Qualified Nonprofit Health Insurance Issuers",
+  "Other Nonprofits", "501(c)(d) - Religious and Apostolic Associations",
+  "Other Nonprofits", "501(c)(e) - Cooperative Hospital Service Organizations",
+  "Other Nonprofits", "501(c)(k) - Child Care Organizations"
+)
+
+ctype_id <- list(
+  "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)" = "501(c)(1)",
+  "501(c)(2) - Title Holding Corporations for Exempt Organization" = "501(c)(2)", 
+  "501(c)(3) - Public Charities" = "501(c)(3) Public Charities",
+  "501(c)(3) - Private Foundations" = "501(c)(3) Private Foundations",
+  "501(c)(4) - Social Welfare Organizations" = "501(c)(4)",
+  "501(c)(5) - Labor, Agricultural, and Horticultural Organizations" = "501(c)(5)",
+  "501(c)(6) - Business Leagues, etc." = "501(c)(6)",
+  "501(c)(7) - Social and Recreation Clubs" = "501(c)(7)",
+  "501(c)(8) - Fraternal Beneficiary Societies" = "501(c)(8)",
+  "501(c)(9) - Voluntary Employees' Beneficiary Associations" = "501(c)(9)",
+  "501(c)(10) - Domestic Fraternal Societies" = "501(c)(10)",
+  "501(c)(11) - Teachers' Retirement Fund Associations" = "501(c)(11)",
+  "501(c)(12) - Benevolent Life Insurance Associations, Mutual Ditch or Irrigation Companies, Mutual or Cooperative Telephone Companies, or Like Organizations (if 85 percent or more of the organization's income consists of amounts collected from members for the sole purpose of meeting losses and expenses)" = "501(c)(12)",
+  "501(c)(13) - Cemetery Companies (owned and operated exclusively for the benefit of their members or which are not operated for profit)" = "501(c)(13)",
+  "501(c)(14) - State Chartered Credit Unions, Mutual Reserve Funds" = "501(c)(14)",
+  "501(c)(15) - Mutual Insurance Companies or Associations" = "501(c)(15)",
+  "501(c)(16) - Cooperative Organizations to Finance Crop Operations" = "501(c)(16)",
+  "501(c)(17) - Supplemental Unemployment Benefit Trusts" = "501(c)(17)",
+  "501(c)(18) - Employee Funded Pension Trusts (created before June 25, 1959)" = "501(c)(18)", 
+  "501(c)(19) - Veterans' Organizations" = "501(c)(19)",
+  "501(c)(20) - Group Legal Services Plan Organizations" = "501(c)(20)",
+  "501(c)(21) - Black Lung Benefit Trusts" = "501(c)(21)",
+  "501(c)(23) - Veterans' Organizations (created before 1880)" = "501(c)(23)",
+  "501(c)(24) - Section 4049 ERISA Trusts" = "501(c)(24)",
+  "501(c)(25) - Title Holding Corporations or Trusts with Multiple Parents" = "501(c)(25)",
+  "501(c)(26) - State-Sponsored High-Risk Health Coverage Organizations" = "501(c)(26)",
+  "501(c)(27) - State-Sponsored Worker's Compensation Reinsurance Organizations" = "501(c)(27)",
+  "501(c)(29) - Qualified Nonprofit Health Insurance Issuers" = "501(c)(29)",
+  "501(c)(d) - Religious and Apostolic Associations" = "501(c)(d)",
+  "501(c)(e) - Cooperative Hospital Service Organizations" = "501(c)(e)",
+  "501(c)(k) - Child Care Organizations" = "501(c)(k)"
+)
+
+ctype_501c3 <- c("501(c)(3) Public Charities", "501(c)(3) Private Foundations")
+ctype_other <- c(
+  "501(c)(1)",
+  "501(c)(2)",
+  "501(c)(5)",
+  "501(c)(6)",
+  "501(c)(7)",
+  "501(c)(8)",
+  "501(c)(9)",
+  "501(c)(10)",
+  "501(c)(11)",
+  "501(c)(12)",
+  "501(c)(13)",
+  "501(c)(14)",
+  "501(c)(15)",
+  "501(c)(16)",
+  "501(c)(17)",
+  "501(c)(18)",
+  "501(c)(19)",
+  "501(c)(20)",
+  "501(c)(21)",
+  "501(c)(23)",
+  "501(c)(24)",
+  "501(c)(25)",
+  "501(c)(26)",
+  "501(c)(27)",
+  "501(c)(28)",
+  "501(c)(29)",
+  "501(c)(d)",
+  "501(c)(e)",
+  "501(c)(k)"
+)
+
+usethis::use_data(
+  ctype_tree_df,
+  ctype_id,
+  ctype_501c3,
+  ctype_other,
+  overwrite = TRUE,
+  internal = TRUE
+)
+
+
 #' @title Build a list of choices for filters based on panelid
 #' @param panelid The id of the visual page
 choice_builder <- function(panelid){
   choice_ls <- list(
-    ctype_level1 = list(
-      "501(c)(3) - Public Charities" = "501(c)(3) Public Charities",
-      "501(c)(3) - Private Foundations" = "501(c)(3) Private Foundations",
-      "501(c)(4) - Social Welfare Organizations" = "501(c)(4)",
-      "Other Nonprofits" = "Other Nonprofits"
-    ),
-    ctype_level2 = list(
-      "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)" = "501(c)(1)",
-      "501(c)(2) - Title Holding Corporations for Exempt Organization" = "501(c)(2)", 
-      "501(c)(5) - Labor, Agricultural and Horticultural Organizations" = "501(c)(5)",
-      "501(c)(6) - Business Leagues, etc." = "501(c)(6)",
-      "501(c)(7) - Social and Recreation Clubs" = "501(c)(7)",
-      "501(c)(8) - Fraternal Beneficiary Societies" = "501(c)(8)",
-      "501(c)(9) - Voluntary Employees' Beneficiary Associations" = "501(c)(9)",
-      "501(c)(10) - Domestic Fraternal Societies" = "501(c)(10)",
-      "501(c)(11) - Teachers' Retirement Fund Associations" = "501(c)(11)",
-      "501(c)(12) - Benevolent Life Insurance Associations, Mutual Ditch or Irrigation Companies, Mutual or Cooperative Telephone Companies, or Like Organizations (if 85 percent or more of the organization's income consists of amounts collected from members for the sole purpose of meeting losses and expenses)" = "501(c)(12)",
-      "501(c)(13) - Cemetery Companies (owned and operated exclusively for the benefit of their members or which are not operated for profit)" = "501(c)(13)",
-      "501(c)(14) - State Chartered Credit Unions, Mutual Reserve Funds" = "501(c)(14)",
-      "501(c)(15) - Mutual Insurance Companies or Associations" = "501(c)(15)",
-      "501(c)(16) - Cooperative Organizations to Finance Crop Operations" = "501(c)(16)",
-      "501(c)(17) - Supplemental Unemployment Benefit Trusts" = "501(c)(17)",
-      "501(c)(18) - Employee Funded Pension Trusts (created before June 25, 1959)" = "501(c)(18)", 
-      "501(c)(19) - Veterans' Organizations" = "501(c)(19)",
-      "501(c)(21) - Black Lung Benefit Trusts" = "501(c)(21)",
-      "501(c)(22) - Withdrawal Liability Payment Funds" = "501(c)(22)",
-      "501(c)(25) - Title Holding Corporations or Trusts with Multiple Parents" = "501(c)(25)",
-      "501(c)(26) - State-Sponsored High-Risk Health Coverage Organizations" = "501(c)(26)",
-      "501(c)(27) - State-Sponsored Worker's Compensation Reinsurance Organizations" = "501(c)(27)",
-      "501(c)(28) - National Railroad Retirement Investment Trust (45 U.S.C. 231n(j)" = "501(c)(28)",
-      "501(c)(29) - Qualified Nonprofit Health Insurance Issuers" = "501(c)(29)",
-      "501(d) - Religious and Apostolic Associations" = "501(d)",
-      "501(e) - Cooperative Hospital Service Organizations" = "501(e)",
-      "501(f) - Cooperative Service Organizations of Operating Educational Organizations" = "501(f)",
-      "501(k) - Child Care Organizations" = "501(k)",
-      "521(a) - Farmers' Cooperative Associations" = "521(a)"
+    ctype_tree_df = ctype_tree_df,
+    ctype_id = ctype_id,
+    ctype = c(
+      "501(c)(3) Organizations",
+      "501(c)(4) - Social Welfare Organizations",
+      "Other Nonprofits"
     ),
     subsector = list(
       "Arts, Culture, and Humanities - ART" = "ART", 
@@ -63,57 +146,21 @@ choice_builder <- function(panelid){
     )
   )
   if (panelid %in% c("pf_amount")){
-    choice_ls$ctype_level1 <- list(
-      "501(c)(3) - Private Foundations" = "501(c)(3) Private Foundations"
+    choice_ls$ctype_tree_df <- tibble::tribble(
+      ~level1, ~level2,
+      "501(c)(3) Organizations", "501(c)(3) - Private Foundations"
     )
-    choice_ls$ctype_level2 <- NULL
+    choice_ls$ctype <- "501(c)(3) Organizations"
   }
   if (stringr::str_starts(panelid, "daf")){
-    choice_ls$ctype_level1 <- list(
-      "501(c)(3) - Public Charities" = "501(c)(3) Public Charities"    
+    choice_ls$ctype_tree_df <- tibble::tribble(
+      ~level1, ~level2,
+      "501(c)(3) Organizations", "501(c)(3) - Public Charities"
     )
-    choice_ls$ctype_level2 <- NULL
+    choice_ls$ctype <- "501(c)(3) Organizations"
   }
   return(choice_ls)
 }
-
-
-
-
-ctype_full <- list(
-  "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)" = "501(c)(1)",
-  "501(c)(2) - Title Holding Corporations for Exempt Organization" = "501(c)(2)", 
-  "501(c)(3) - Public Charities" = "501(c)(3) PUBLIC CHARITIES",
-  "501(c)(3) - Private Foundations" = "501(c)(3) PRIVATE FOUNDATIONS",
-  "501(c)(4) - Social Welfare Organizations" = "501(c)(4)",
-  "501(c)(5) - Labor, Agricultural and Horticultural Organizations" = "501(c)(5)",
-  "501(c)(6) - Business Leagues, etc." = "501(c)(6)",
-  "501(c)(7) - Social and Recreation Clubs" = "501(c)(7)",
-  "501(c)(8) - Fraternal Beneficiary Societies" = "501(c)(8)",
-  "501(c)(9) - Voluntary Employees' Beneficiary Associations" = "501(c)(9)",
-  "501(c)(10) - Domestic Fraternal Societies" = "501(c)(10)",
-  "501(c)(11) - Teachers' Retirement Fund Associations" = "501(c)(11)",
-  "501(c)(12) - Benevolent Life Insurance Associations, Mutual Ditch or Irrigation Companies, Mutual or Cooperative Telephone Companies, or Like Organizations (if 85 percent or more of the organization's income consists of amounts collected from members for the sole purpose of meeting losses and expenses)" = "501(c)(12)",
-  "501(c)(13) - Cemetery Companies (owned and operated exclusively for the benefit of their members or which are not operated for profit)" = "501(c)(13)",
-  "501(c)(14) - State Chartered Credit Unions, Mutual Reserve Funds" = "501(c)(14)",
-  "501(c)(15) - Mutual Insurance Companies or Associations" = "501(c)(15)",
-  "501(c)(16) - Cooperative Organizations to Finance Crop Operations" = "501(c)(16)",
-  "501(c)(17) - Supplemental Unemployment Benefit Trusts" = "501(c)(17)",
-  "501(c)(18) - Employee Funded Pension Trusts (created before June 25, 1959)" = "501(c)(18)", 
-  "501(c)(19) - Veterans' Organizations" = "501(c)(19)",
-  "501(c)(21) - Black Lung Benefit Trusts" = "501(c)(21)",
-  "501(c)(22) - Withdrawal Liability Payment Funds" = "501(c)(22)",
-  "501(c)(25) - Title Holding Corporations or Trusts with Multiple Parents" = "501(c)(25)",
-  "501(c)(26) - State-Sponsored High-Risk Health Coverage Organizations" = "501(c)(26)",
-  "501(c)(27) - State-Sponsored Worker's Compensation Reinsurance Organizations" = "501(c)(27)",
-  "501(c)(28) - National Railroad Retirement Investment Trust (45 U.S.C. 231n(j)" = "501(c)(28)",
-  "501(c)(29) - Qualified Nonprofit Health Insurance Issuers" = "501(c)(29)",
-  "501(d) - Religious and Apostolic Associations" = "501(d)",
-  "501(e) - Cooperative Hospital Service Organizations" = "501(e)",
-  "501(f) - Cooperative Service Organizations of Operating Educational Organizations" = "501(f)",
-  "501(k) - Child Care Organizations" = "501(k)",
-  "521(a) - Farmers' Cooperative Associations" = "521(a)"
-)
 
 ctype_level1 <- list(
   "501(c)(3) - Public Charities" = "501(c)(3) PUBLIC CHARITIES",
