@@ -4,10 +4,11 @@
 #' @param label The label of the radiobuttons
 #' @param choices The choices of the radiobuttons
 #' @param selected The selected choice of the radiobuttons
+#' @param class The div class of the radiobutton
 #' @return A shiny radiobuttons
-urbn_radiobuttons <- function(ns, id, label, choices, selected){
+urbn_radiobuttons <- function(ns, id, label, choices, selected, class){
   htmltools::div(
-    class = "filter__text",
+    class = class,
     shiny::radioButtons(
       inputId = ns(id),
       label = label,
