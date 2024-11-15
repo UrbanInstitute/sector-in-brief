@@ -5,7 +5,7 @@ single_col_plot <- function(table,
                             xvar,
                             xtitle,
                             ytitle) {
-  subtitle <- plot_subtitle(groupby_var=NULL)
+  subtitle <- plot_subtitle(groupby_var=NULL, selected_groups="")
   p <- ggplot(table, mapping = aes(x = "Total", y = !!sym(yvar))) +
     ggiraph::geom_segment_interactive(
       aes(x = "Total", 
@@ -34,7 +34,6 @@ single_col_plot <- function(table,
       x = NULL,
       y = ytitle
     ) +
-    coord_flip() +
     plot_theme
   p <- girafe_wrapper(p)
   return(p)
