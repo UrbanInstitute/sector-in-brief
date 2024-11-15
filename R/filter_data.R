@@ -1,40 +1,7 @@
 # Function to filter data
-filter_data <- function(data,
-                        org_level = "All Nonprofits",
-                        other_orgs = NULL,
-                        geo_level = "all",
-                        region = NULL,
-                        state_single = NULL,
-                        state_mult = NULL,
-                        county = NULL,
-                        cbsa = NULL,
-                        subsector_level = "all",
-                        subsectors = NULL,
-                        asset_size_level = "all",
-                        asset_sizes = NULL,
-                        time_series = FALSE,
-                        year_start = NULL,
-                        year_end = NULL,
-                        yearvar = "Year") {
-  if (org_level != "All Nonprofits") {
-    data <- orgtype_query(data, org_level, other_orgs)
-  }
-  if (geo_level != "all"){
-    data <- geo_query(data, geo_level, region, state_single, state_mult, county, cbsa)
-  }
-  if (subsector_level != "all") {
-    data <- general_query(data, "Subsector",subsectors)
-  }
-  if (asset_size_level != "all") {
-    data <- general_query(data, "Asset Size", asset_sizes)
-  }
-  if (time_series){
-    if (year_start != 1989) {
-      data <- filter(data, !!sym(yearvar) >= year_start)
-    }
-    if (year_end != 2024) {
-      data <- filter(data, !!sym(yearvar) <= year_end)
-    }
-  }
+filter_data <- function(data, filter_ls){     
+  fp <- purrr::map2(names(filter_ls), filter_ls, function(vars, vals) quo((!!(as.name(vars))) %in% !!vals))
+  data <- dplyr::filter(data, !!!fp)
+  data <- dplyr::compute(data)
   return(data)
 }

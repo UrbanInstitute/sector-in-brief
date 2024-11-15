@@ -4,27 +4,33 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
   shiny::updateSelectizeInput(
     session = session,
     inputId = id,
-    choices = geo_df[[geo_var]][geo_df[["Census State"]] == geo_input],
+    choices = geo_df[[geo_var]][geo_df[["Census.State"]] == geo_input],
     server = TRUE
   )
 }
 
 geo_filter_ui <- function(id, state_choices) {
-  htmltools::tagList(
-    radioButtons(
-      shiny::NS(id, "geo_level"),
-      inline = FALSE,
-      "Select Geographic Level",
-      choices = list("Entire USA" = "all", 
-                     "Region" = "Census Region", 
-                     "State" = "Census State", 
-                     "County" = "Census County", 
-                     "Metro/Micro Area" = "Census CBSA"),
-      selected = "all"
+  ns <- shiny::NS(id)
+  bslib::card(
+    bslib::card_header(
+      "Geography",
+      bslib::tooltip(
+        bsicons::bs_icon("question-circle"),
+        "Information about Census-defined geographic level available on the About page."
+      )
+    ),
+    urbn_radiobuttons(
+      ns,
+      id = "geo_level",
+      label = "Select Geographic Level",
+      choices = geo_level,
+      selected = "National",
+      class = "filter__text"
     ),
     shiny::conditionalPanel(
-      selectizeInput(
-        shiny::NS(id, "region_selector"),
+      selectize_wrapper(
+        ns = ns,
+        id = "region",
         label = "Select Region(s)",
         choices = c("Northeast", "South", "Midwest", "West"),
         multiple = TRUE
@@ -33,28 +39,31 @@ geo_filter_ui <- function(id, state_choices) {
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
-      selectizeInput(
-        shiny::NS(id, "state_selector_multi"),
+      selectize_wrapper(
+        ns = ns,
+        id = "state_mult",
         label = "Select State(s)",
-        choices = state_choices,
+        choices = states,
         multiple = TRUE
       ),
       condition = "input.geo_level == 'Census State'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
-      selectizeInput(
-        shiny::NS(id, "state_selector_single"),
+      selectize_wrapper(
+        ns = ns,
+        id = "state_single",
         label = "Select State",
-        choices = state_choices,
+        choices = states,
         multiple = FALSE
       ),
       condition = "input.geo_level == 'Census County' | input.geo_level == 'Census CBSA'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
-      selectizeInput(
-        shiny::NS(id, "county_selector"),
+      selectize_wrapper(
+        ns = ns,
+        id = "county",
         label = "Select Counties",
         choices = NULL,
         multiple = TRUE,
@@ -64,8 +73,9 @@ geo_filter_ui <- function(id, state_choices) {
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
-      selectizeInput(
-        shiny::NS(id, "cbsa_selector"),
+      selectize_wrapper(
+        ns = ns,
+        id = "cbsa",
         label = "Select Metro/Micro Area(s)",
         choices = NULL,
         multiple = TRUE,
@@ -79,25 +89,30 @@ geo_filter_ui <- function(id, state_choices) {
 
 geo_filter_server <- function(id, geo_df) {
   shiny::moduleServer(id, function(input, output, session) {
-    observeEvent(input$state_selector_single, {
+    observeEvent(input$state_single, {
+      substate_filter(
+        session,
+        "county",
+        input$state_single,
+        geo_df,
+        "Census.County"
+      )
       substate_filter(session,
-                     "county_selector",
-                     input$state_selector_single,
-                     geo_df,
-                     "Census County")
-      substate_filter(session,
-                     "cbsa_selector",
-                     input$state_selector_single,
-                     geo_df,
-                     "Census CBSA")
+                      "cbsa",
+                      input$state_single,
+                      geo_df,
+                      "Census.CBSA")
+    })
+    shiny::observeEvent(input$geo_reset, {
+      shiny::updateSelectizeInput(inputId = "geo_level", selected = "National")
     })
     list(
-      state_selector_single = reactive(input$state_selector_single),
-      state_selector_multi = reactive(input$state_selector_multi),
-      region_selector = reactive(input$region_selector),
+      state_single = reactive(input$state_single),
+      state_mult = reactive(input$state_mult),
+      region = reactive(input$region),
       geo_level = reactive(input$geo_level),
-      county_selector = reactive(input$county_selector),
-      cbsa_selector = reactive(input$cbsa_selector)
+      county = reactive(input$county),
+      cbsa = reactive(input$cbsa)
     )
     
   })

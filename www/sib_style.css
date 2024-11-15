@@ -1,30 +1,129 @@
 /* Custom css template for Sector In Brief Dashboard /*
 /* Programmer Name: Thiyaghessan tpoongundranar@urban.org /*
 /* Date Created: 2024-08-23 /*
-/* Date Last Modified: 2024-08-23 */
+/* Date Last Modified: 2024-10-10 */
+/* Naming conventions follow BEM naming convention */
+.irs--shiny .irs-to, .irs--shiny .irs-from {
+  background-color: #0a4c6a;
+}
+.navbar .nav-underline .nav-link, .navbar .nav-underline :where(ul.nav.navbar-nav > li) > a {
+  padding-bottom: 0;
+}
+.nav-pills > li > a {
+  font-size: 20px;
+}
+.nav-link, .nav-tabs > li > a {
+  color: #696969;
+  font-size: 20px;
+}
 
 .body {
     font-family: 'Lato';
     font-size: 16px;
     text-align: center;
 }
-.header {
-    font-family: 'Lato'; /* Use the Lato font */
-    font-size: 16px; /* Set the font size to large */
+.bslib-card .card-header { 
+  background-color: white; 
+  color: black;
+  font-size: 20px;
+  font-family: 'Lato';
 }
-.title {
-    font-family: 'Lato', sans-serif; /* Use the Lato font */
-    font-size: 50px; /* Set the font size to large */
-    font-weight: 700; /* Set font weight to bold */
-    color: black; /* Set text color to black */
-    height: 400px;
-    text-align: center; /* Center align the text */
-    margin: 0; /* Remove default margin */
-    padding: 40px; /* Add some padding around the title */
-    background-image: url('pexels-scottwebb-1029615.jpg');
-    background-size: cover; /* Ensure the background image covers the entire area */
-    background-position: center; /* Center the background image */
-    background-repeat: no-repeat; /* Prevent the background image from repeating */
+.nav-menu {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+  background-color: #cfe8f3;
+}
+.text-3xl {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 3rem; /* Set the font size to large */
+  color: #000000;
+  font-weight: 700;
+}
+.text-2xl {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 2rem; /* Set the font size to large */
+  color: #000000;
+  font-weight: 700;
+}
+.text-3xl-cyan {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 3rem; /* Set the font size to large */
+  color: #1696d2;
+  font-weight: 700;
+}
+.leading-relaxed {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 2.25rem; /* Set the font size to large */
+  color: #696969;
+}
+.leading {
+  font-family: 'Lato'; /* Use the Lato font */
+  font-size: 1.25rem; /* Set the font size to large */
+  color: #696969;
+}
+.welcome-header {
+    box-sizing: border-box;
+    width: 50%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.8) 100%);
+    padding: 75px 75px 75px 75px;
+    flex-direction: column;
+}
+.flex-box--row {
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+  box-sizing: border-box;
+}
+.flex-box--column {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: center;
+  width: 50%;
+  box-sizing: border-box;
+}
+.img-box {
+  padding: 75px 75px 75px 75px;
+  height: 80%;
+  width: 50%;
+}
+.header--md {
+  font-family: 'Lato';
+  font-size: 2rem;
+  color: #000000;
+  font-weight: 700;
+}
+.subheader {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  color: #696969;
+  text-align: left;
+}
+
+.welcome-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('pattern-square-dot.png');
+    background-size: 12px; /* Ensure the background image covers the entire area */
+    background-repeat: repeat; /* Prevent the background image from repeating */
+}
+.banner-light {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+}
+.banner-light__small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 250px;
+    margin: 20px;
+    background-color: #ffffff;
 }
 .container {
     max-width: 1200px;
@@ -54,19 +153,239 @@
     margin-top: 0;
 }
 .footer {
-    background-color: #333;
+    background-color: #1696d2;
     color: #fff;
     text-align: center;
     padding: 10px 0;
-    position: absolute;
     width: 100%;
     bottom: 0;
 }
-
+.footer_text {
+  font-family: 'Lato';
+  font-size: 0.8em;
+  color: #000000;
+  text-align: center;
+}
 .body .h2 {
     font-family: 'Lato';
     font-size: 30px;
     text-align: center;
     margin-top: 0;
     padding-top: 20px;
+}
+.summary-table-title {
+  font-family: 'Lato';
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+  background-color: #000000;
+  color: white;
+  font-size: 1rem;
+  font-weight: 400;
+}
+.summary-table-row {
+  font-family: 'Lato';
+  font-size: 0.8rem;
+  background-color: white;
+}
+.var-header {
+  font-family: 'Lato';
+  font-size: 2em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+}
+.var-sub-header {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  color: #696969;
+  text-align: left;
+}
+.var-caption {
+  font-family: 'Lato';
+  font-size: 16px;
+  color: #696969;
+  text-align: left;
+}
+.var-title-card {
+  background-color: white;
+}
+.var-select-header {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  padding: 0.8rem;
+  color: black;
+  text-align: left;
+  background-color: #cfe8f3;
+}
+.viz-header {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+  background-color: #cfe8f3;
+  padding: 0.8rem;
+  padding-left: 1.5rem;
+}
+.nav-menu {
+  font-family: 'Lato';
+  font-size: 1.5em;
+  font-weight: 700;
+  color: black;
+  text-align: left;
+  background-color: #cfe8f3;
+}
+.h3 {
+  font-size: 1.5em;
+  color: black;
+  text-align: center;
+}
+.p {
+  font-size: 1em;
+  color: black;
+  text-align: left;
+  margin-left: 0px;
+  margin:0;
+}
+.tableheader {
+  font-family: 'Lato';
+  font-size: 1.3em;
+  font-weight: bold;
+  color: black;
+  text-align: left;
+  padding-top: 20px;
+}
+.selectize-input {
+  font-family: 'Lato';
+  font-size: 1em;
+  color: black;
+}
+.filter__text {
+  font-family: 'Lato';
+  font-size: 1.0em;
+  color: black;
+}
+.form-text {
+  font-family: 'Lato';
+  font-size: 1.2em;
+  color: #696969;
+  text-align: justify;
+  margin: auto;
+}
+.form-header {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  text-align: justify;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.form-header-text {
+  font-family: 'Lato';
+  font-size: 1.2rem;
+  color: #696969;
+  text-align: justify;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.form-choice-header {
+  font-family: 'Lato';
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000000;
+  text-align: left;
+  margin: auto;
+}
+.form-choice-text {
+  font-family: 'Lato';
+  font-size: 1rem;
+  color: #000000;
+  text-align: justify;
+  margin: auto;
+}
+.btn-urban {
+  color: #ffffff;
+  background-color: #1696d2;
+  border-color: #1696d2;
+  font-size: 18px;
+  font-family: 'Lato';
+  border-radius: 0;
+  display: flex;
+  margin: auto;
+}
+.btn-urban:hover {
+  color: #ffffff;
+  background-color: #062635;
+  border-color: #062635;
+  font-size: 18px;
+  font-family: 'Lato';
+  border-radius: 0;
+  display: flex;
+  margin: auto;
+}
+.btn-download {
+  color: #ffffff;
+  background-color: #1696d2;
+  border-color: #1696d2;
+  font-size: 18px;
+  font-family: 'Lato';
+  border-radius: 0;
+  margin: auto;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+}
+.btn-download:hover {
+  color: #ffffff;
+  background-color: #062635;
+  border-color: #062635;
+}
+.btn-radio-header {
+  font-family: 'Lato';
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000000;
+  text-align: justify;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.urbn-checkbox {
+  font-family: 'Lato';
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.urbn-navbar-title {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 10px;
+  padding-bottom: 0;
+}
+.nav-link, .nav-underline {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 10px;
+  padding-bottom: 0;
+}
+.nav-underline .nav-link.active, 
+.nav-underline :where(ul.nav.navbar-nav > li)>a.active {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 10px;
+  padding-bottom: 0;
 }
