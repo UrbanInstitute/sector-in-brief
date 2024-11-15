@@ -14,9 +14,10 @@ Imports:
     arrow,
     bsicons,
     dplyr,
-    DT,
     ggiraph,
     ggplot2,
+    httr,
+    jsonlite,
     microbenchmark,
     pkgload,
     profvis,
@@ -25,7 +26,6 @@ Imports:
     shiny,
     shinycssloaders,
     tidylog,
-    urbnthemes,
     usdata,
     usethis
 Depends: 
