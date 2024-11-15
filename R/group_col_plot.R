@@ -7,7 +7,8 @@ group_col_plot <- function(table,
                            ytitle,
                            xtitle,
                            num_groups) {
-  subtitle <- plot_subtitle(groupby_var)
+  selected_groups <- unique(table[[groupby_var]])
+  subtitle <- plot_subtitle(groupby_var, selected_groups)
   p <- ggplot(table, aes(
     x = !!sym(groupby_var),
     y = !!sym(yvar),

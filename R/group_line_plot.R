@@ -7,7 +7,8 @@ group_line_plot <- function(table,
                             ytitle,
                             xtitle,
                             num_groups) {
-  subtitle <- plot_subtitle(groupby_var)
+  selected_groups <- unique(table[[groupby_var]])
+  subtitle <- plot_subtitle(groupby_var, selected_groups)
   p <- ggplot(table,
               aes(
                 x = !!sym(xvar),
@@ -42,7 +43,8 @@ group_line_plot <- function(table,
       subtitle = subtitle,
       caption = caption,
       x = xtitle,
-      y = ytitle
+      y = ytitle,
+      color = ifelse(groupby_var == "Census CBSA", "Metro Area", groupby_var)
     ) +
     plot_theme
   p <- girafe_wrapper(p)
