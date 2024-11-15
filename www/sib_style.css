@@ -9,6 +9,9 @@
 .navbar .nav-underline .nav-link, .navbar .nav-underline :where(ul.nav.navbar-nav > li) > a {
   padding-bottom: 0;
 }
+.nav-pills > li > a {
+  font-size: 20px;
+}
 .nav-link, .nav-tabs > li > a {
   color: #696969;
   font-size: 20px;
@@ -19,10 +22,10 @@
     font-size: 16px;
     text-align: center;
 }
-.card-header { 
+.bslib-card .card-header { 
   background-color: white; 
   color: black;
-  font-size: 1.5em;
+  font-size: 20px;
   font-family: 'Lato';
 }
 .nav-menu {
@@ -104,7 +107,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 500px;
     background-image: url('pattern-square-dot.png');
     background-size: 12px; /* Ensure the background image covers the entire area */
     background-repeat: repeat; /* Prevent the background image from repeating */
@@ -113,7 +115,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 500px;
     background-color: #ffffff;
 }
 .banner-light__small {
@@ -196,6 +197,12 @@
 .var-sub-header {
   font-family: 'Lato';
   font-size: 1.5em;
+  color: #696969;
+  text-align: left;
+}
+.var-caption {
+  font-family: 'Lato';
+  font-size: 16px;
   color: #696969;
   text-align: left;
 }
@@ -290,9 +297,8 @@
   font-size: 1rem;
   font-weight: 700;
   color: #000000;
-  text-align: justify;
+  text-align: left;
   margin: auto;
-  text-transform: uppercase;
 }
 .form-choice-text {
   font-family: 'Lato';
