@@ -13,9 +13,10 @@ app <- function(...) {
     ),
     bslib::nav_spacer(),
     welcome,
+    about(), 
     bslib::nav_menu(
       title = "Visualise Data",
-      visualpanels[["Number"]],
+      visualpanels[["Numbers"]],
       bslib::nav_panel(
         title = "Finances",
         finance_header,
@@ -53,10 +54,7 @@ app <- function(...) {
                        subheader = download_subtitle),
       dataRequestUI("data_download", geo_df)
     ),
-    footer = htmltools::div(
-      class = "footer",
-      "© 2024 National Center for Charitable Statistics"
-    )
+    footer = text_footer
   )
   
   server <- function(input, output, session) {
@@ -76,7 +74,7 @@ app <- function(...) {
         observeEvent(input$private_foundation_grants, {
           data_server_wrapper(input$private_foundation_grants, data_server_args, geo_df)
         })    
-      } else if (input$tabs == "Number"){
+      } else if (input$tabs == "Numbers"){
         data_server_wrapper(input$tabs, data_server_args, geo_df)
       }
     })
