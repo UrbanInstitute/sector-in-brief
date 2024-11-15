@@ -10,7 +10,7 @@ default_vars <- c(
 )
 
 data_server_args <- list(
-  "Number" = list(
+  "Numbers" = list(
     path = "data/number_nonprofits.parquet",
     vars = c(default_vars, "Number of Nonprofits", "Year"),
     id = "number",
