@@ -11,7 +11,6 @@ dataRequestUI <- function(id, geo_df) {
       open = FALSE,
       bslib::accordion_panel(
         title = "Option 1: Form Type",
-        download_formtype_para,
         htmltools::br(),
         htmltools::div(
           class = "banner-light__small",
@@ -22,9 +21,9 @@ dataRequestUI <- function(id, geo_df) {
           class = "btn-radio-header",
           shiny::radioButtons(
             inputId = ns("form_select"),
-            label = NULL,
-            choices = c("Form 990 Filers", 
-                        "Form 990 and Form 990-EZ Filers"),
+            label = "Select one option *",
+            choices = list("Form 990 Filers" = "990", 
+                        "Form 990 and Form 990-EZ Filers" = "990EZ"),
             inline = TRUE
           )
         ),
@@ -40,15 +39,15 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("org_select"),
               label = htmltools::div(
-                htmltools::tags$b("ORGANIZATION TYPE"),
+                htmltools::tags$b("Organization Type *"),
                 htmltools::p("Section 501(c) of the Internal Revenue Code")
               ),
-              choices = ctype_full,
+              choices = ctype_id,
               multiple = TRUE,
               options = list(`actions-box` = TRUE,
                              "size" = 5),
               choicesOpt = list(
-                content = choice_formatter(ctype_full, 100)
+                content = choice_formatter(ctype_id, 100)
               )
             )
           ),
@@ -57,8 +56,8 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("subsector_select"),
               label = htmltools::div(
-                htmltools::tags$b("SUBSECTOR"),
-                htmltools::p("National Taxonomy of Exempt Entities (NTEE) codes")
+                htmltools::tags$b("Subsector *"),
+                htmltools::HTML("<p>12 general categories of the <a href='https://urbaninstitute.github.io/nccs-legacy/ntee/ntee-history.html'>National Taxonomy of Exempt Entities</a> (NTEE) code system</p>")
               ),
               choices = subsector,
               multiple = TRUE,
@@ -70,10 +69,17 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("size_select"),
               label = htmltools::div(
-                htmltools::tags$b("ASSET SIZE"),
-                htmltools::p("Total assets reported to the IRS")
+                htmltools::tags$b("Asset Size *"),
+                htmltools::p("Total assets from the IRS Business Master File grouped in five categories.")
               ),
-              choices = size,
+              choices = list(
+                "Under $100,000" = "1",
+                "$100,000 - $499,999" = "2",
+                "$500,000 - $999,999" = "3",
+                "$1,000,000 - $4,999,999" = "4",
+                "$5,000,000 - $9,999,999" = "5",
+                "Above $10,000,000" = "6"
+              ),
               multiple = TRUE,
               options = list(`actions-box` = TRUE)
             )
@@ -87,28 +93,25 @@ dataRequestUI <- function(id, geo_df) {
         download_geo_para,
         htmltools::br(),
         bslib::layout_column_wrap(
-          urban_virtualselect(ns, "geo_select", "Select State(s) First", state_choices),
+          urban_virtualselect(ns, "region_select", "Optional - Select Region(s)", c("Northeast", "Midwest", "South", "West")),
+          urban_virtualselect(ns, "geo_select", "Select State(s) *", state_choices),
           shiny::conditionalPanel(
             condition = "input.geo_select.length > 0",
-            shinyWidgets::virtualSelectInput(
-              inputId = ns("county_select"),
+            urban_virtualselect(
+              ns,
+              "county_select",
               label = "Optional - Select Specific County(s)",
-              choices = unique(geo_df[["Census.County"]]),
-              showValueAsTags = TRUE,
-              search = TRUE,
-              multiple = TRUE
+              choices = unique(geo_df[["Census.County"]])
             ),
             ns = ns
           ),
           shiny::conditionalPanel(
             condition = "input.geo_select.length > 0",
-            shinyWidgets::virtualSelectInput(
-              inputId = ns("cbsa_select"),
-              label = "Optional - Select Specific Metro Area(s)",
-              choices = unique(geo_df[["Census.CBSA"]]),
-              showValueAsTags = TRUE,
-              search = TRUE,
-              multiple = TRUE
+            urban_virtualselect(
+              ns,
+              "cbsa_select",
+              label = "Optional - Select Specific Metropolitan (> 50,000 people) and Micropolitan (10,000 – 50,000 people) Areas",
+              choices = unique(geo_df[["Census.CBSA"]])
             ),
             ns = ns
           )
@@ -125,7 +128,7 @@ dataRequestUI <- function(id, geo_df) {
             class = "form-choice-header",
             shinyWidgets::pickerInput(
               inputId = ns("start_year"),
-              label = "From Tax Year",
+              label = "From Tax Year *",
               choices = c(1989:2022),
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -135,7 +138,7 @@ dataRequestUI <- function(id, geo_df) {
             class = "form-choice-header",
             shinyWidgets::pickerInput(
               inputId = ns("end_year"),
-              label = "Through Tax Year",
+              label = "Through Tax Year *",
               choices = c(1989:2022),
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -162,18 +165,7 @@ dataRequestUI <- function(id, geo_df) {
               inputId = ns("data_select"),
               label = NULL,
               width = "100%",
-              choices = c(
-                "Program Service Accomplishments - Information on the major programs and services",
-                "Required Schedules - Schedules required by the IRS",
-                "Statements - Tax compliance statements reported to the IRS",
-                "Governance - Information on the board of directors and governance structure",
-                "Compensation - Compensation for key individuals reported to the IRS",
-                "Revenue Statement - A breakdown of revenue sourced reported to the IRS",
-                "Functional Expenses - An accounting of all expenses reported to the IRS.",
-                "Balance Sheet - An accounting of asssets and liabilities.",
-                "Public Charity Status - Information on the organization's public charity status",
-                "Lobbying - Information on lobbying activities"
-              ),
+              choices = var_choices_990,
               inline = FALSE
             )
           ),
@@ -207,14 +199,14 @@ dataRequestUI <- function(id, geo_df) {
             ),
             shiny::textInput(
               inputId = ns("email"),
-              label = "Email",
-              placeholder = "Email",
+              label = "Email *",
+              placeholder = "",
               value = ""
             ),
             shiny::textInput(
               inputId = ns("organization"),
-              label = "Organization",
-              placeholder = "Organization",
+              label = "Organization *",
+              placeholder = "",
               value = ""
             ),
             shiny::textInput(
@@ -346,10 +338,42 @@ dataRequestServer <- function(id, geo_df) {
       bslib::accordion_panel_set(id = "accordion", value = "Option 2: Organization, Subsector, and Size")
     })
     observeEvent(input$next_geo, {
-      bslib::accordion_panel_set(id = "accordion", value = "Option 3: Geographic Scope")
+      if (length(input$org_select) == 0){
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "Please select at least one organization type",
+          type = "error"
+        )
+      } else if (length(input$size_select) == 0){
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "Please select at least one asset size",
+          type = "error"
+        )
+      } else if (length(input$subsector_select) == 0){
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "Please select at least one subsector",
+          type = "error"
+        )
+      } else {
+        bslib::accordion_panel_set(id = "accordion", value = "Option 3: Geographic Scope")
+      }
     })
     observeEvent(input$next_time, {
-      bslib::accordion_panel_set(id = "accordion", value = "Option 4: Date Range")
+      if (length(input$geo_select) == 0){
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "Please select at least one state",
+          type = "error"
+        )
+      } else {
+        bslib::accordion_panel_set(id = "accordion", value = "Option 4: Date Range")
+      }
     })
     observeEvent(input$next_data, {
       bslib::accordion_panel_set(id = "accordion", value = "Option 5: Variables")
@@ -358,7 +382,23 @@ dataRequestServer <- function(id, geo_df) {
       bslib::accordion_panel_set(id = "accordion", value = "Contact Information")
     })
     observeEvent(input$next_review, {
-      bslib::accordion_panel_set(id = "accordion", value = "Review Your Request")
+      if(nchar(input$email) == 0){
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "Please enter an email address",
+          type = "error"
+        )
+      } else if(nchar(input$organization) == 0){
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "Please enter an organization",
+          type = "error"
+        )
+      } else {
+        bslib::accordion_panel_set(id = "accordion", value = "Review Your Request")
+      }
     })
     
     # Update CBSA/County Inputs
@@ -375,24 +415,38 @@ dataRequestServer <- function(id, geo_df) {
       }
     })
     
-    # Select all variables
-    observeEvent(input$all_data, {
-      if (input$all_data) {
+    # Change variable selection based on form type
+    observeEvent(input$form_select, {
+      if (input$form_select == "990") {
         shiny::updateCheckboxGroupInput(
           session = session,
           inputId = "data_select",
-          selected = c(
-            "Program Service Accomplishments - Information on the major programs and services",
-            "Required Schedules - Schedules required by the IRS",
-            "Statements - Tax compliance statements reported to the IRS",
-            "Governance - Information on the board of directors and governance structure",
-            "Compensation - Compensation for key individuals reported to the IRS",
-            "Revenue Statement - A breakdown of revenue sourced reported to the IRS",
-            "Functional Expenses - An accounting of all expenses reported to the IRS.",
-            "Balance Sheet - An accounting of asssets and liabilities.",
-            "Public Charity Status - Information on the organization's public charity status",
-            "Lobbying - Information on lobbying activities"
-          )
+          choices = var_choices_990,
+          selected = var_choices_990
+        )
+      } else {
+        shiny::updateCheckboxGroupInput(
+          session = session,
+          inputId = "data_select",
+          choices = var_choices_990ez,
+          selected = var_choices_990ez
+        )
+      }
+    })
+    
+    # Button to select all variables
+    observeEvent(input$all_data, {
+      if (input$all_data & input$form_select == "990") {
+        shiny::updateCheckboxGroupInput(
+          session = session,
+          inputId = "data_select",
+          selected = var_choices_990
+        )
+      } else if (input$all_data & input$form_select == "990EZ") {
+        shiny::updateCheckboxGroupInput(
+          session = session,
+          inputId = "data_select",
+          selected = var_choices_990ez
         )
       }
     })
@@ -436,13 +490,27 @@ dataRequestServer <- function(id, geo_df) {
         paste(input$data_select, collapse = ", ")
       }
     })
+    
+    # Create the query
+    
+    
+    
     shinyWidgets::useSweetAlert()
     observeEvent(input$start_data_download, {
+      request <- query_builder_download(input)
       sendSweetAlert(
         session = session,
-        title = "Request Successful!",
-        text = "An email will be sent to you shortly with a link to download your data.",
+        title = "Success",
+        text = "Your data request has been submitted successfully. A link to a .csv file containing your requested data and an accompanying data dictionary will be sent to your email within the next hour.",
         type = "success"
+      )
+      response <- httr::POST(
+        url = "https://qf8i5d1vg2.execute-api.us-east-1.amazonaws.com/stg/data/",
+        body = request,
+        encode = "json",
+        httr::add_headers(
+          "Content-Type" = "application/json"
+        )
       )
     })
  })
