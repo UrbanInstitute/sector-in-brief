@@ -5,7 +5,7 @@
 plot_caption <- function(inputs) {
   # Params needed for caption
   caption <- ""
-  ctype_level1 <- inputs$ctype_level1
+  ctype <- inputs$ctype
   geo_level <- inputs$geo_level
   region <- inputs$geo_region
   state_single <- inputs$geo_state_single
@@ -26,22 +26,23 @@ plot_caption <- function(inputs) {
     county = county,
     cbsa = cbsa
   )
+  caption <- paste(caption, "Organization Type(s):", paste(ctype, collapse = ", "), "\n")
   caption <- paste(caption, "Subsector(s):", paste(subsector, collapse = ", "), "\n")
   caption <- caption_size(caption, size, asset_size_ls)
   # Private Foundation notes
-  caption <- caption_pf(caption, ctype_level1)
+  caption <- caption_pf(caption, ctype)
   # DAF Notes
   caption <- caption_daf(caption, agg_var)
+  # Finance Notes
+  caption <- caption_finance(caption, agg_var)
   # Year Notes
   caption <- caption_year(caption, year_var)
   caption <- paste(
     caption,
     "\n",
-    "•	All data is derived directly from IRS tax records and are thus subject to changes in IRS reporting requirements. Minor anomalies in the Year-Over-Year values are likely due to changes in these requirements.",
+    "•	All data is derived directly from IRS tax records and are thus subject to changes in IRS reporting requirements. Fluctuations in observed Year-Over-Year values are likely due to changes in these requirements.",
     "\n",
-    "•	The graphs only include data until 2021 because the IRS has only partially released tax records for tax year 2022. These figures will be updated with 2022 data once those records have been made fully available.",
-    "\n",
-    "•	Tax years with missing data from the IRS are represented by points connected with a dotted line."
+    "•	The graphs only include data until 2021 because the IRS has only partially released tax records for tax year 2022."
   )
   return(caption)
 }
