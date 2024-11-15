@@ -7,7 +7,6 @@ visualpanel_args <- tibble::tribble(
   "Benefits", "Benefits", benefits_desc, "benefits", 1989, 2021,
   "Payroll Taxes", "Payroll Taxes", payroll_desc, "payroll", 1989, 2021,
   "Private Foundation Grants", "Grants", grants_desc, "pf_amount", 1989, 2021,
-  "Average Foundation Grantmaking", "Average Grantmaking", avg_grants_desc, "pf_avg", 1989, 2021,
   "Number of DAFs", "Number of DAFs", daf_number_desc, "daf_number", 2021, 2021,
   "DAF Contributions", "DAF Contributions", daf_contributions_desc,"daf_contributions", 2021, 2021,
   "DAF Grants", "DAF Grants", daf_grants_desc, "daf_grants", 2021, 2021,
