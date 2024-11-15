@@ -8,6 +8,12 @@ dataloader <- function(path, cols=NULL) {
         `Number of DAFs` <= 50000
       ) |>
       dplyr::compute()
+  } else if ("Total Assets" %in% cols){
+    data_select <- data_select |>
+      dplyr::filter(
+        `Total Assets` <= 1e14
+      ) |>
+      dplyr::compute()
   }
   shinycssloaders::hidePageSpinner()
   return(data_select)
