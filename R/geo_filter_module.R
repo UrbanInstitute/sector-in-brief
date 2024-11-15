@@ -14,14 +14,18 @@ geo_filter_ui <- function(id, state_choices) {
   bslib::card(
     bslib::card_header(
       "Geography",
-      shiny::actionLink(shiny::NS(id, "geo_reset"), "Reset", style = "float: right;  color: #0a4c6a")
+      bslib::tooltip(
+        bsicons::bs_icon("question-circle"),
+        "Information about Census-defined geographic level available on the About page."
+      )
     ),
     urbn_radiobuttons(
       ns,
       id = "geo_level",
       label = "Select Geographic Level",
       choices = geo_level,
-      selected = "National"
+      selected = "National",
+      class = "filter__text"
     ),
     shiny::conditionalPanel(
       selectize_wrapper(
