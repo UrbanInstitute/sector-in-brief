@@ -5,7 +5,7 @@ single_line_plot <- function(table,
                              xvar,
                              xtitle,
                              ytitle) {
-  subtitle <- plot_subtitle(groupby_var=NULL)
+  subtitle <- plot_subtitle(groupby_var=NULL, selected_groups="")
   p <- ggplot(table, aes(x = !!sym(xvar), y = !!sym(yvar))) +
     ggiraph::geom_line_interactive(size = 1.5,
                                    hover_nearest = FALSE,
