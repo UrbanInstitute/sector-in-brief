@@ -1,8 +1,276 @@
 /* Custom css template for Sector In Brief Dashboard /*
 /* Programmer Name: Thiyaghessan tpoongundranar@urban.org /*
 /* Date Created: 2024-08-23 /*
-/* Date Last Modified: 2024-10-10 */
+/* Date Last Modified: 2024-11-19 */
 /* Naming conventions follow BEM naming convention */
+
+/* Import Lato font from Google fonts */
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap");
+
+:root {
+  /* 2 font sizes lg (computers), sm (phones) */
+  --h1-lg: 48px;
+  --h2-lg: 36px;
+  --h3-lg: 30px;
+  --h4-lg: 24px;
+  --h5-lg: 20px;
+  --h6-lg: 16px;
+  --h1-sm: 36px;
+  --h2-sm: 30px;
+  --h3-sm: 24px;
+  --h4-sm: 20px;
+  --h5-sm: 18px;
+  --h6-sm: 16px;
+  
+  --p-lg: 20px;
+  --p-sm: 18px;
+  
+  --text-base: 14px;
+  
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-snug: 1.375;
+  --line-height-tight: 1.25;
+  
+  --font-family: Lato; 
+  /* Urban Color Palette */
+  --color-blue-shade-darkest: #062635;
+  --color-blue-shade-darker: #0a4c6a;
+  --color-blue-shade-dark: #12719e;
+  --color-blue: #1696d2;
+  --color-blue-shade-medium: #46abdb;
+  --color-blue-shade-light: #73bfe2;
+  --color-blue-shade-lighter: #a2d4ec;
+  --color-blue-shade-lightest: #cfe8f3;
+  --color-black: #000000;
+  --color-gray-shade-darkest: #353535;
+  --color-gray-shade-darker: #696969;
+  --color-gray-shade-dark: #9d9d9d;
+  --color-gray: #d2d2d2;
+  --color-gray-shade-medium: #dcdbdb;
+  --color-gray-shade-light: #e3e3e3;
+  --color-gray-shade-lighter: #ececec;
+  --color-gray-shade-lightest: #f5f5f5;
+  --color-white: #ffffff;
+}
+/* Flexbox container */
+.bg-box__dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('pattern-square-dot.png');
+    background-size: 12px; 
+    background-repeat: repeat;
+}
+.bg-box__blue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-blue-shade-lightest);
+}
+.bg-box__white {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-white);
+}
+.bg-box__grey {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-gray-shade-lighter);
+    overflow: auto;
+    align-items: flex-start;
+}
+.box-title {
+    box-sizing: border-box;
+    width: 50%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.8) 100%);
+    padding: 75px 75px 75px 75px;
+    flex-direction: column;
+    @media screen and (max-width: 769px) {
+        width: 75%;
+        padding: 50px 50px 50px 50px;
+    };
+}
+.flex-box__column {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
+  width: 50%;
+  padding:20px;
+}
+.flex-box__row {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  justify-content: center;
+  width: 50%;
+  padding:20px;
+}
+.flex-box__column, .flex-box__row {
+    @media screen and (max-width: 769px) {
+        width: 75%;
+        padding: 10px;
+    };
+}
+/* Navbar */
+a.dropdown-item {
+  font-family: var(--font-family);
+  font-size: var(--h5-lg);
+  color: var(--color-black);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  @media screen and (max-width: 769px) {
+        font-size: var(--h5-sm);
+    };
+}
+/* Dashboard Title */
+.text-4xl {
+  font-family: var(--font-family);
+  font-size: var(--h4-lg);
+  color: var(--color-black);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+/* Dashboard SubTitle */
+.text-4xl-cyan {
+  font-family: var(--font-family);
+  font-size: var(--h4-lg);
+  color: var(--color-blue);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+/* Mobile formatting */
+.text-4xl, .text-4xl-cyan {
+    @media screen and (max-width: 769px) {
+        font-size: var(--h4-sm);
+    };
+}
+/* Headers */
+h2 {
+  font-family: var(--font-family);
+  font-size: var(--h2-lg);
+  color: var(--color-black);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-snug);
+  @media screen and (max-width: 769px) {
+        font-size: var(--h2-sm);
+    };
+}
+.h2-blue {
+  color: var(--color-blue);
+}
+h3 {
+  font-family: var(--font-family);
+  font-size: var(--h3-lg);
+  color: var(--color-black);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-normal);
+  text-transform: uppercase;
+  @media screen and (max-width: 769px) {
+        font-size: var(--h3-sm);
+    };
+}
+h4 {
+  font-family: var(--font-family);
+  font-size: var(--h4-lg);
+  color: var(--color-black);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  @media screen and (max-width: 769px) {
+        font-size: var(--h4-sm);
+    };
+}
+.h4-white {
+  color: var(--color-white);
+}
+/* Paragraph */
+p {
+  font-family: var(--font-family);
+  font-size: var(--p-lg);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-gray-shade-darkest);
+  line-height: var(--line-height-relaxed);
+  @media screen and (max-width: 769px) {
+        font-size: var(--p-sm);
+        line-height: var(--line-height-normal);
+    };
+}
+.base {
+  font-size: var(--text-base);
+  color: var(--color-black);
+  line-height: var(--line-height-normal);
+}
+/* Hyperlinks */
+.actionlink, .actionlink:link, .actionlink:visited {
+  color: var(--color-blue);
+}
+.actionlink:hover {
+  color: var(--color-blue-shade-darker);
+}
+/* a tags */
+a#visual_link.action-button.shiny-bound-input, a#download_link.action-button.shiny-bound-input {
+  text-decoration: none;
+}
+/* Images */
+.img {
+  max-width: 18rem;
+  max-height: 18rem;
+}
+/* Header class for Accordion*/
+.accordion .accordion-header {
+  font-family: 'Lato';
+  font-size: var(--h3-scale);
+  color: #000000;
+  font-weight: 700;
+}
+/*Mobile formatting*/
+.text-3xl, .text-3xl-cyan, .content-paragraph,  .accordion .accordion-header, .accordion .accordion-header__sm, .urbn-navbar-title {
+  @media screen and (max-width: 767px) {
+        font-size: var(--base-font-size__sm);
+    };
+  @media screen and (max-width: 992px) {
+        font-size: var(--base-font-size__md);
+    };
+}
+.lg-view{
+   display:inline-block;
+}
+
+.sm-view{
+   display:none;
+}
+@media screen and (max-width: 992px) {
+    .lg-view{
+       display:none;
+    }
+
+    .sm-view{
+       display:inline-block;
+    }
+}
+.accordion .accordion-header__sm {
+  font-family: 'Lato';
+  font-size: var(--h4-scale);
+  color: #000000;
+  font-weight: 700;
+}
+
+.subheader {
+  font-family: 'Lato';
+  font-size: 1.5rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;  /* Space between paragraphs */
+  color: #696969;
+  text-align: left;
+}
 .irs--shiny .irs-to, .irs--shiny .irs-from {
   background-color: #0a4c6a;
 }
@@ -10,7 +278,7 @@
   padding-bottom: 0;
 }
 .nav-pills > li > a {
-  font-size: 20px;
+  font-size: var(--h4-scale);
 }
 .nav-link, .nav-tabs > li > a {
   color: #696969;
@@ -25,7 +293,7 @@
 .bslib-card .card-header { 
   background-color: white; 
   color: black;
-  font-size: 20px;
+  font-size: 16px;
   font-family: 'Lato';
 }
 .nav-menu {
@@ -36,87 +304,21 @@
   text-align: left;
   background-color: #cfe8f3;
 }
-.text-3xl {
-  font-family: 'Lato'; /* Use the Lato font */
-  font-size: 3rem; /* Set the font size to large */
-  color: #000000;
-  font-weight: 700;
-}
+
 .text-2xl {
   font-family: 'Lato'; /* Use the Lato font */
   font-size: 2rem; /* Set the font size to large */
   color: #000000;
   font-weight: 700;
 }
-.text-3xl-cyan {
-  font-family: 'Lato'; /* Use the Lato font */
-  font-size: 3rem; /* Set the font size to large */
-  color: #1696d2;
-  font-weight: 700;
-}
-.leading-relaxed {
-  font-family: 'Lato'; /* Use the Lato font */
-  font-size: 2.25rem; /* Set the font size to large */
-  color: #696969;
-}
+
+
 .leading {
   font-family: 'Lato'; /* Use the Lato font */
   font-size: 1.25rem; /* Set the font size to large */
   color: #696969;
 }
-.welcome-header {
-    box-sizing: border-box;
-    width: 50%;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.8) 100%);
-    padding: 75px 75px 75px 75px;
-    flex-direction: column;
-}
-.flex-box--row {
-  display: flex;
-  flex-direction: row;
-  width: 50%;
-  box-sizing: border-box;
-}
-.flex-box--column {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-  justify-content: center;
-  width: 50%;
-  box-sizing: border-box;
-}
-.img-box {
-  padding: 75px 75px 75px 75px;
-  height: 80%;
-  width: 50%;
-}
-.header--md {
-  font-family: 'Lato';
-  font-size: 2rem;
-  color: #000000;
-  font-weight: 700;
-}
-.subheader {
-  font-family: 'Lato';
-  font-size: 1.5rem;
-  color: #696969;
-  text-align: left;
-}
 
-.welcome-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-image: url('pattern-square-dot.png');
-    background-size: 12px; /* Ensure the background image covers the entire area */
-    background-repeat: repeat; /* Prevent the background image from repeating */
-}
-.banner-light {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ffffff;
-}
 .banner-light__small {
     display: flex;
     align-items: center;
@@ -189,14 +391,14 @@
 }
 .var-header {
   font-family: 'Lato';
-  font-size: 2em;
+  font-size: var(--h3-scale);
   font-weight: 700;
   color: black;
   text-align: left;
 }
 .var-sub-header {
   font-family: 'Lato';
-  font-size: 1.5em;
+  font-size: var(--h4-scale);
   color: #696969;
   text-align: left;
 }
@@ -383,9 +585,15 @@
 .nav-underline .nav-link.active, 
 .nav-underline :where(ul.nav.navbar-nav > li)>a.active {
   font-family: 'Lato';
-  font-size: 1.5rem;
+  font-size: var(--h4-scale);
   font-weight: 700;
   color: #000000;
   margin-bottom: 10px;
   padding-bottom: 0;
+  @media screen and (max-width: 767px) {
+        font-size: var(--base-font-size__sm);
+    };
+  @media screen and (max-width: 992px) {
+        font-size: var(--base-font-size__md);
+    };
 }
