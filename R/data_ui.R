@@ -3,11 +3,10 @@ data_ui <- function(id, choices, start_year, end_year) {
   ns <- shiny::NS(id)
   htmltools::tagList(
     org_card = bslib::card(
-      bslib::card_header("Organization Type", 
-                         bslib::tooltip(
-                           bsicons::bs_icon("question-circle"),
-                           "Section 501(c) of the Internal Revenue Code. Subsector"
-                         )),
+      bslib::card_header(htmltools::tagList(
+        htmltools::h6("Organization Type"),
+        htmltools::tags$p(class = "base", html_orgtype),
+      )),
       urbn_tree(
         ns = ns,
         id = "ctype",
@@ -18,26 +17,30 @@ data_ui <- function(id, choices, start_year, end_year) {
     ),
     geo_card = geo_filter_ui(shiny::NS(id, "geo_filter"), state_choices),
     subsector_card = bslib::card(
-      bslib::card_header(
-        "Subsector",
-        bslib::tooltip(
-          bsicons::bs_icon("question-circle"),
-          htmltools::HTML("12 general categories of the <a href='https://urbaninstitute.github.io/nccs-legacy/ntee/ntee-history.html'>National Taxonomy of Exempt Entities</a> (NTEE) code system. Asset Size")
+      bslib::card_header(htmltools::tagList(
+        htmltools::h6("Subsector"),
+        htmltools::tags$p(
+          class = "base",
+          "12 general categories of the",
+          htmltools::a(href = "https://urbaninstitute.github.io/nccs-legacy/ntee/ntee-history.html", "National Taxonomy of Exempt Entities (NTEE)"),
+          "code system."
         )
-      ),
+      )),
       urbn_checkboxgroup(
         ns = ns,
         id = "subsector",
         choices = choices$subsector,
         selected = choices$subsector
       )
-    ), 
+    ),
     size_card = bslib::card(
-      bslib::card_header("Asset Size", 
-                         bslib::tooltip(
-                           bsicons::bs_icon("question-circle"),
-                           "Total assets from the IRS Business Master File grouped in five categories."
-                         )),
+      bslib::card_header(htmltools::tagList(
+        htmltools::h6("Asset Size"),
+        htmltools::tags$p(
+          class = "base",
+          "Total assets from the IRS Business Master File grouped in five categories."
+        )
+      )),
       urbn_checkboxgroup(
         ns = ns,
         id = "size",
@@ -46,17 +49,20 @@ data_ui <- function(id, choices, start_year, end_year) {
       )
     ),
     date_card = bslib::card(
-      bslib::card_header("Date Range", 
-                         bslib::tooltip(
-                           bsicons::bs_icon("question-circle"),
-                           "Tax years, defined as the 12-month period beginning in a given calendar year, used to calculate annual financial statements"
-                         )),
+      bslib::card_header(htmltools::tagList(
+        htmltools::h6("Date Range"),
+        htmltools::tags$p(
+          class = "base",
+          "Dates are tax years, which lag calendar years by two years on average (e.g., tax year 2024 is for calendar year 2022)."
+        )
+      )),
       urbn_slider(ns, "date_range", start_year, end_year)
     ),
     process_button = urbn_task_button(
       ns = ns,
       id = "process_data",
       label = "UPDATE DATA",
-      label_busy = "VISUALIZING...")
+      label_busy = "VISUALIZING..."
+    )
   )
 }
