@@ -11,13 +11,8 @@ plot_subtitle <- function(groupby_var, selected_groups) {
       subtitle <- "By Metro Area"
     } else {
       subtitle <- paste("By ", groupby_var)
+      subtitle <- gsub("Census ", "", subtitle)
     }
   }
-  if (! is.null(groupby_var)){
-    if (groupby_var %in% c("Census Region", "Census State", "Census County", "Census CBSA")) {
-      subtitle <- paste(subtitle, paste(selected_groups, collapse = ", "), sep = ": ")
-    }
-  }
-  
   return(subtitle)
 }
