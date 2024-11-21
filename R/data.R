@@ -2,10 +2,27 @@
 library(reactable)
 library(usethis)
 
+visual_link_page <- "Finances"
+download_link_page <- "Custom Panel Datasets"
+
+# URLs
+ctype_desc_url <- "https://www.irs.gov/charities-non-profits/other-tax-exempt-organizations"
+
+# Reusable HTML Components
+html_orgtype <- htmltools::a(
+  "Section 501(c) of the Internal Revenue Code",
+  href = ctype_desc_url
+)
+
+navbar_title <- htmltools::h4(
+  htmltools::tags$img(src = "ui-logo-rgb-white.svg", height= "50px"),
+  "National Center for Charitable Statistics"
+)
+
 form_data <- tibble::tribble(
   ~Option, ~Data_Source, ~Variable_Availability, ~Year_Availability,
-  '<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">Form 990 Filers</a>', "1,654,300 Nonprofits", "All 547paper-form variables", "2012-2022",
-  '<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">Form 990 + Form 990-EZ Filers</a>', "2,765,384 nonprofits", "236 variables that are in the EZ version, which also appear in the Form 990", "1989-2022"
+  'Form 990 Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "1,654,300 nonprofits", "All 547 paper-form variables", "2012-2022",
+  'Form 990 + Form 990-EZ Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "2,765,384 nonprofits", "236 variables in the EZ version, which also appear in the Form 990.", "1989-2022"
 )
 
 download_table <- reactable::reactable(
@@ -51,16 +68,18 @@ download_table <- reactable::reactable(
   defaultPageSize = 10
 )
 
-irs.data.sets <- "•	IRS Statistics Of Income Extracts contain selected financial variables from both paper and electronic filings of the Form 990, Form 990-EZ and Form 990-PF <br> •	The IRS 990 Series download page contains the full filing for each e-filed From 990, Form 990-EZ, Form 990-PF and Form 990-N"
-nccs.data.sets <- "•	The NCCS Core  Series contains processed panel data from the IRS’ Statistics Of Income extracts for the Form 990, Form 990-EZ and Form 990-PF. <br> •	The NCCS Efile catalog contains processed e-filed tax records for Form 990 and Form 990-EZ only"
+irs.data.sets <- "•	IRS Statistics Of Income extracts contain selected financial variables from both paper and electronic filings of the Form 990, Form 990-EZ, and Form 990-PF.<br>•	The IRS 990 series download page contains the full filing for each e-filed Form 990, Form 990-EZ, Form 990-PF, and Form 990-N."
+nccs.data.sets <- "•	The NCCS Core Series contains processed panel data from the IRS’s Statistics of Income extracts for the Form 990, Form 990-EZ, and Form 990-PF.<br>•	The NCCS e-file catalog contains processed e-filed tax records for Form 990 and Form 990-EZ only."
 
 
 data_sources <- tibble::tribble(
   ~Form, ~Filer, ~Data, ~NCCS_data,
-  "990", "Nonprofits with gross receipts greater than $200,000, or total assets greater than $500,000", irs.data.sets, nccs.data.sets,
-  "990-EZ", "Nonprofits with gross receipts less than $200,000 and total assets less than $500,000", irs.data.sets, nccs.data.sets,
-  "990-PF", "Private foundations and charitable trusts", irs.data.sets, nccs.data.sets,
-  "990-N", "Nonprofits with gross receipts less than $50,000", irs.data.sets, "•	The NCCS 990-N ePostcard catalog contains data from Form 990N (this data sets is not included in the dashboard because it has not been harmonized)."
+  "990", "Nonprofits with gross receipts greater than $200,000, or
+total assets greater than $500,000.", irs.data.sets, nccs.data.sets,
+  "990-EZ", "Nonprofits with gross receipts less than or equal to $200,000, or
+total assets less than or equal to $500,000 (these nonprofits can choose to file the full Form 990 instead).", irs.data.sets, nccs.data.sets,
+  "990-PF", "Private foundations.", irs.data.sets, nccs.data.sets,
+  "990-N", "Nonprofits with gross receipts less than or equal to $50,000 (these nonprofits can choose to file the full Form 990 instead).", irs.data.sets, "•	The NCCS 990-N ePostcard catalog contains data from Form 990-N (this dataset is not included in the dashboard because it has not been harmonized)."
 )
 
 data_source_table <- reactable::reactable(
@@ -91,11 +110,31 @@ data_source_table <- reactable::reactable(
     ),
     Data = colDef(
       name = "IRS Data Set(s)",
-      html = TRUE
+      html = TRUE,
+      style = JS("function(rowInfo, column, state) {
+        const firstSorted = state.sorted[0]
+        // Merge cells if unsorted or sorting by Data
+        if (!firstSorted || firstSorted.id === 'Data') {
+          const prevRow = state.pageRows[rowInfo.viewIndex - 1]
+          if (prevRow && rowInfo.values['Data'] === prevRow['Data']) {
+            return { visibility: 'hidden' }
+          }
+        }
+      }")
     ),
     NCCS_data = colDef(
       name = "NCCS Data Set(s)",
-      html = TRUE
+      html = TRUE,
+      style = JS("function(rowInfo, column, state) {
+        const firstSorted = state.sorted[0]
+        // Merge cells if unsorted or sorting by Data
+        if (!firstSorted || firstSorted.id === 'NCCS_data') {
+          const prevRow = state.pageRows[rowInfo.viewIndex - 1]
+          if (prevRow && rowInfo.values['NCCS_data'] === prevRow['NCCS_data']) {
+            return { visibility: 'hidden' }
+          }
+        }
+      }")
     )
   ),
   striped = TRUE,
@@ -106,6 +145,7 @@ data_source_table <- reactable::reactable(
 )
 
 usethis::use_data(
+  navbar_title,
   download_table,
   data_source_table,
   internal = TRUE,
