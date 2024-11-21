@@ -65,17 +65,6 @@ data_server_args <- list(
     title_prefix = "Total Benefits",
     time_series = TRUE
   ),
-  "Payroll Taxes" = list(
-    path = "data/finances.parquet",
-    vars = c(default_vars, "Total Payroll Taxes", "Tax Year"),
-    id = "payroll",
-    year_var = "Tax Year",
-    agg_var = "Total Payroll Taxes",
-    ytitle = "Dollars",
-    xtitle = "Tax Year",
-    title_prefix = "Total Payroll Taxes",
-    time_series = TRUE
-  ),
   "Private Foundation Grants" = list(
     path = "data/pf_grants.parquet",
     vars = c(default_vars, "Total Contributions", "Tax Year"),
@@ -85,17 +74,6 @@ data_server_args <- list(
     ytitle = "Dollars",
     xtitle = "Tax Year",
     title_prefix = "Total Grants Made By Private Foundations",
-    time_series = TRUE
-  ),
-  "Average Foundation Grantmaking" = list(
-    path = "data/pf_grants.parquet",
-    vars = c(default_vars, "Total Contributions", "Tax Year"),
-    id = "pf_avg",
-    year_var = "Tax Year",
-    agg_var = "Total Contributions",
-    ytitle = "Dollars",
-    xtitle = "Tax Year",
-    title_prefix = "Average Grantmaking for",
     time_series = TRUE
   ),
   "Number of DAFs" = list(
