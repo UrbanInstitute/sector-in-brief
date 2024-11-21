@@ -13,10 +13,12 @@ geo_filter_ui <- function(id, state_choices) {
   ns <- shiny::NS(id)
   bslib::card(
     bslib::card_header(
-      "Geography",
-      bslib::tooltip(
-        bsicons::bs_icon("question-circle"),
-        "Information about Census-defined geographic level available on the About page."
+      htmltools::tagList(
+        htmltools::h6("Geographic Filters"),
+        htmltools::p(
+          class = "base",
+          "Information about census-defined geographic level is available on the About page."
+        )
       )
     ),
     urbn_radiobuttons(
