@@ -1,7 +1,6 @@
 page_header_card <- function(header, subheader) {
-  card <- htmltools::div(
-    class = "var-title-card",
-    htmltools::h2(header, class = "var-header"),
+  card <- htmltools::tagList(
+    htmltools::h2(header),
     subheader
   )
   return(card)
