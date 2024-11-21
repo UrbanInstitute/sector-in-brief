@@ -4,18 +4,18 @@ app <- function(...) {
   geo_df <- read.csv("data/nested_geographies.csv")
   ui <- bslib::page_navbar(
     id = "tabs",
-    title = navbar_title(title = "     | National Center for Charitable Statistics", 
-                         height="60px"),
+    padding = "10px",
+    title = navbar_title(title = "     | NCCS"),
     bg = "#0096d2",
     fillable = FALSE,
     htmltools::tags$head(
       htmltools::includeCSS("www/sib_style.css")
     ),
     bslib::nav_spacer(),
-    welcome,
-    about(), 
+    welcomeUI,
+    aboutUI(), 
     bslib::nav_menu(
-      title = "Visualise Data",
+      title = "Data Visualizations",
       visualpanels[["Numbers"]],
       bslib::nav_panel(
         title = "Finances",
@@ -25,8 +25,7 @@ app <- function(...) {
           visualpanels[["Assets"]],
           visualpanels[["Revenues"]],
           visualpanels[["Expenses"]],
-          visualpanels[["Benefits"]],
-          visualpanels[["Payroll Taxes"]]        )
+          visualpanels[["Benefits"]]      )
       ),
       bslib::nav_panel(
         title = "Private Foundation Grantmaking",
@@ -49,7 +48,7 @@ app <- function(...) {
       )
     ),
     bslib::nav_panel(
-      title = "Download Data",
+      title = "Custom Panel Datasets",
       page_header_card(header = download_title, 
                        subheader = download_subtitle),
       dataRequestUI("data_download", geo_df)
@@ -79,6 +78,12 @@ app <- function(...) {
       }
     })
     dataRequestServer("data_download", geo_df)
+    observeEvent(input$visual_link, {
+      shiny::updateTabsetPanel(session, "tabs", selected = visual_link_page)
+    })
+    observeEvent(input$download_link, {
+      shiny::updateTabsetPanel(session, "tabs", selected = download_link_page)
+    })
   }
   shinyApp(ui = ui, server = server)
 }
