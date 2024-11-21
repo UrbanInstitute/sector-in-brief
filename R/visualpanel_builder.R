@@ -17,7 +17,8 @@ visualpanel_builder <- function(title,
     title = title,
     page_header_card(panel_header, panel_desc),
     bslib::card(
-      bslib::card_title("Select Your Filters", class = "var-select-header"),
+      class = "card-filter",
+      bslib::card_title("Select Your Filters", class = "bg-light-gray"),
       title = "",
       bslib::layout_column_wrap(
         all_cards[["org_card"]], 
