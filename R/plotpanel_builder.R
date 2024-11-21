@@ -14,7 +14,8 @@ plotpanel_builder <- function(id, title, plot_id, table_id, download_id, table_t
       ),
       bslib::accordion(
         bslib::accordion_panel(
-          title = "View Data",
+          title = accordion_title("View Data"),
+          value = "view_table",
           id = "reactable",
           htmltools::div(
             class = "form-header",
