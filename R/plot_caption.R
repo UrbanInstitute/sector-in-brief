@@ -26,23 +26,18 @@ plot_caption <- function(inputs) {
     county = county,
     cbsa = cbsa
   )
-  caption <- paste(caption, "Organization Type(s):", paste(ctype, collapse = ", "), "\n")
+  caption <- paste(caption, "Organization Type(s):", stringr::str_wrap(paste(ctype, collapse = ", "), width=200), "\n")
   caption <- paste(caption, "Subsector(s):", paste(subsector, collapse = ", "), "\n")
   caption <- caption_size(caption, size, asset_size_ls)
   # Private Foundation notes
   caption <- caption_pf(caption, ctype)
-  # DAF Notes
-  caption <- caption_daf(caption, agg_var)
   # Finance Notes
   caption <- caption_finance(caption, agg_var)
   # Year Notes
   caption <- caption_year(caption, year_var)
   caption <- paste(
     caption,
-    "\n",
-    "•	All data is derived directly from IRS tax records and are thus subject to changes in IRS reporting requirements. Fluctuations in observed Year-Over-Year values are likely due to changes in these requirements.",
-    "\n",
-    "•	The graphs only include data until 2021 because the IRS has only partially released tax records for tax year 2022."
+    "•	All data is derived directly from IRS tax records and subject to changes in IRS reporting requirements. Fluctuations in observed year-over-year values are likely due to changes in these requirements."
   )
   return(caption)
 }

@@ -14,7 +14,10 @@ caption_geo <- function(caption,
                       state_mult,
                       county,
                       cbsa) {
-  if (geo_level == "Census Region") {
+  if (geo_level == "National"){
+    caption <- paste("Geography: National, grouped by regions.", "\n")
+  }
+  else if (geo_level == "Census Region") {
     caption <- paste("Region(s):", paste(region, collapse = ", "), "\n")
   }
   else if (geo_level == "Census State") {
