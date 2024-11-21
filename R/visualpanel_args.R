@@ -5,11 +5,10 @@ visualpanel_args <- tibble::tribble(
   "Revenues", "Revenues", revenue_desc, "revenues", 1989, 2021,
   "Expenses", "Expenses", expenses_desc, "expenses", 1989, 2021,
   "Benefits", "Benefits", benefits_desc, "benefits", 1989, 2021,
-  "Payroll Taxes", "Payroll Taxes", payroll_desc, "payroll", 1989, 2021,
   "Private Foundation Grants", "Grants", grants_desc, "pf_amount", 1989, 2021,
   "Number of DAFs", "Number of DAFs", daf_number_desc, "daf_number", 2021, 2021,
   "DAF Contributions", "DAF Contributions", daf_contributions_desc,"daf_contributions", 2021, 2021,
   "DAF Grants", "DAF Grants", daf_grants_desc, "daf_grants", 2021, 2021,
   "DAF Value", "DAF Value", daf_value_desc, "daf_value", 2021, 2021,
-  "DAF Percentage", "Percentage of organizations that maintain a DAF", daf_proportion_desc, "daf_proportion", 2021, 2021,
+  "DAF Proportion", "Percentage of organizations that maintain a DAF", daf_proportion_desc, "daf_proportion", 2021, 2021,
 )
