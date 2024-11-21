@@ -45,9 +45,9 @@ welcomeUI <- bslib::nav_panel(
   htmltools::div(
     class = "bg-box__grey",
     htmltools::div(
-      class = "flex-box__row",
+      class = "flex-box__row-align",
       credits,
-      about,
+      about
     )
   )
 )
