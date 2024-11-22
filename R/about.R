@@ -2,26 +2,16 @@
 aboutUI <- function() {
   about <- bslib::nav_panel(
     title = "About",
-    about_title,
+    about_title_box,
     htmltools::br(),
     customization,
-    htmltools::div(
-      class = "bg-box__white",
-      htmltools::div(
-        class = "flex-box__column",
-        bslib::accordion(
-          open = FALSE,
-          bslib::accordion_panel(
-            title = accordion_title("Data Sources"),
-            value = "Data Sources",
-            data_sources
-          )
-        )
-      )
-    ),
+    htmltools::br(),
+    accordion_data_source,
+    htmltools::br(),
     variations,
     htmltools::br(),
-    faq
+    faq,
+    htmltools::br()
   )
   return(about)
 }

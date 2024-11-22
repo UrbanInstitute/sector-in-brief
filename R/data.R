@@ -7,6 +7,19 @@ download_link_page <- "Custom Panel Datasets"
 
 # URLs
 ctype_desc_url <- "https://www.irs.gov/charities-non-profits/other-tax-exempt-organizations"
+bmf_link <- "https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf"
+ntee_link <- "https://www.irs.gov/pub/irs-tege/p4838.pdf"
+soi_link <- "https://www.irs.gov/statistics/soi-tax-stats-annual-extract-of-tax-exempt-organization-financial-data"
+tract_link <- "https://www2.census.gov/geo/pdfs/reference/GARM/Ch10GARM.pdf"
+nccs_link <- "https://urbaninstitute.github.io/nccs/"
+unified_bmf_link <- "https://urbaninstitute.github.io/nccs/datasets/bmf/"
+core_link <- "https://lecy.github.io/nccs/datasets/core/"
+daf_link <- "https://www.irs.gov/charities-non-profits/charitable-organizations/donor-advised-funds"
+efile_link <- "https://lecy.github.io/nccs/datasets/efile/"
+census_regions_link <- 'https://www2.census.gov/geo/pdfs/maps-data/maps/reference/us_regdiv.pdf'
+census_crosswalks_link <- "https://urbaninstitute.github.io/nccs/datasets/census/"
+geocoder_link <- "https://urban-institute.medium.com/choosing-a-geocoder-for-the-urban-institute-86192f656c5f"
+qualtrics_link <- "https://urban.co1.qualtrics.com/jfe/form/SV_2fRHTFJxNzD4GcS"
 
 # Reusable HTML Components
 html_orgtype <- htmltools::a(
