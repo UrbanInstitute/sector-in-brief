@@ -6,7 +6,7 @@ aboutUI <- function() {
     htmltools::br(),
     customization,
     htmltools::br(),
-    accordion_data_source,
+    data_sources,
     htmltools::br(),
     variations,
     htmltools::br(),
