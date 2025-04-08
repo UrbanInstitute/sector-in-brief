@@ -1,9 +1,22 @@
 tooltip_text <- function(table, yvar, xvar, groupby_var = NULL) {
+  if (yvar %in% c(
+    "Total Assets",
+    "Total Revenues",
+    "Total Expenses",
+    "Total Benefits",
+    "Total Contributions",
+    "Total Grants",
+    "Total Value"
+  )) {
+    yvar_formatted <- scales::dollar(table[[yvar]], prefix = "$")
+  } else {
+    yvar_formatted <- scales::comma(table[[yvar]])
+  }
   if (is.null(groupby_var)) {
     text <- paste("<b>",
                   yvar,
                   "</b>: ",
-                  scales::comma(table[[yvar]]),
+                  yvar_formatted,
                   "<br><b>",
                   xvar,
                   "</b>: ",
@@ -17,7 +30,7 @@ tooltip_text <- function(table, yvar, xvar, groupby_var = NULL) {
       "<br><b>",
       yvar,
       "</b>: ",
-      scales::comma(table[[yvar]]),
+      yvar_formatted,
       "<br><b>",
       xvar,
       "</b>: ",

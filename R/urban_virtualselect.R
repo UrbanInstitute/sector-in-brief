@@ -1,6 +1,6 @@
 urban_virtualselect <- function(ns, id, label, choices, ...){
   htmltools::div(
-    class = "form-choice-header",
+    class = "picker-urbn",
     shinyWidgets::virtualSelectInput(
       inputId = ns(id),
       label = label,

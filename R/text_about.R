@@ -1,179 +1,226 @@
-library(usethis)
+# HTML formatted text for the about page
 
-bmf_link <- "<a href='https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf'>IRS Business Master Files</a>"
-ntee_link <- "<a href='https://www.irs.gov/pub/irs-tege/p4838.pdf'>National Taxonomy of Exempt Entities (NTEE)</a>"
-soi_link <- "<a href='https://www.irs.gov/statistics/soi-tax-stats-annual-extract-of-tax-exempt-organization-financial-data'>Statistics of Income (SOI)</a>"
-tract_link <- "<a href='https://www2.census.gov/geo/pdfs/reference/GARM/Ch10GARM.pdf'>Census tract and block</a>"
-nccs_link <- "<a href='https://urbaninstitute.github.io/nccs/'>website</a>"
-unified_bmf_link <- "<a href='https://urbaninstitute.github.io/nccs/datasets/bmf/'>here</a>"
-core_link <- "<a href='https://lecy.github.io/nccs/datasets/core/'>NCCS' Core Series</a>"
-nccs_full_link <- "<a href='https://urbaninstitute.github.io/nccs/'>National Center for Charitable Statistics (NCCS)</a>"
-unified_bmf_full_link <- "<a href='https://urbaninstitute.github.io/nccs/datasets/bmf/'>Unified Business Master Files (BMF)</a>"
-daf_link <- "<a href='https://www.irs.gov/charities-non-profits/charitable-organizations/donor-advised-funds'>Donor Advised Fund</a>"
-efile_link <- "<a href='https://lecy.github.io/nccs/datasets/efile/'>NCCS' E-Filer Catalog</a>"
+# Text for the about page
+about_title <- "About"
+about_subtitle <- "Learn more about the data behind the Nonprofit Sector in Brief Dashboard."
 
-about_title <- htmltools::div(class = "welcome-banner",
-                              htmltools::div(
-                                class = "welcome-header",
-                                htmltools::h1(
-                                  class = "text-3xl",
-                                  "About",
-                                  htmltools::p(
-                                    class = "text-3xl-cyan",
-                                    "Learn more about the data behind the Nonprofit Sector in Brief Explorer."
-                                  )
-                                )
-                              ))
+customization_title <- "Customization"
+customization_body <- "There are several ways to customize data visualizations and create panel datasets."
 
-customization <- htmltools::div(class = "banner-light",
-                                htmltools::div(
-                                  class = "flex-box--column",
-                                  bslib::accordion(
-                                    open = FALSE,
-                                    bslib::accordion_panel(
-                                      title = htmltools::HTML("<b>Customization</b>"),
-                                      htmltools::p(
-                                        class = "subheader",
-                                        "There are several ways to customize data visualizations and create panel datasets."
-                                      ),
-                                      bslib::accordion(
-                                        open = FALSE,
-                                        bslib::accordion_panel(
-                                          title = htmltools::HTML("<b>Organization Type</b>"),
-                                          htmltools::HTML(
-                                            sprintf(
-                                              "Organization type categories are derived from the subsector codes reported in the %s.",
-                                              bmf_link
-                                            )
-                                          )
-                                        ),
-                                        bslib::accordion_panel(title = htmltools::HTML("<b>Subsector</b>"), htmltools::HTML(
-                                          sprintf(
-                                            "Subsectors are derived from the general categories of the %s codes reported in the IRS %s.",
-                                            ntee_link,
-                                            bmf_link
-                                          )
-                                        )),
-                                        bslib::accordion_panel(
-                                          title = htmltools::HTML("<b>Tax Year</b>"),
-                                          htmltools::HTML(
-                                            "Tax years are derived from the tax period provided in the Form 990, 990-EZ or 990-PF."
-                                          )
-                                        ),
-                                        bslib::accordion_panel(title = htmltools::HTML("<b>Asset Size</b>"), htmltools::HTML(
-                                          sprintf(
-                                            "Asset size categories are derived from the total assets reported in the %s.",
-                                            bmf_link
-                                          )
-                                        )),
-                                        bslib::accordion_panel(
-                                          title = htmltools::HTML("<b>Geography</b>"),
-                                          htmltools::HTML(
-                                            sprintf(
-                                              "Geographic options are derived by mapping the addresses associated with each nonprofit in the %s to a Census region, state, county, and metro areas. core-based-statistical area using the Urban Institute’s proprietary geocoder (Urban Institute, 2020).",
-                                              bmf_link
-                                            )
-                                          ),
-                                          htmltools::tags$ul(
-                                            htmltools::tags$li(
-                                              htmltools::HTML(
-                                                "Census regions divide all 51 US States into 4 units – Northeast, Midwest, South and West (U.S. Census Bureau) A map can be found <a href='https://www2.census.gov/geo/pdfs/maps-data/maps/reference/us_regdiv.pdf'>here</a>."
-                                              )
-                                            ),
-                                            htmltools::tags$li(
-                                              "Census Core-based Statistical Areas (CBSAs) consist of metropolitan (urban area of at least 50,000 inhabitants) and micropolitan areas (urban area containing between 10,000 and 50,000 inhabitants) (U.S Census Bureau, 2023). In this dashboard, metropolitan and micropolitan areas are jointly referred to as “Metro Areas” for brevity."
-                                            ),
-                                            htmltools::tags$li(
-                                              htmltools::HTML(
-                                                "Each address is mapped across multiple Census units using NCCS’ <a href='https://urbaninstitute.github.io/nccs/datasets/census/'>Census Crosswalks</a> (Davis & Lecy, 2023)."
-                                              )
-                                            )
-                                          )
-                                        )
-                                      )
-                                    )
-                                  )
-                                ))
+org_type_title <- "Organization Type"
+org_type_body <- "These categories are derived from the subsector codes reported in the"
 
-data_sources <-
-  htmltools::div(
-    htmltools::p(
-      class = "subheader",
-      "Urban Institute’s National Center for Charitable Statistics (NCCS) derives the data used in the Nonprofit Sector in Brief Data Explorer from the Internal Revenue Service (IRS). Nonprofits, as tax exempt organizations, are required to complete IRS 990 series of Tax Forms annually. The specific 990 form a nonprofit must file is determined by their organization type and gross receipts/total assets (IRS, 2024). The table below breaks down the reporting requirements for each type of Form 990 and the NCCS data sets associated with each form. "
+subsector_title <- "Subsector"
+subsector_body <- htmltools::p(
+  "Subsectors are from the general categories of the  ",
+  htmltools::a(href = ntee_link, "National Taxonomy of Exempt Entities (NTEE)"),
+  " codes reported in the IRS ",
+  htmltools::a(href = bmf_link, "Business Master File.")
+)
+
+tax_year_title <- "Tax Year"
+tax_year_body <- htmltools::p("These years are from the tax periods in the Forms 990, 990-EZ, or 990-PF.")
+
+asset_size_title <- "Asset Size"
+asset_size_body <- htmltools::p(
+  "These categories are derived from the total assets reported in the IRS ",
+  htmltools::a(href = bmf_link, "Business Master File."),
+  "Missing values are imputed from the nonprofit's most recent Form 990 filing."
+)
+
+geo_title <- "Geography"
+geo_body <- htmltools::tagList(
+  htmltools::p(
+    "Geographic options are generated by mapping the addresses associated with each nonprofit in the ",
+    htmltools::a(href = bmf_link, "Business Master File"),
+    " to a census region, state, county, or metro area (defined as a core-based-statistical area), using the Urban Institute's ",
+    htmltools::a(href = geocoder_link, "proprietary geocoder."),
+    "Each address is mapped across multiple census units using ",
+    htmltools::a(href = census_crosswalks_link, "NCCS's census crosswalks.")
+  ),
+  htmltools::tags$ul(
+    htmltools::tags$li(
+      "The ",
+      htmltools::a(href = census_regions_link, "census regions (PDF)"),
+      " are Northeast, Midwest, South, and West."
     ),
-    bslib::accordion(
-      open = FALSE,
-      bslib::accordion_panel(
-        title = htmltools::HTML("<b>Data Sets</b>"),
-        data_source_table,
-        htmltools::br(),
-        htmltools::p(class = "subheader", htmltools::HTML(
-          sprintf(
-            "The IRS releases both electronically filed (e-filed) versions of individual tax filings and a compilation of selected financial variables from Form 990s in a series of %s (IRS, 2024). To analyze IRS data across tax years, NCCS standardizes names, data types, and definitions because variable names and definitions are not consistent year-over-year. Next, NCCS links tax records from every nonprofit filed between 1989 to 2022 in a single time-series panel, complete with geocoding to the %s levels for easy filtering through a process called harmonization. For more information, visit the NCCS %s.",
-            soi_link,
-            tract_link,
-            nccs_link
-          )
-        )),
-        htmltools::p(
-          class = "subheader",
-          "Data for the Visualize Data and Download Data tabs come from the following data sources:"
-        )
-      )
-    ),
-    bslib::accordion(
-      open = FALSE,
-      bslib::accordion_panel(title = htmltools::HTML("<b>Numbers</b>"), htmltools::HTML(
-        sprintf(
-          "Data on the number of nonprofits is derived from NCCS’ Unified Business Master Files (BMF), a compilation of all BMFs released by the IRS. A detailed description of this file is provided %s.",
-          unified_bmf_link
-        )
-      )),
-      bslib::accordion_panel(
-        title = htmltools::HTML("<b>Finances and Private Foundation Grantmaking</b>"),
-        htmltools::HTML(
-          sprintf(
-            "Data on nonprofit financials and private foundation grantmaking are derived from %s, which comes from the IRS’ %s for Form 990, 990-EZ and 990-PF. Currently NCCS has harmonized data for the 990 and 990-EZ panels through 2021. The 990-PFs are partially harmonized and will be fully processed in 2025.",
-            core_link,
-            soi_link
-          )
-        )
-      ),
-      bslib::accordion_panel(
-        title = htmltools::HTML("<b>Donor Advised Funds</b>"),
-        htmltools::HTML(
-          "Data on donor advised funds (DAFs) is derived from Schedules A and D of e-filed Form 990s for tax year 2021. DAF data is only available via electronic filings and a complete sample of all e-filed tax records is only available starting in tax year 2021, which was the first year the IRS mandated e-filing."
-        )
-      ),
-      bslib::accordion_panel(
-        title = htmltools::HTML("<b>Download Data</b>"),
-        htmltools::HTML(
-          sprintf(
-            "Data for the download tool is derived from the harmonized %s, derived from the IRS’ %s for Form 990 and 990-EZ. While the 2021 tax records are complete, the IRS is still releasing 2022 data and therefore, the 2022 data represents only a partial sample of nonprofits. Form 990-PF data on private foundations is currently harmonized for the variables that appear on the Visualize Data page and will be fully processed for the Download Data page by 2025.",
-            core_link,
-            soi_link
-          )
-        )
-      )
+    htmltools::tags$li(
+      'In this dashboard, "metro areas" refer to census ',
+      htmltools::tags$b("core-based statistical areas,"),
+      "which consist of metropolitan areas (urban areas with at least 50,000 inhabitants) and micropolitan areas (urban areas with between 10,000 and 50,000 inhabitants)."
     )
   )
-
-credits <- htmltools::div(
-  class = "subheader",
-  htmltools::p(
-    "The Nonprofit Sector in Brief Data Explorer makes public data on nonprofits from 1989 to the present available to visualize and download."
-  ),
-  htmltools::p("Research - Jesse Lecy, Hannah Martin, Laura Tomasko"),
-  htmltools::p("Development - Thiyaghessan Poongundranar"),
-  htmltools::p("Design - Thiyaghessan Poongundranar")
 )
 
-welcome_about <- htmltools::div(
-  class = "footer_text",
-  htmltools::HTML(
-    "<p>This project is funded by the National Center for Charitable Statistics (NCCS). The NCCS data used in this data explorer contains standardized names, data types, and definitions for all variables across the various iterations of the IRS Form 990. NCCS data links tax records from every nonprofit filed between 1989 to 2022 in a single time-series panel, complete with geocoding to the Census tract and block levels for easy filtering. For more information, see the <a href='https://nccs.urban.org/'>NCCS Website</a></p>"
+data_source_title <- "Data Sources"
+data_source_body <- htmltools::tagList(
+  htmltools::p(
+    "The IRS releases electronically filed (e-filed) versions of individual tax filings and a compilation of selected financial variables from Forms 990 in a series of ",
+    htmltools::a(href = soi_link, "Statistics of Income (SOI) extracts."),
+    "To analyze IRS data across tax years, NCCS standardizes names, data types, and definitions, because variable names and definitions are not consistent year-over-year. Next, NCCS links tax records from every nonprofit filed from 1989 to 2022 in a single time-series panel, complete with geocoding (mapping each tax record to a latitude and longitude) to the ",
+    htmltools::a(href = tract_link, "census tract and block levels"),
+    " for easy filtering through a process called harmonization. For more information, visit ",
+    htmltools::a(href = nccs_link, "the NCCS site.")
+  ),
+  htmltools::p(
+    "Data for the Data Visualizations and Custom Panel Datasets features come from the following data sources:"
   )
 )
+
+numbers_title <- "Numbers"
+numbers_body <- htmltools::p(
+  "Numbers of nonprofits come from NCCS's Unified Business Master File, a compilation of all Business Master Files released by the IRS. View our ",
+  htmltools::a(
+    href = unified_bmf_link,
+    "detailed description"
+  ),
+  " of the file for more information."
+)
+
+finance_datasrc_title <- "Finances and Private Foundation Grantmaking"
+finance_datasrc_body <- htmltools::p(
+  "Data on nonprofit financials and private foundation grantmaking are derived from ",
+  htmltools::a(href = core_link, "NCCS's Core Series,"),
+  "which comes from the IRS's ",
+  htmltools::a(href = soi_link, "Statistic of Income extracts"),
+  " for Forms 990, 990-EZ, and 990-PF. Currently NCCS has harmonized data for the 990 and 990-EZ panels through 2021. The 990-PFs are partially harmonized and will be fully processed in 2025."
+)
+
+daf_datasrc_title <- "Donor Advised Funds"
+daf_datasrc_body <- htmltools::p(
+  "Data on donor-advised funds come from Schedules A and D of e-filed Forms 990 for tax year 2021. These data are only available via electronic filings, and a complete sample of all e-filed tax records is only available starting in tax year 2021, the first year the IRS mandated e-filing."
+)
+
+custom_datasrc_title <- "Custom Panel Datasets"
+custom_datasrc_body <- htmltools::p(
+  "Data for this feature are from ",
+  htmltools::a(href = core_link, "NCCS's Core Series,"),
+  "which is derived from the IRS's ",
+  htmltools::a(href = soi_link, "Statistic of Income (SOI) extracts"),
+  " for Forms 990 and 990-EZ. While the 2021 tax records are complete, the IRS is still releasing 2022 data, meaning the 2022 data we provide represent only a partial sample of nonprofits. Form 990-PF data on private foundations are currently available for the variables that appear in the Data Visualizations feature and will be fully processed for the Custom Panel Datasets feature by 2025."
+)
+
+variations_title <- "Notable Dataset Variations"
+variations_body <- htmltools::tagList(
+  htmltools::p(
+    "Since its establishment, NCCS has maintained a comprehensive database of nonprofit organizations based on IRS data. Over time, NCCS data-collection protocols and IRS reporting requirements have both evolved, leading to variations in dataset composition and year-over-year trends."
+  ),
+  htmltools::p(
+    "Below are key methodological changes that explain notable variations in longitudinal analyses. Consider these methodological shifts when conducting trend analyses or drawing conclusions from year-over-year comparisons."
+  )
+)
+
+coverages_title <- "1994-1995 Expansion of Coverage"
+coverages_body <- htmltools::p(
+  "Before 1994, NCCS data collection was limited to nonprofit organizations exceeding specific revenue thresholds. Beginning in 1995, NCCS expanded its scope to include tax records from all IRS-filing nonprofit organizations, substantially increasing the number of organizations included in our data archives."
+)
+
+form_mod_title <- "Form Modifications"
+form_mod_body <- htmltools::p(
+  "In 2008 the IRS implemented significant modifications to Form 990 and introduced Forms 990-EZ and 990-N. These changes substantially expanded reporting requirements, leading to a marked increase in the number of reporting organizations and available financial data between 2008 and 2009. Any sharp increases in nonprofit counts or financial metrics during this period should be interpreted in this context of expanded reporting requirements rather than interpreted as actual sector growth."
+)
+
+missing_data_title <- "Missing Data"
+missing_data_body <- htmltools::p(
+  "The IRS has not released the Statistics of Income extracts for Forms 990-PF for tax years 2016, 2017, and 2018. Missing data points for private foundations during these years are indicated with dotted lines."
+)
+
+faq_title <- "Frequently Asked Questions"
+
+visualize_faq_title <- "Why can't I visualize data for individual nonprofits?"
+visualize_faq_body <- htmltools::p(
+  "The Nonprofit Sector In Brief Dashboard focuses on providing an overview of the nonprofit sector. Our dashboard is designed for research on trends affecting the sector as a whole instead of the activities of individual organizations."
+)
+
+tax_year_faq_title <- "What is the difference between tax years and regular calendar years?"
+tax_year_faq_body <- htmltools::p(
+  "A tax year is the accounting period for which a tax record is filed. For example, nonprofits commonly filed taxes for the year 2022 in 2024; those tax filings are assigned a calendar year of 2024 and a tax year of 2022 by NCCS to prevent confusion."
+)
+
+custom_panel_faq_title <- "Why do I have to use the Custom Panel Dataset feature to download full datasets?"
+custom_panel_faq_body <- htmltools::p(
+  "NCCS's panel datasets contain over 25 GB of data, so delivering them directly through the dashboard would result in excessively large downloads."
+)
+
+old_reports_faq_title <- "Where can I access the Sector In Brief reports?"
+old_reports_faq_body <- htmltools::p(
+  "Sector In Brief reports from 2009 to 2019 are located on the ",
+  htmltools::a(
+    href = nccs_link,
+    "NCCS website."
+  )
+)
+
+
+faq_contact_title <- "I have a question about the dashboard. Who should I contact?"
+faq_contact_body <- htmltools::p("Please submit a ",
+                                 htmltools::a(href = qualtrics_link,
+                                              "feedback form."))
+
+
+# HTML Components for the about page
+about_title_box <- title_box(about_title, about_subtitle)
+
+customization <- white_flexbox(bslib::accordion(
+  open = FALSE,
+  urbn_accordion_panel(
+    title = customization_title,
+    htmltools::p(customization_body),
+    bslib::accordion(
+      open = FALSE,
+      urbn_accordion_panel(title = org_type_title, htmltools::p(
+        org_type_body,
+        htmltools::a(href = bmf_link, "IRS Business Master Files.")
+      )),
+      urbn_accordion_panel(title = subsector_title, subsector_body),
+      urbn_accordion_panel(title = tax_year_title, tax_year_body),
+      urbn_accordion_panel(title = asset_size_title, asset_size_body),
+      urbn_accordion_panel(title = geo_title, geo_body)
+    )
+  )
+))
+
+data_sources <- white_flexbox(bslib::accordion(
+  open = FALSE,
+  urbn_accordion_panel(
+    title = data_source_title,
+    data_source_table,
+    data_source_body,
+    urbn_accordion_panel(title = numbers_title, numbers_body),
+    urbn_accordion_panel(title = finance_datasrc_title, finance_datasrc_body),
+    urbn_accordion_panel(title = daf_datasrc_title, daf_datasrc_body),
+    urbn_accordion_panel(title = custom_datasrc_title, custom_datasrc_body)
+  )
+))
+
+variations <- white_flexbox(
+  bslib::accordion(
+    open = FALSE,
+    urbn_accordion_panel(
+      title = variations_title,
+      variations_body,
+      urbn_accordion_panel(coverages_title, coverages_body),
+      urbn_accordion_panel(form_mod_title, form_mod_body),
+      urbn_accordion_panel(missing_data_title, missing_data_body)
+    )
+  )
+)
+
+faq <- white_flexbox(
+  bslib::accordion(
+    open = FALSE,
+    urbn_accordion_panel(
+      title = "Frequently Asked Questions",
+      urbn_accordion_panel(visualize_faq_title, visualize_faq_body),
+      urbn_accordion_panel(tax_year_faq_title, tax_year_faq_body),
+      urbn_accordion_panel(custom_panel_faq_title, custom_panel_faq_body),
+      urbn_accordion_panel(old_reports_faq_title, old_reports_faq_body),
+      urbn_accordion_panel(faq_contact_title, faq_contact_body)
+    )
+  )
+)
+
+
 
 usethis::use_data(
   about_title,
@@ -186,8 +233,6 @@ usethis::use_data(
   nccs_link,
   unified_bmf_link,
   core_link,
-  credits,
-  welcome_about,
   internal = TRUE,
   overwrite = TRUE
 )

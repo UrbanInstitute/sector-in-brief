@@ -4,26 +4,27 @@ dataRequestUI <- function(id, geo_df) {
   size <- names(choices$size)
   subsector <- choices$subsector
   bslib::card(
-    bslib::card_title("Ready To Get Started?", class = "var-select-header"),
+    bslib::card_title("Ready To Get Started?", class = "bg-light-gray"),
     urban_button(ns, "start_form", "REQUEST DATA"),
     bslib::accordion(
       id = ns("accordion"),
       open = FALSE,
       bslib::accordion_panel(
-        title = "Option 1: Form Type",
+        title = accordion_title("Option 1: Form Type"),
+        value = "Option 1: Form Type",
         htmltools::br(),
         htmltools::div(
-          class = "banner-light__small",
+          class = "bg-box__white",
           download_table
         ),
         htmltools::br(),
         htmltools::div(
-          class = "btn-radio-header",
+          class = "btn-radio-urbn__lg",
           shiny::radioButtons(
             inputId = ns("form_select"),
             label = "Select one option *",
             choices = list("Form 990 Filers" = "990", 
-                        "Form 990 and Form 990-EZ Filers" = "990EZ"),
+                           "Form 990 and Form 990-EZ Filers" = "990EZ"),
             inline = TRUE
           )
         ),
@@ -31,16 +32,19 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_type", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Option 2: Organization, Subsector, and Size",
+        title = accordion_title("Option 2: Organization, Subsector, and Size"),
+        value = "Option 2: Organization, Subsector, and Size",
         htmltools::br(),
         bslib::layout_column_wrap(
           htmltools::div(
-            class = "form-choice-text",
+            class = "picker-urbn",
             shinyWidgets::pickerInput(
               inputId = ns("org_select"),
-              label = htmltools::div(
-                htmltools::tags$b("Organization Type *"),
-                htmltools::p("Section 501(c) of the Internal Revenue Code")
+              label = htmltools::tagList(
+                htmltools::h5("Organization Type*"),
+                htmltools::p(
+                  html_orgtype
+                )
               ),
               choices = ctype_id,
               multiple = TRUE,
@@ -52,12 +56,19 @@ dataRequestUI <- function(id, geo_df) {
             )
           ),
           htmltools::div(
-            class = "form-choice-text",
+            class = "picker-urbn",
             shinyWidgets::pickerInput(
               inputId = ns("subsector_select"),
-              label = htmltools::div(
-                htmltools::tags$b("Subsector *"),
-                htmltools::HTML("<p>12 general categories of the <a href='https://urbaninstitute.github.io/nccs-legacy/ntee/ntee-history.html'>National Taxonomy of Exempt Entities</a> (NTEE) code system</p>")
+              label = htmltools::tagList(
+                htmltools::tags$b("Subsector*"),
+                htmltools::tagList(
+                  htmltools::p("12 general categories of the",
+                               htmltools::a(
+                                 "National Taxonomy of Exempt Entities (NTEE)", 
+                                 href = ntee_link
+                               ),
+                               "code system.")
+                )
               ),
               choices = subsector,
               multiple = TRUE,
@@ -65,12 +76,14 @@ dataRequestUI <- function(id, geo_df) {
             )
           ),
           htmltools::div(
-            class = "form-choice-text",
+            class = "picker-urbn",
             shinyWidgets::pickerInput(
               inputId = ns("size_select"),
-              label = htmltools::div(
+              label = htmltools::tagList(
                 htmltools::tags$b("Asset Size *"),
-                htmltools::p("Total assets from the IRS Business Master File grouped in five categories.")
+                htmltools::p(
+                  "Total assets from the IRS Business Master File grouped in five categories."
+                )
               ),
               choices = list(
                 "Under $100,000" = "1",
@@ -89,18 +102,25 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_geo", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Option 3: Geographic Scope",
+        title = accordion_title("Option 3: Geographic Scope"),
+        value = "Option 3: Geographic Scope",
         download_geo_para,
         htmltools::br(),
         bslib::layout_column_wrap(
-          urban_virtualselect(ns, "region_select", "Optional - Select Region(s)", c("Northeast", "Midwest", "South", "West")),
-          urban_virtualselect(ns, "geo_select", "Select State(s) *", state_choices),
+          urban_virtualselect(ns, 
+                              "region_select", 
+                              htmltools::tags$b("Optional - Select Region(s)"), 
+                              c("Northeast", "Midwest", "South", "West")),
+          urban_virtualselect(ns, 
+                              "geo_select",
+                              htmltools::tags$b("Select State(s)*"),
+                              state_choices),
           shiny::conditionalPanel(
             condition = "input.geo_select.length > 0",
             urban_virtualselect(
               ns,
               "county_select",
-              label = "Optional - Select Specific County(s)",
+              label = htmltools::tags$b("Optional - Select County(s)"),
               choices = unique(geo_df[["Census.County"]])
             ),
             ns = ns
@@ -110,7 +130,7 @@ dataRequestUI <- function(id, geo_df) {
             urban_virtualselect(
               ns,
               "cbsa_select",
-              label = "Optional - Select Specific Metropolitan (> 50,000 people) and Micropolitan (10,000 – 50,000 people) Areas",
+              label = htmltools::tags$b("Optional - Select Metro Areas(s)"),
               choices = unique(geo_df[["Census.CBSA"]])
             ),
             ns = ns
@@ -120,26 +140,29 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_time", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Option 4: Date Range",
+        title = accordion_title("Option 4: Date Range"),
+        value = "Option 4: Date Range",
         download_date_para,
         htmltools::br(),
         bslib::layout_column_wrap(
           htmltools::div(
-            class = "form-choice-header",
+            class = "picker-urbn",
             shinyWidgets::pickerInput(
               inputId = ns("start_year"),
-              label = "From Tax Year *",
+              label = htmltools::tags$b("From Tax Year *"),
               choices = c(1989:2022),
+              selected = 2012,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
             )
           ),
           htmltools::div(
-            class = "form-choice-header",
+            class = "picker-urbn",
             shinyWidgets::pickerInput(
               inputId = ns("end_year"),
-              label = "Through Tax Year *",
+              label = htmltools::tags$b("Through Tax Year *"),
               choices = c(1989:2022),
+              selected = 2022,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
             )
@@ -149,12 +172,13 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_data", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Option 5: Variables",
+        title = accordion_title("Option 5: Variables"),
+        value = "Option 5: Variables",
         download_fields_para,
         htmltools::br(),
         htmltools::br(),
         htmltools::div(
-          class = "form-header",
+          class = "switch-urbn",
           bslib::input_switch(ns("all_data"), "All Data", TRUE)
         ),
         bslib::layout_column_wrap(
@@ -164,9 +188,9 @@ dataRequestUI <- function(id, geo_df) {
             shiny::checkboxGroupInput(
               inputId = ns("data_select"),
               label = NULL,
-              width = "100%",
               choices = var_choices_990,
-              inline = FALSE
+              inline = FALSE,
+              width = "100%"
             )
           ),
           htmltools::div()
@@ -175,148 +199,119 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_user", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Contact Information",
-        htmltools::div(
-          class = "form-text",
+        title = accordion_title("Contact Information"),
+        value = "Contact Information",
+        htmltools::p(
           "A link to the requested data will be sent to your email address."
         ),
         htmltools::br(),
-        htmltools::div(
-          class = "form-choice-header",
           bslib::layout_column_wrap(
             width = 0.5,
             shiny::textInput(
               inputId = ns("first_name"),
-              label = "First Name",
+              label = htmltools::tags$h5("First Name"),
               placeholder = "First Name",
               value = ""
             ),
             shiny::textInput(
               inputId = ns("last_name"),
-              label = "Last Name",
-              placeholder = "Last Name",
+              label = htmltools::tags$h5("Last Name"),
+              placeholder = "",
               value = ""
             ),
             shiny::textInput(
               inputId = ns("email"),
-              label = "Email *",
+              label = htmltools::tags$h5("Email *"),
               placeholder = "",
               value = ""
             ),
             shiny::textInput(
               inputId = ns("organization"),
-              label = "Organization *",
+              label = htmltools::tags$h5("Organization *"),
               placeholder = "",
               value = ""
             ),
             shiny::textInput(
               inputId = ns("purpose"),
-              label = "Title",
-              placeholder = "Job Title",
+              label = htmltools::tags$h5("Title"),
+              placeholder = "",
               value = ""
             )
-          )
-        ),
+          ),
         htmltools::br(),
         urban_button(ns, "next_review", "NEXT")
       ),
       bslib::accordion_panel(
-        title = "Review Your Request",
-        htmltools::div(
-          class = "form-text",
-          "If you need to make any changes, you can navigate back to the appropriate section using the drop-down menus above."
+        title = accordion_title("Review Your Request"),
+        value = "Review Your Request",
+        htmltools::p(
+          "If you need to make any changes before submitting your request, 
+          navigate back to the appropriate section using the drop-down menus above."
         ),
         htmltools::br(),
         bslib::layout_column_wrap(
           width = 1/3,
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("Form", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "Form"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_form"))
+              shiny::textOutput(ns("selected_form")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("Organization Type", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "Organization Type"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_org"))
+              shiny::textOutput(ns("selected_org")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("Asset Size", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "Asset Size"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_size"))
+              shiny::textOutput(ns("selected_size")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("Subsector(s)", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "Subsector(s)"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_subsector"))
+              shiny::textOutput(ns("selected_subsector")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("State(s)", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "State(s)"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_state"))
+              shiny::textOutput(ns("selected_state")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("County(s)", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "County(s)"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_county"))
+              shiny::textOutput(ns("selected_county")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("Metro Area(s)", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "Metro Area(s)"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_cbsa"))
+              shiny::textOutput(ns("selected_cbsa")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("Timeframe", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "Timeframe"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_timeframe"))
+              shiny::textOutput(ns("selected_timeframe")),
+              class = "center-justify"
             )
           ),
-          htmltools::div(
+          htmltools::tagList(
+            htmltools::h4("Variables", class = "center-justify"),
             htmltools::div(
-              class = "form-header",
-              "Variables"
-            ),
-            htmltools::div(
-              class = "form-header-text",
-              shiny::textOutput(ns("selected_variables"))
+              shiny::textOutput(ns("selected_variables")),
+              class = "center-justify"
             )
           )
         ),
@@ -424,12 +419,36 @@ dataRequestServer <- function(id, geo_df) {
           choices = var_choices_990,
           selected = var_choices_990
         )
+        shinyWidgets::updatePickerInput(
+          session = session,
+          inputId = "start_year",
+          choices = c(1989:2022),
+          selected = 1989
+        )
+        shinyWidgets::updatePickerInput(
+          session = session,
+          inputId = "end_year",
+          choices = c(1989:2022),
+          selected = 2022
+        )
       } else {
         shiny::updateCheckboxGroupInput(
           session = session,
           inputId = "data_select",
           choices = var_choices_990ez,
           selected = var_choices_990ez
+        )
+        shinyWidgets::updatePickerInput(
+          session = session,
+          inputId = "start_year",
+          choices = c(2012:2022),
+          selected = 2012
+        )
+        shinyWidgets::updatePickerInput(
+          session = session,
+          inputId = "end_year",
+          choices = c(2012:2022),
+          selected = 2022
         )
       }
     })
@@ -458,7 +477,16 @@ dataRequestServer <- function(id, geo_df) {
       paste(input$org_select, collapse = ", ")
     })
     output$selected_size <- renderText({
-      paste(input$size_select, collapse = ", ")
+      size_translate_list <- list(
+        "1" = "Under $100,000",
+        "2" = "$100,000 - $499,999",
+        "3" = "$500,000 - $999,999",
+        "4" = "$1,000,000 - $4,999,999",
+        "5" = "$5,000,000 - $9,999,999",
+        "6" = "Above $10,000,000"
+      )
+      size_translate <- size_translate_list[input$size_select]
+      paste(unlist(size_translate), collapse = ", ")
     })
     output$selected_subsector <- renderText({
       paste(input$subsector_select, collapse = ", ")
@@ -487,14 +515,13 @@ dataRequestServer <- function(id, geo_df) {
       if (input$all_data) {
         "All Data"
       } else {
-        paste(input$data_select, collapse = ", ")
+        var_length <- length(input$data_select)
+        paste(var_length, "variables selected")
       }
     })
     
     # Create the query
-    
-    
-    
+
     shinyWidgets::useSweetAlert()
     observeEvent(input$start_data_download, {
       request <- query_builder_download(input)

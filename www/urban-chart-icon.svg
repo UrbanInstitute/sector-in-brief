@@ -1,0 +1,13 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Curved line -->
+  <path d="M20 70 Q 35 30, 50 50 T 80 30" 
+        fill="none" 
+        stroke="#1696d2" 
+        stroke-width="3"
+        stroke-linecap="round"/>
+  
+  <!-- Data points -->
+  <circle cx="20" cy="70" r="3.5" fill="#1696d2"/>
+  <circle cx="50" cy="50" r="3.5" fill="#1696d2"/>
+  <circle cx="80" cy="30" r="3.5" fill="#1696d2"/>
+</svg>

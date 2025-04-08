@@ -1,0 +1,21 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Download arrow -->
+  <path d="M50 20 L50 65" 
+        stroke="#1696d2" 
+        stroke-width="3" 
+        stroke-linecap="round"/>
+  
+  <!-- Arrow head -->
+  <path d="M30 45 L50 65 L70 45" 
+        fill="none" 
+        stroke="#1696d2" 
+        stroke-width="3" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  
+  <!-- Bottom line -->
+  <line x1="25" y1="80" x2="75" y2="80" 
+        stroke="#1696d2" 
+        stroke-width="3" 
+        stroke-linecap="round"/>
+</svg>
