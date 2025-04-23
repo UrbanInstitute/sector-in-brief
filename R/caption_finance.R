@@ -16,7 +16,7 @@ caption_finance <- function(caption, agg_var) {
   } else if (agg_var == "Total Expenses") {
     caption <- paste(
       caption,
-      string::str_wrap(
+      stringr::str_wrap(
       "•	Other expenses include spending on employee services; advertising and promotion; royalties; IT; occupancy; travel, conferences; interest; affiliate payments; depreciation, depletion, and amortization; and insurance.", width = 200),
       "\n"
     )
