@@ -7,7 +7,7 @@ summarise_data <- function(data, groupby_var, sum_var, query) {
                      "by_ctype" = "Organization Type",
                      "by_geo" = geo_level,
                      "by_subsector" = "Subsector",
-                     "by_asset_size" = "Asset Size")
+                     "by_asset_size" = "Size")
   # Create tables
   is_pf <- FALSE
   if (length(org_type) == 1){
