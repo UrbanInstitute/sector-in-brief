@@ -3,7 +3,7 @@ geo_level <- list(
   "Region" = "Census Region",
   "State" = "Census State",
   "County" = "Census County",
-  "Metro/Micro Area" = "Census CBSA"
+  "Metro/Micro Area" = "Metro/Micro Area"
 )
 
 states <- list(
