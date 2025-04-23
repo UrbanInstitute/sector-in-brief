@@ -80,9 +80,9 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("size_select"),
               label = htmltools::tagList(
-                htmltools::tags$b("Asset Size *"),
+                htmltools::tags$b("Size *"),
                 htmltools::p(
-                  "Total assets from the IRS Business Master File grouped in five categories."
+                  "Total expenses from the IRS Business Master File grouped in five categories."
                 )
               ),
               choices = list(
