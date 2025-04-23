@@ -11,7 +11,7 @@ render_outputs <- function(plots, tables, output, query, agg_var, year_var, tabl
   output_plots <- render_plots(plots)
   output_tables <- render_tables(tables,
                                  agg_var = agg_var,
-                                 groupbys = list(NULL, "Organization Type",query$geo_level, "Subsector", "Asset Size"),
+                                 groupbys = list(NULL, "Organization Type",query$geo_level, "Subsector", "Size"),
                                  year_var = year_var)
   output_downloads <- render_download(tables)
   output$plot_overall <- output_plots$default
@@ -30,7 +30,7 @@ render_outputs <- function(plots, tables, output, query, agg_var, year_var, tabl
   output$table_ctype_title <- renderText(paste0(table_title_prefix, ", by Organization Type"))
   output$table_subsector_title <- renderText(paste0(table_title_prefix, ", by Subsector"))
   output$table_geo_title <- renderText(paste0(table_title_prefix, ", by Geography"))
-  output$table_size_title <- renderText(paste0(table_title_prefix, ", by Asset Size"))
+  output$table_size_title <- renderText(paste0(table_title_prefix, ", by Size"))
   
   output$dl_overall <- output_downloads$default
   output$dl_ctype <- output_downloads$by_ctype
