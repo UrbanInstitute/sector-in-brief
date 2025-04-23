@@ -43,8 +43,7 @@ group_line_plot <- function(table,
       subtitle = subtitle,
       caption = caption,
       x = xtitle,
-      y = ytitle,
-      color = ifelse(groupby_var == "Census CBSA", "Metro Area", groupby_var)
+      y = ytitle
     ) +
     plot_theme
   p <- girafe_wrapper(p)
