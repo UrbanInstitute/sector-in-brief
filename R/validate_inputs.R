@@ -18,12 +18,12 @@ validate_inputs <- function(inputs){
       message <- "Please select at least one county."
     }
   }
-  if (inputs$geo_level == "Census CBSA"){
+  if (inputs$geo_level == "Metro/Micro Area"){
     if (length(inputs$geo_state_single) == 0){
       message <- "Please select a state."
     }
     if (length(inputs$geo_cbsa) == 0){
-      message <- "Please select at least one CBSA."
+      message <- "Please select at least one Metro/Micro Area."
     }
   }
   if (length(inputs$subsector) == 0){
