@@ -35,10 +35,10 @@ data_ui <- function(id, choices, start_year, end_year) {
     ),
     size_card = bslib::card(
       bslib::card_header(htmltools::tagList(
-        htmltools::h6("Asset Size"),
+        htmltools::h6("Size"),
         htmltools::tags$p(
           class = "base",
-          "Total assets from the IRS Business Master File grouped in five categories."
+          "Total expenses from the IRS Business Master File grouped in five categories."
         )
       )),
       urbn_checkboxgroup(
