@@ -2,11 +2,11 @@
 default_vars <- c(
   "Organization Type",
   "Subsector",
-  "Asset Size",
+  "Size",
   "Census Region",
   "Census State",
   "Census County",
-  "Census CBSA"
+  "Metro/Micro Area"
 )
 
 data_server_args <- list(
