@@ -131,7 +131,7 @@ dataRequestUI <- function(id, geo_df) {
               ns,
               "cbsa_select",
               label = htmltools::tags$b("Optional - Select Metro Areas(s)"),
-              choices = unique(geo_df[["Census.CBSA"]])
+              choices = unique(geo_df[["Metro.Micro.Area"]])
             ),
             ns = ns
           )
@@ -405,7 +405,7 @@ dataRequestServer <- function(id, geo_df) {
         )
         shinyWidgets::updateVirtualSelect(
           inputId = "cbsa_select",
-          choices = unique(geo_df[["Census.CBSA"]][geo_df[["Census.State"]] %in% input$geo_select])
+          choices = unique(geo_df[["Metro.Micro.Area"]][geo_df[["Census.State"]] %in% input$geo_select])
         )
       }
     })
