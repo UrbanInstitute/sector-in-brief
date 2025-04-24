@@ -4,7 +4,7 @@ query_builder_download <- function(inputs){
     "var" = c(
       "EIN2",
       "ORG_TYPE",
-      "ASSET_SIZE",
+      "Size",
       "SUBSECTOR",
       "CENSUS_STATE_ABBR",
       "CENSUS_COUNTY_NAME",
@@ -19,7 +19,7 @@ query_builder_download <- function(inputs){
     )
   # Option 2
   filters[["ORG_TYPE"]] <- inputs$org_select
-  filters[["ASSET_SIZE"]] <- inputs$asset_select
+  filters[["Size"]] <- inputs$asset_select
   filters[["SUBSECTOR"]] <- inputs$subsector_select
   # Option 3
   filters[["CENSUS_STATE_ABBR"]] <- inputs$geo_select
