@@ -11,7 +11,7 @@
 # - tibble
 # - purrr
 # - bslib
-# - R/visual_text.R
+# - R/text-visuals.R
 # - R/data_ui.R
 # - R/options_nogeo.R
 # - R/page_header_card.R
