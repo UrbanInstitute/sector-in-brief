@@ -1,3 +1,5 @@
+source("R/visual_text.R", local = FALSE)
+
 app <- function(...) {
   # Load elements
   visualpanels <- visualpanel_mapper(visualpanel_args)
@@ -25,14 +27,17 @@ app <- function(...) {
           visualpanels[["Assets"]],
           visualpanels[["Revenues"]],
           visualpanels[["Expenses"]],
-          visualpanels[["Benefits"]]      )
+          visualpanels[["Benefits"]],
+          visualpanels[["Government Grants"]]
+        )
       ),
       bslib::nav_panel(
-        title = "Private Foundation Grantmaking",
+        title = "Private Foundation Giving",
         pf_header,
         bslib::navset_card_pill(
           id = "private_foundation_grants",
-          visualpanels[["Private Foundation Grants"]]
+          visualpanels[["Private Foundation Grants"]],
+          visualpanels[["Program Related Investments"]]
         )
       ),
       bslib::nav_panel(
@@ -69,7 +74,7 @@ app <- function(...) {
         observeEvent(input$daf, {
           data_server_wrapper(input$daf, data_server_args, geo_df)
         })
-      } else if (input$tabs == "Private Foundation Grantmaking") {
+      } else if (input$tabs == "Private Foundation Giving") {
         observeEvent(input$private_foundation_grants, {
           data_server_wrapper(input$private_foundation_grants, data_server_args, geo_df)
         })    
