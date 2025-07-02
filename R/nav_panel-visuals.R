@@ -13,7 +13,7 @@
 # - bslib
 # - R/visual_text.R
 # - R/data_ui.R
-# - R/choice_builder.R
+# - R/options_nogeo.R
 # - R/page_header_card.R
 # - R/plot_ui.R
 # Notes:
