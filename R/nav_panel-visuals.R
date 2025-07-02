@@ -10,6 +10,11 @@
 # Dependencies:
 # - tibble
 # - purrr
+# - bslib
+# - R/data_ui.R
+# - R/choice_builder.R
+# - R/page_header_card.R
+# - R/plot_ui.R
 # Notes:
 # Nav panels require the following: Title, header text for panel, description text
 # for each variable, unique object id, start and end years to filer datasets.
