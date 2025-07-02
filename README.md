@@ -86,3 +86,4 @@ The scripts are described in the order they are called.
 * `nav_panel-visuals.R`: Contains objects and functions used to create the layout for the visualization tabs.
 * `data_ui.R`: Contains the UI elements for the filters in the visuals tab.
 * `options_nogeo.R`: Contains the UI elements for the filter options in the visualization tab.
+* `text-visuals.R`: Contains the text and descriptions for the visualization tabs.
