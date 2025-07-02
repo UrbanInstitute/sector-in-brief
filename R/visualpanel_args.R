@@ -3,12 +3,12 @@
 # Author: Thiyaghessan [tpoongundranar@urban.org]
 # Date created: 2024-06-01
 # Date last edited: 2025-07-02
-# Purpose: Define the arguments for visual panels in the application.
-# Usage: This file is sourced by the main application to create visual panels in
+# Purpose: Define the arguments for bslib cards used for visuals.
+# Usage: This file is sourced by the main application to create visual cards in
 # conjunction with the visualpanel_mapper.R and visualpanel_builder.R scripts.
 # Details:
-# Provides the following arguments: Title, text in panel head, description text
-# for each panel, unique object id, start and end years to filer datasets.
+# Provides the following arguments: Title, header text for pill, description text
+# for each card, unique object id, start and end years to filer datasets.
 ################################################################################
 
 visualpanel_args <- tibble::tribble(
