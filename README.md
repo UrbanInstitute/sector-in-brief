@@ -87,3 +87,21 @@ The scripts are described in the order they are called.
 * `text-visuals.R`: Contains the text and descriptions for the visualization tabs.
 * `data_ui.R`: Contains the UI elements for the filters in the visuals tab.
 * `options_nogeo.R`: Contains the UI elements for the filter options in the visuals tab.
+* `geo_filter_module.R`: Contains the UI and server logic for the geographic filter module used in the visuals tab for geographic filtering.
+
+### Script Headers
+
+Each script comes with a script header structured as follows:
+
+```
+#------------------------------------------------------------------------------
+# File: <filename>
+# Author: <author>
+# Date Created: <date first created>
+# Date Last Modified: <date last modified>
+# Purpose: <brief description of the script's purpose>
+# Usage: <how to use the script>
+# Dependencies: <list of packages or other scripts required>
+# Notes: <any additional notes or comments>
+#------------------------------------------------------------------------------
+```
