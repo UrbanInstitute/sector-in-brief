@@ -1,4 +1,16 @@
-# This script contains the text that goes into the Data Visualizations page
+#-------------------------------------------------------------------------------
+# File: R/text-visuals.R
+# Author: Thiyaghessan Poongundranar [tpoongundranar@urban.org]
+# Date Created: 2024-06-01
+# Date Last Modified: 2025-07-02
+# Purpose: Contains html tags with text describing the visuals in the dashboard.
+#
+# Usage: Loaded at app startup. Text should be reviewed by COMM on Box.
+#
+# Dependencies: 
+#   - htmltools
+#-------------------------------------------------------------------------------
+
 number_of_nonprofits <- htmltools::tagList(
   htmltools::p(
     "Understanding the number of nonprofit organizations registered with the IRS provides a sense of the overall size and growth of the sector. NCCS data encompass all tax-exempt ",
@@ -58,11 +70,15 @@ benefits_desc <- htmltools::p(
   "Total benefits are the sum of salaries, wages, benefits, pension plan accruals and contributions, and the 401(k) and 403(b) contributions nonprofits pay to and on behalf of employees. It provides a measure of overall spending on nonprofit-sector employees."
 )
 
+gov_grants_desc <- htmltools::p(
+  "Total government grants ($) is defined as the aggregate value reported on Form 990, Part VIII, Line 1e in 2021 electronically filed returns, categorized by geographic location, organizational size categories, and nonprofit subsector. Note that this measure understates total government funding, as it excludes other forms of public support such as government contracts, fees, vouchers, reimbursements, and other forms of revenue derived from services that are supported through government programs. Those types of government support, although substantial, are aggregated in other revenue categories and cannot be disaggregated."
+)
+
 pf_header <- htmltools::tagList(
-  htmltools::h2("Private Foundation Grantmaking"),
+  htmltools::h2("Private Foundation Giving"),
   htmltools::tagList(
     htmltools::p(
-      "Grants by private foundations, which are typically funded by an individual donor or family, are one of several sources of private funding available to public charities. Trends in these foundations’ grantmaking reflect their available resources."
+      "Financial support from private foundations, typically funded by an individual donor or family, encompasses both traditional grants and program-related investments (PRIs). Both mechanisms serve as vital sources of private funding for public charities and other mission-driven entities, reflecting the foundations' available resources and their strategic approaches to furthering their charitable purposes."
     ),
     htmltools::p(
       "Other foundations that receive funds from various sources and make grants, such as community foundations, are incorporated as public charities and not counted in private foundation data."
@@ -85,6 +101,11 @@ pf_header <- htmltools::tagList(
 grants_desc <- htmltools::p(
   "Private foundation grants represent the dollar value of the grants these nonprofits allocate, calculated as the sum of gifts, grants, and contributions issued. It captures overall giving trends among private foundations."
 )
+
+pri_desc <- htmltools::p(
+  "Program-related investments (PRIs) are a unique form of funding from private foundations, representing capital deployed for charitable purposes with the expectation of repayment. Unlike traditional grants, PRIs aim to recycle funds for future philanthropic efforts, often providing below-market-rate loans or equity to mission-driven organizations. They capture trends in foundations using financial tools to achieve social impact beyond one-way giving."
+)
+
 
 daf_header <- htmltools::tagList(
   htmltools::h2("Donor-Advised Funds"),
