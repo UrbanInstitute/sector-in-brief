@@ -1,1 +1,83 @@
-Code to run shiny app is present in deploy/
+# Nonprofit Sector In Brief Dashboard
+
+This repository contains the code needed to create the [Nonprofit Sector In Brief Dashboard](https://nccs-urban.shinyapps.io/sector-in-brief/)
+web application with R Shiny. 
+
+# Overview
+
+## Purpose
+
+This dashboard makes data on nonprofits released by the IRS and processed by the
+National Center for Charitable Statistics (NCCS) accessible to a wide audience. 
+It provides visualizations and downloadable datasets that help users understand 
+the nonprofit sector in the United States. The dashboard has 2 components:
+
+1. **Visualizations**: Interactive charts and graphs that summarize key 
+statistics about the nonprofit sector.
+2. **Data Download**: A section where users can download custom curated 
+datasets for further analysis.
+
+## Target Audience
+
+* **Visualizations**: Media, Research Analysts, Policymakers, and the General Public
+* **Data Download**: Researchers, Data Scientists, and Developers
+
+## Features
+
+* Interactive visualizations of nonprofit sector statistics that can be filtered
+and aggregated by organization type, geography, subsector and size.
+  * Geographic units: Region, State, County, and Metro/Micro Area.
+* Downloadable custom datasets of NCCS Core Files in CSV format using a 
+serverless API architecture
+* Responsive design that works on both desktop and mobile devices
+
+## How it Works
+
+The dashboard visualizes data using pre-processed parquet files created using 
+NCCS's CORE, BMF and E-file datasets. The CORE and E-File data contains
+financial metrics from tax years 1989 to 2021, while the BMF data contains
+demographic information on nonprofits and has been geocoded to allow for
+filtering and aggregation by region, state, county and metro/micro areas.
+
+The download tab is a simple UI presenting a data request form that triggers 
+AWS Athena via a serverless API. Once the request is processed, the user
+receives an email containing the data and the associated data dictionary.
+
+# Getting Started
+
+## Prerequisites
+
+* R version 2.10 or higher
+* RStudio (optional, but recommended)
+
+## Installation
+
+1. Clone the repository with `git clone`
+2. Install R packages
+
+```r
+renv::restore()
+```
+3. Run the app from the project root directory
+```r
+shiny::runApp()
+```
+
+# Application Structure
+
+## Directory Layout
+
+```
+.
+├── app.R                # Main Shiny application file
+├── data                 # Directory for parquet files containing data used in visualization tabs
+├── deploy               # Directory for deployment scripts and configuration files created with rsconnect
+├── R                    # Directory for custom R functions and modules
+├── www                  # Directory for static assets (CSS, JavaScript, images)
+├── README.md            # This file
+└── DESCRIPTION          # R package metadata file
+```
+
+## Scripts
+
+* `app.R`: Main Shiny application file that initializes the app and defines the UI and server logic.
