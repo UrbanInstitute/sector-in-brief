@@ -11,6 +11,7 @@
 # - tibble
 # - purrr
 # - bslib
+# - R/visual_text.R
 # - R/data_ui.R
 # - R/choice_builder.R
 # - R/page_header_card.R
