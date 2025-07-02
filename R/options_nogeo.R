@@ -53,6 +53,16 @@ ctype_tree_df <- tibble::tribble(
   "Other Nonprofits", "501(c)(k) - Child Care Organizations"
 )
 
+ctype_pf_tree_df <- tibble::tribble(
+  ~level1, ~level2,
+  "501(c)(3) Organizations", "501(c)(3) - Private Foundations"
+)
+
+ctype_daf_tree_df <- tibble::tribble(
+  ~level1, ~level2,
+  "501(c)(3) Organizations", "501(c)(3) - Public Charities"
+)
+
 # List of options for each 501c type with descriptions
 ctype_id <- list(
   "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)" = "501(c)(1)",
@@ -88,6 +98,10 @@ ctype_id <- list(
   "501(c)(k) - Child Care Organizations" = "501(c)(k)"
 )
 
+# Vector of parent options for primary 501c type groupings
+ctype_root <- c("501(c)(3) Organizations", 
+                "501(c)(4) - Social Welfare Organizations",
+                "Other Nonprofits")
 # Vector of options for the different 501c3 types
 ctype_501c3 <- c("501(c)(3) Public Charities", "501(c)(3) Private Foundations")
 # Vector of options for all non 501c3 organization types
@@ -123,8 +137,32 @@ ctype_other <- c(
   "501(c)(k)"
 )
 
+# List of options for 12 NTEE Major groups
+ntee_maj_12_ls <- list(
+  "Arts, Culture, and Humanities - ART" = "ART", 
+  "Education (minus Universities) - EDU" = "EDU",
+  "Health (minus Hospitals) - HEL" = "HEL",
+  "Human Services - HMS" = "HMS",
+  "International, Foreign Affairs - IFA" = "IFA",
+  "Public, Societal Benefit - PSB" = "PSB",
+  "Religion Related - REL" = "REL",
+  "Mutual/Membership Benefit - MMB" = "MMB",
+  "Universities - UNI" = "UNI",
+  "Hospitals - HOS" = "HOS",
+  "Environment and Animals - ENV" = "ENV",
+  "Other" = "UNU"
+)
+
 # List of options used for expense size filters
-expense_size_ls <- list(
+size_encode_ls <- list(
+  "Under $100,000" = 1,
+  "$100,000 - $499,999" = 2,
+  "$500,000 - $999,999" = 3,
+  "$1 Million - $4.99 Million" = 4,
+  "$5 Million - $9.99 Million" = 5,
+  "Above $10 Million" = 6
+)
+size_decode_ls <- list(
   "1" = "Under $100,000",
   "2" = "$100,000 - $499,999",
   "3" = "$500,000 - $999,999",
@@ -135,10 +173,15 @@ expense_size_ls <- list(
 
 usethis::use_data(
   ctype_tree_df,
+  ctype_pf_tree_df,
+  ctype_daf_tree_df,
   ctype_id,
+  ctype_root,
   ctype_501c3,
   ctype_other,
-  expense_size_ls,
+  ntee_maj_12_ls,
+  size_encode_ls,
+  size_decode_ls,
   overwrite = TRUE,
   internal = TRUE
 )
@@ -158,46 +201,17 @@ choice_builder <- function(panelid){
   choice_ls <- list(
     ctype_tree_df = ctype_tree_df,
     ctype_id = ctype_id,
-    ctype = c(
-      "501(c)(3) Organizations",
-      "501(c)(4) - Social Welfare Organizations",
-      "Other Nonprofits"
-    ),
-    subsector = list(
-      "Arts, Culture, and Humanities - ART" = "ART", 
-      "Education (minus Universities) - EDU" = "EDU",
-      "Health (minus Hospitals) - HEL" = "HEL",
-      "Human Services - HMS" = "HMS",
-      "International, Foreign Affairs - IFA" = "IFA",
-      "Public, Societal Benefit - PSB" = "PSB",
-      "Religion Related - REL" = "REL",
-      "Mutual/Membership Benefit - MMB" = "MMB",
-      "Universities - UNI" = "UNI",
-      "Hospitals - HOS" = "HOS",
-      "Environment and Animals - ENV" = "ENV",
-      "Other" = "UNU"
-    ),
-    size = list(
-      "Under $100,000" = 1,
-      "$100,000 - $499,999" = 2,
-      "$500,000 - $999,999" = 3,
-      "$1 Million - $4.99 Million" = 4,
-      "$5 Million - $9.99 Million" = 5,
-      "Above $10 Million" = 6
-    )
+    ctype = ctype_root,
+    subsector = ntee_maj_12_ls,
+    size = size_encode_ls
   )
+  # Change organization type filter options for PF and DAF tabs
   if (panelid %in% c("pf_amount", "pri")){
-    choice_ls$ctype_tree_df <- tibble::tribble(
-      ~level1, ~level2,
-      "501(c)(3) Organizations", "501(c)(3) - Private Foundations"
-    )
+    choice_ls$ctype_tree_df <- ctype_pf_tree_df
     choice_ls$ctype <- "501(c)(3) Organizations"
   }
-  if (stringr::str_starts(panelid, "daf")){
-    choice_ls$ctype_tree_df <- tibble::tribble(
-      ~level1, ~level2,
-      "501(c)(3) Organizations", "501(c)(3) - Public Charities"
-    )
+  else if (stringr::str_starts(panelid, "daf")){
+    choice_ls$ctype_tree_df <- ctype_daf_tree_df
     choice_ls$ctype <- "501(c)(3) Organizations"
   }
   return(choice_ls)
