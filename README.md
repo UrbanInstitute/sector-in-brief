@@ -88,6 +88,7 @@ The scripts are described in the order they are called.
 * `data_ui.R`: Contains the UI elements for the filters in the visuals tab.
 * `options_nogeo.R`: Contains the UI elements for the filter options in the visuals tab.
 * `geo_filter_module.R`: Contains the UI and server logic for the geographic filter module used in the visuals tab for geographic filtering.
+* `urbn_ui_elements.R`: Contains custom UI elements and functions used throughout the application styled according to urban branding guidelines.
 
 ### Script Headers
 
