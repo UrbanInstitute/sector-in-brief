@@ -1,4 +1,15 @@
-# Module for data processing in Shiny App
+#' @title Shiny module for the data selection UI
+#' 
+#' @description This module creates a UI for selecting data filters such as 
+#' organization type, geographic area, subsector, size, and date range. Each filter
+#' is contained in a bslib card object.
+#' 
+#' @param id The namespace for the module
+#' @param choices A list containing the choices for each filter
+#' @param start_year The starting year for the date range filter
+#' @param end_year The ending year for the date range filter
+#' 
+#' # @return A list of HTML tags containing the UI elements for data selection
 data_ui <- function(id, choices, start_year, end_year) {
   ns <- shiny::NS(id)
   htmltools::tagList(
@@ -53,7 +64,7 @@ data_ui <- function(id, choices, start_year, end_year) {
         htmltools::h6("Date Range"),
         htmltools::tags$p(
           class = "base",
-          "Dates are tax years, which lag calendar years by two years on average (e.g., tax year 2024 is for calendar year 2022)."
+          "Dates are tax years, which lag calendar years by two years on average (e.g., tax year 2022 is for calendar year 2024)."
         )
       )),
       urbn_slider(ns, "date_range", start_year, end_year)
