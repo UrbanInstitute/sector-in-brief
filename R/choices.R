@@ -1,4 +1,23 @@
-# Choices for filters - excludes geo filters
+#-------------------------------------------------------------------------------
+# File: R/options_nogeo.R
+# Author: Thiyaghessan Poongundranar [tpoongundranar@urban.org]
+# Date Created: 2024-06-01
+# Date Modified: 2025-07-02
+# Purpose: Contains the options used in the bslib card filters for the visuals
+# tab for all filters except geography.
+# Usage: Creates internal objects containing disaggregation options for each 
+# filter, triggered using choice_builder()
+# Dependencies:
+#   - tibble
+#   - stringr
+#   - usethis
+# Notes:
+#  - organization type: options for 501c type filters based on tab selected
+#  - subsector: options for 12 NTEE code major groups based on tab selected
+#  - size: options for expense size based on tab selected
+#-------------------------------------------------------------------------------
+
+# Tibble of options used in organization type tree diagram filter
 ctype_tree_df <- tibble::tribble(
   ~level1, ~level2,
   "501(c)(3) Organizations", "501(c)(3) - Public Charities",
@@ -34,6 +53,7 @@ ctype_tree_df <- tibble::tribble(
   "Other Nonprofits", "501(c)(k) - Child Care Organizations"
 )
 
+# List of options for each 501c type with descriptions
 ctype_id <- list(
   "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)" = "501(c)(1)",
   "501(c)(2) - Title Holding Corporations for Exempt Organization" = "501(c)(2)", 
@@ -68,7 +88,9 @@ ctype_id <- list(
   "501(c)(k) - Child Care Organizations" = "501(c)(k)"
 )
 
+# Vector of options for the different 501c3 types
 ctype_501c3 <- c("501(c)(3) Public Charities", "501(c)(3) Private Foundations")
+# Vector of options for all non 501c3 organization types
 ctype_other <- c(
   "501(c)(1)",
   "501(c)(2)",
@@ -101,18 +123,37 @@ ctype_other <- c(
   "501(c)(k)"
 )
 
+# List of options used for expense size filters
+expense_size_ls <- list(
+  "1" = "Under $100,000",
+  "2" = "$100,000 - $499,999",
+  "3" = "$500,000 - $999,999",
+  "4" = "$1 Million - $4.99 Million",
+  "5" = "$5 Million - $9.99 Million",
+  "6" = "Above $10 Million"
+)
+
 usethis::use_data(
   ctype_tree_df,
   ctype_id,
   ctype_501c3,
   ctype_other,
+  expense_size_ls,
   overwrite = TRUE,
   internal = TRUE
 )
 
 
 #' @title Build a list of choices for filters based on panelid
+#' 
+#' @description This function builds a list of choices for filters based on the
+#' panelid provided. It returns a list containing the organization type tree,
+#' organization type id, organization type options, subsector options, and size
+#' options.
+#' 
 #' @param panelid The id of the visual page
+#' 
+#' @return A list containing the choices for filters
 choice_builder <- function(panelid){
   choice_ls <- list(
     ctype_tree_df = ctype_tree_df,
@@ -145,7 +186,7 @@ choice_builder <- function(panelid){
       "Above $10 Million" = 6
     )
   )
-  if (panelid %in% c("pf_amount")){
+  if (panelid %in% c("pf_amount", "pri")){
     choice_ls$ctype_tree_df <- tibble::tribble(
       ~level1, ~level2,
       "501(c)(3) Organizations", "501(c)(3) - Private Foundations"
@@ -161,115 +202,3 @@ choice_builder <- function(panelid){
   }
   return(choice_ls)
 }
-
-ctype_level1 <- list(
-  "501(c)(3) - Public Charities" = "501(c)(3) PUBLIC CHARITIES",
-  "501(c)(3) - Private Foundations" = "501(c)(3) PRIVATE FOUNDATIONS",
-  "501(c)(3) Public Charities and Private Foundations" = "501(c)(3)",
-  "501(c)(4) - Social Welfare Organizations" = "501(c)(4)",
-  "Other Nonprofits" = "Other Nonprofits"
-)
-
-ctype_level2 <- list(
-  "501(c)(1) - Corporations Organized Under Act of Congress (including Federal Credit Unions)" = "501(c)(1)",
-  "501(c)(2) - Title Holding Corporations for Exempt Organization" = "501(c)(2)", 
-  "501(c)(5) - Labor, Agricultural and Horticultural Organizations" = "501(c)(5)",
-  "501(c)(6) - Business Leagues, etc." = "501(c)(6)",
-  "501(c)(7) - Social and Recreation Clubs" = "501(c)(7)",
-  "501(c)(8) - Fraternal Beneficiary Societies" = "501(c)(8)",
-  "501(c)(9) - Voluntary Employees' Beneficiary Associations" = "501(c)(9)",
-  "501(c)(10) - Domestic Fraternal Societies" = "501(c)(10)",
-  "501(c)(11) - Teachers' Retirement Fund Associations" = "501(c)(11)",
-  "501(c)(12) - Benevolent Life Insurance Associations, Mutual Ditch or Irrigation Companies, Mutual or Cooperative Telephone Companies, or Like Organizations (if 85 percent or more of the organization's income consists of amounts collected from members for the sole purpose of meeting losses and expenses)" = "501(c)(12)",
-  "501(c)(13) - Cemetery Companies (owned and operated exclusively for the benefit of their members or which are not operated for profit)" = "501(c)(13)",
-  "501(c)(14) - State Chartered Credit Unions, Mutual Reserve Funds" = "501(c)(14)",
-  "501(c)(15) - Mutual Insurance Companies or Associations" = "501(c)(15)",
-  "501(c)(16) - Cooperative Organizations to Finance Crop Operations" = "501(c)(16)",
-  "501(c)(17) - Supplemental Unemployment Benefit Trusts" = "501(c)(17)",
-  "501(c)(18) - Employee Funded Pension Trusts (created before June 25, 1959)" = "501(c)(18)", 
-  "501(c)(19) - Veterans' Organizations" = "501(c)(19)",
-  "501(c)(21) - Black Lung Benefit Trusts" = "501(c)(21)",
-  "501(c)(22) - Withdrawal Liability Payment Funds" = "501(c)(22)",
-  "501(c)(25) - Title Holding Corporations or Trusts with Multiple Parents" = "501(c)(25)",
-  "501(c)(26) - State-Sponsored High-Risk Health Coverage Organizations" = "501(c)(26)",
-  "501(c)(27) - State-Sponsored Worker's Compensation Reinsurance Organizations" = "501(c)(27)",
-  "501(c)(28) - National Railroad Retirement Investment Trust (45 U.S.C. 231n(j)" = "501(c)(28)",
-  "501(c)(29) - Qualified Nonprofit Health Insurance Issuers" = "501(c)(29)",
-  "501(d) - Religious and Apostolic Associations" = "501(d)",
-  "501(e) - Cooperative Hospital Service Organizations" = "501(e)",
-  "501(f) - Cooperative Service Organizations of Operating Educational Organizations" = "501(f)",
-  "501(k) - Child Care Organizations" = "501(k)",
-  "521(a) - Farmers' Cooperative Associations" = "521(a)"
-)
-
-state_choices <- list(
-  "Alabama" = "AL",
-  "Alaska" = "AK", 
-  "Arizona" = "AZ",
-  "Arkansas" = "AR",
-  "California" = "CA",
-  "Colorado" = "CO",
-  "Connecticut" = "CT",
-  "Delaware" = "DE",
-  "District of Columbia" = "DC",
-  "Florida" = "FL",
-  "Georgia" = "GA",
-  "Hawaii" = "HI",
-  "Idaho" = "ID",
-  "Illinois" = "IL",
-  "Indiana" = "IN",
-  "Iowa" = "IA",
-  "Kansas" = "KS",
-  "Kentucky" = "KY",
-  "Louisiana" = "LA",
-  "Maine" = "ME",
-  "Maryland" = "MD",
-  "Massachusetts" = "MA",
-  "Michigan" = "MI",
-  "Minnesota" = "MN",
-  "Mississippi" = "MS",
-  "Missouri" = "MO",
-  "Montana" = "MT",
-  "Nebraska" = "NE",
-  "Nevada" = "NV",
-  "New Hampshire" = "NH",
-  "New Jersey" = "NJ",
-  "New Mexico" = "NM",
-  "New York" = "NY",
-  "North Carolina" = "NC",
-  "North Dakota" = "ND",
-  "Ohio" = "OH",
-  "Oklahoma" = "OK",
-  "Oregon" = "OR",
-  "Pennsylvania" = "PA",
-  "Rhode Island" = "RI",
-  "South Carolina" = "SC",
-  "South Dakota" = "SD",
-  "Tennessee" = "TN",
-  "Texas" = "TX",
-  "Utah" = "UT",
-  "Vermont" = "VT",
-  "Virginia" = "VA",
-  "Washington" = "WA",
-  "West Virginia" = "WV",
-  "Wisconsin" = "WI",
-  "Wyoming" = "WY"
-)
-
-asset_size_ls <- list(
-  "1" = "Under $100,000",
-  "2" = "$100,000 - $499,999",
-  "3" = "$500,000 - $999,999",
-  "4" = "$1 Million - $4.99 Million",
-  "5" = "$5 Million - $9.99 Million",
-  "6" = "Above $10 Million"
-)
-
-asset_sizes <- list(
-  "Under $100,000",
-  "$100,000 - $499,999",
-  "$500,000 - $999,999",
-  "$1 Million - $4.99 Million",
-  "$5 Million - $9.99 Million",
-  "Above $10 Million"
-)
