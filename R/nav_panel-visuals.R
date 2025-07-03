@@ -14,7 +14,6 @@
 # - R/text-visuals.R
 # - R/data_ui.R
 # - R/options_nogeo.R
-# - R/page_header_card.R
 # - R/plot_ui.R
 # Notes:
 # Nav panels require the following: Title, header text for panel, description text
@@ -75,7 +74,7 @@ visualpanel_builder <- function(title,
   all_cards <- data_ui(panelid, choices, start_year, end_year)
   panel <- bslib::nav_panel(
     title = title,
-    page_header_card(panel_header, panel_desc),
+    card_header_text(panel_header, panel_desc),
     bslib::card(
       class = "card-filter",
       bslib::card_title("Select Your Filters", class = "bg-light-gray"),
@@ -92,4 +91,21 @@ visualpanel_builder <- function(title,
     plot_ui(panelid)
   )
   return(panel)
+}
+
+#' @title Header and subheader text for each plot card
+#' 
+#' @description This function creates a list of html tags containing the 
+#' header and subheader for each card in the visualization panels.
+#' 
+#' @param header The main header text for the card. Character string
+#' @param subheader The subheader text for the card. Character string
+#' 
+#' @return A list of html tags containing the header and subheader
+card_header_text <- function(header, subheader) {
+  headertags <- htmltools::tagList(
+    htmltools::h2(header),
+    subheader
+  )
+  return(headertags)
 }
