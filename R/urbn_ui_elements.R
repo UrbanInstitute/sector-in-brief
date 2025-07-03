@@ -183,3 +183,31 @@ urbn_tree <- function(ns, id, choice_df, selected, ...){
     )
   )
 }
+
+#' @title Wrapper function for Urban themed shiny download button
+#' 
+#' @param id The namespace of the plot panel
+#' @param download_id The id of the download button
+#' @param label The label of the download button
+#' 
+#' @return A shiny download button with Urban styling
+urbn_download_button <- function(id, download_id, label){
+  shiny::downloadButton(
+    # concatenates namespace and download id to creare a unique id
+    outputId = NS(id, download_id),
+    label = label,
+    class = "btn-download",
+    icon = NULL
+  )
+}
+
+#' @title Create a header for the downloadable reactable
+#' 
+#' @param id The namespace of the plot panel
+#' @param table_title_id The id of the table title
+#' 
+#' @return A html div tag containing the header for the reactable table
+urbn_tbl_hdr <- function(id, table_title_id) {
+  header <- htmltools::div(class = "form-header", shiny::textOutput(NS(id, table_title_id)))
+  return(header)
+}
