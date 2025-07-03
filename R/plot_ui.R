@@ -124,8 +124,8 @@ plotpanel_builder <- function(id,
 #' 
 #' @return A list of HTML tags containing the table header, reactable output, 
 #' and download button
-table_contents <- funtion(id, table_id, download_id, table_title_id) {
-  htmltool::tagList(
+table_contents <- function(id, table_id, download_id, table_title_id) {
+  htmltools::tagList(
     urbn_tbl_hdr(id, table_title_id),
     reactable::reactableOutput(NS(id, table_id)),
     htmltools::br(),
