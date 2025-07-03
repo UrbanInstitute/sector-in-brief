@@ -13,6 +13,9 @@
 #
 # Dependencies:
 # - shinycssloaders
+# - arrow
+# - R/geo_filter_server.R
+# - R/data_pipeline.R
 #-------------------------------------------------------------------------------
 
 #' @title Extract data from parquet files
@@ -35,69 +38,32 @@ data_extract <- function(path, cols=NULL) {
 #' 
 #' @description This function processes the data based on user inputs, applying
 #' filters and aggregations as specified. It also handles the display of
-#' visualizations and tables in the Shiny app based on user inputs.
+#' visualizations and tables in the Shiny app based on user inputs. A reactive
+#' trigger is used to reprocess the data whenever the user clicks the
+#' 'update data' button.
 #' 
 #' @param id The ID of the Shiny module.
 #' @param geo_df A data frame containing geographic information for filtering.
 #' @param data The data to be processed, typically an arrow table.
-#' @param year_var The name of the column representing the year in the data.
-#' @param agg_var The name of the column to be aggregated in the data.
-#' @param title_prefix A prefix for the title of the visualizations.
-#' @param ytitle The title for the y-axis of the visualizations.
-#' @param xtitle The title for the x-axis of the visualizations.
-#' @param time_series A boolean indicating whether the data is time series data.
-#' Determines if the plot is a line chart or dumbell plot.
+#' @param output.config A list containing configuration parameters for the output
 #' 
 #' @return A Shiny module server function that processes the data and updates
 #' the UI with the results.
 data_transform <- function(id,
                            geo_df,
                            data,
-                           year_var,
-                           agg_var,
-                           title_prefix,
-                           ytitle,
-                           xtitle,
-                           time_series = TRUE) {
+                           output.config) {
   shiny::moduleServer(id, function(input, output, session) {
     geo_filters <- geo_filter_server("geo_filter", geo_df)
-    shiny::observeEvent(input$org_reset, {
-      shiny::updateSelectizeInput(inputId = "org_level", selected = "501(c)(3) Public Charities")
+    process_trigger <- shiny::reactiveVal(0)
+    shiny::observeEvent(input$process_data, {
+      process_trigger(process_trigger() + 1)
     })
-    shiny::observeEvent(input$subsector_reset, {
-      shiny::updateCheckboxGroupInput(inputId = "subsector_select", selected = "")
-    })
-    shiny::observeEvent(input$size_reset, {
-      shiny::updateCheckboxGroupInput(inputId = "size_filter", selected = "")
-    })
-    shiny::observeEvent(input$date_reset, {
-      shiny::updateSliderInput(inputId = "date_range", value = c(2000, 2020))
-    })
-    data_pipeline(
-      input,
-      geo_filters,
-      time_series,
-      title_prefix,
-      agg_var,
-      year_var,
-      ytitle,
-      xtitle,
-      data,
-      geo_df,
-      output
-    )
-    observeEvent(input$process_data, {
-      # Gather all inputs
-      # Validate inputs
+    observeEvent(process_trigger(), {
       data_pipeline(
         input,
         geo_filters,
-        time_series,
-        title_prefix,
-        agg_var,
-        year_var,
-        ytitle,
-        xtitle,
+        output.config,
         data,
         geo_df,
         output
@@ -117,13 +83,8 @@ data_transform <- function(id,
 #' @param geo_df A data frame containing geographic information for filtering.
 #' 
 #' @return Processed data frames ready for visualization in the Shiny app.
-data_load <- function(page, data_server_args, geo_df){
-  data <- data_extract(path = data_server_args[[page]][["path"]], 
-                     cols = data_server_args[[page]][["vars"]])
-  data_transform(
-    id = data_server_args[[page]][["id"]],
-    data = data,
-    geo_df = geo_df,
+data_load <- function(page, data_server_args, geo_df) {
+  output.config <- list(
     year_var = data_server_args[[page]][["year_var"]],
     agg_var = data_server_args[[page]][["agg_var"]],
     ytitle = data_server_args[[page]][["ytitle"]],
@@ -131,6 +92,8 @@ data_load <- function(page, data_server_args, geo_df){
     title_prefix = data_server_args[[page]][["title_prefix"]],
     time_series = data_server_args[[page]][["time_series"]]
   )
+  data <- data_extract(path = data_server_args[[page]][["path"]], cols = data_server_args[[page]][["vars"]])
+  data_transform(id = data_server_args[[page]][["id"]], geo_df, data, output.config)
 }
 
 # TODO
