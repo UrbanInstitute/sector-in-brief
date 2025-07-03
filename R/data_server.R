@@ -45,14 +45,14 @@ data_extract <- function(path, cols=NULL) {
 #' @param id The ID of the Shiny module.
 #' @param geo_df A data frame containing geographic information for filtering.
 #' @param data The data to be processed, typically an arrow table.
-#' @param output.config A list containing configuration parameters for the output
+#' @param config A list containing configuration parameters for the output
 #' 
 #' @return A Shiny module server function that processes the data and updates
 #' the UI with the results.
 data_transform <- function(id,
                            geo_df,
                            data,
-                           output.config) {
+                           config) {
   shiny::moduleServer(id, function(input, output, session) {
     geo_filters <- geo_filter_server("geo_filter", geo_df)
     process_trigger <- shiny::reactiveVal(0)
@@ -63,7 +63,7 @@ data_transform <- function(id,
       data_pipeline(
         input,
         geo_filters,
-        output.config,
+        config,
         data,
         geo_df,
         output
@@ -84,7 +84,7 @@ data_transform <- function(id,
 #' 
 #' @return Processed data frames ready for visualization in the Shiny app.
 data_load <- function(page, data_server_args, geo_df) {
-  output.config <- list(
+  config <- list(
     year_var = data_server_args[[page]][["year_var"]],
     agg_var = data_server_args[[page]][["agg_var"]],
     ytitle = data_server_args[[page]][["ytitle"]],
@@ -93,7 +93,7 @@ data_load <- function(page, data_server_args, geo_df) {
     time_series = data_server_args[[page]][["time_series"]]
   )
   data <- data_extract(path = data_server_args[[page]][["path"]], cols = data_server_args[[page]][["vars"]])
-  data_transform(id = data_server_args[[page]][["id"]], geo_df, data, output.config)
+  data_transform(id = data_server_args[[page]][["id"]], geo_df, data, config)
 }
 
 # TODO
