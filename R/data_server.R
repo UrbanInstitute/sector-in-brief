@@ -59,7 +59,7 @@ data_transform <- function(id,
     shiny::observeEvent(input$process_data, {
       process_trigger(process_trigger() + 1)
     })
-    observeEvent(process_trigger(), {
+    output_data_reactive <- eventReactive(process_trigger(), {
       data_pipeline(
         input,
         geo_filters,
@@ -69,6 +69,7 @@ data_transform <- function(id,
         output
       )
     })
+    return(output_data_reactive)
   })
 }
 
@@ -92,8 +93,10 @@ data_load <- function(page, data_server_args, geo_df) {
     title_prefix = data_server_args[[page]][["title_prefix"]],
     time_series = data_server_args[[page]][["time_series"]]
   )
-  data <- data_extract(path = data_server_args[[page]][["path"]], cols = data_server_args[[page]][["vars"]])
-  data_transform(id = data_server_args[[page]][["id"]], geo_df, data, config)
+  data_extracted <- data_extract(path = data_server_args[[page]][["path"]], cols = data_server_args[[page]][["vars"]])
+  processed_data_reactive <- data_transform(id = data_server_args[[page]][["id"]], geo_df, data_extracted, config)
+  rs_ls <- list(config = config, data = processed_data_reactive)
+  return(rs_ls)
 }
 
 # TODO
