@@ -71,7 +71,6 @@ render_titles <- function(prefix){
   output_titles <- purrr::map(
     output_titles,
     .f = function(title) {
-      print(paste0(prefix, title))
       renderText(paste0(prefix, title))
     }
   )
