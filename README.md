@@ -92,6 +92,7 @@ The scripts are described in the order they are called.
 * `plot_ui.R`: Contains the UI elements for the plots in the visuals tab.
 * `data_server.R`: Contains server logic for ETL process in visuals tab.
 * `render_outputs.R`: Contains server logic for rendering outputs in the visuals tab.
+* `query_builder.R`: Contains functions for building queries for data processing in the visualizations tab.
 
 ### Script Headers
 
