@@ -49,26 +49,16 @@ data_extract <- function(path, cols=NULL) {
 #' 
 #' @return A Shiny module server function that processes the data and updates
 #' the UI with the results.
-data_transform <- function(id,
-                           geo_df,
-                           data,
-                           config) {
+data_transform <- function(id, geo_df, data, config) {
   shiny::moduleServer(id, function(input, output, session) {
-    geo_filters <- geo_filter_server("geo_filter", geo_df)
+    # This ensures data is processed at the start and when the trigger is activated
     process_trigger <- shiny::reactiveVal(0)
     shiny::observeEvent(input$process_data, {
       process_trigger(process_trigger() + 1)
     })
-    output_data_reactive <- eventReactive(process_trigger(), {
-      data_pipeline(
-        input,
-        geo_filters,
-        config,
-        data,
-        geo_df,
-        output
-      )
-    })
+    geo_filters <- geo_filter_server("geo_filter", geo_df)
+    output_data_reactive <- shiny::reactive({data_pipeline(input, geo_filters, config, data, geo_df, output)}) |>
+      shiny::bindEvent(process_trigger())
     return(output_data_reactive)
   })
 }

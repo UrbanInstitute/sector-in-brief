@@ -1,4 +1,4 @@
-source("R/visual_text.R", local = FALSE)
+source("R/text-visuals.R", local = FALSE)
 
 app <- function(...) {
   # Load elements
@@ -54,7 +54,7 @@ app <- function(...) {
     ),
     bslib::nav_panel(
       title = "Custom Panel Datasets",
-      page_header_card(header = download_title, 
+      card_header_text(header = download_title, 
                        subheader = download_subtitle),
       dataRequestUI("data_download", geo_df)
     ),
@@ -65,22 +65,45 @@ app <- function(...) {
     # Server modules to update county and cbsa options based on State
     # Data Wrangling
     daf_title_prefix <- "Donor Advised Funds For: "
-    data_select <- observeEvent( input$tabs, {
-      if (input$tabs == "Finances"){
+    curr_data <- shiny::reactiveVal(NULL)
+    curr_config <- shiny::reactiveVal(NULL)
+    trigger <- NULL
+    data_select <- observeEvent(input$tabs, {
+      if (input$tabs == "Finances") {
         observeEvent(input$finances, {
-          data_server_wrapper(input$finances, data_server_args, geo_df)
+          results <-  data_load(input$finances, data_server_args, geo_df)
+          curr_data(results$data)
+          curr_config(results$config)
         })
-      } else if (input$tabs == "Donor Advised Funds"){
+      } else if (input$tabs == "Donor Advised Funds") {
         observeEvent(input$daf, {
-          data_server_wrapper(input$daf, data_server_args, geo_df)
+          results <-  data_load(input$daf, data_server_args, geo_df)
+          curr_data(results$data)
+          curr_config(results$config)
         })
       } else if (input$tabs == "Private Foundation Giving") {
         observeEvent(input$private_foundation_grants, {
-          data_server_wrapper(input$private_foundation_grants, data_server_args, geo_df)
-        })    
-      } else if (input$tabs == "Numbers"){
-        data_server_wrapper(input$tabs, data_server_args, geo_df)
+          results <-  data_load(input$private_foundation_grants, data_server_args, geo_df)
+          curr_data(results$data)
+          curr_config(results$config)
+        })
+      } else if (input$tabs == "Numbers") {
+        results <-  data_load(input$tabs, data_server_args, geo_df)
+        curr_data(results$data)
+        curr_config(results$config)
       }
+      shiny::observe({
+        req(curr_data())
+        config <- curr_config()
+        render_data <- curr_data()()
+        render_outputs(
+          plots = render_data$plots,
+          tables = render_data$tables,
+          output = render_data$output,
+          query = render_data$query,
+          config = config
+        )
+      })
     })
     dataRequestServer("data_download", geo_df)
     observeEvent(input$visual_link, {
