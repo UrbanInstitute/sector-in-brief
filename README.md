@@ -47,7 +47,7 @@ receives an email containing the data and the associated data dictionary.
 
 ## Prerequisites
 
-* R version 2.10 or higher
+* R version 4.0 or higher
 * RStudio (optional, but recommended)
 
 ## Installation
@@ -93,6 +93,49 @@ The scripts are described in the order they are called.
 * `data_server.R`: Contains server logic for ETL process in visuals tab.
 * `render_outputs.R`: Contains server logic for rendering outputs in the visuals tab.
 * `query_builder.R`: Contains functions for building queries for data processing in the visualizations tab.
+
+# Data
+
+Visualization data lives in `data/` as parquet files
+(`number_nonprofits.parquet`, `finances.parquet`, `pf_grants.parquet`,
+`daf.parquet`) plus two CSV lookups (`nested_geographies.csv`,
+`panel_dd.csv`). The parquet files are gitignored — they are synced
+manually from `s3://nccsdata/sector-in-brief/`. A future change tracked
+under ADR 0011 will have the app fetch them from S3 on startup so the
+working copy no longer carries ~125 MB of stale data.
+
+# Tests
+
+A small `shinytest2` suite lives in `tests/`. Run with:
+
+```r
+shinytest2::test_app()
+```
+
+Or from the shell:
+
+```sh
+Rscript tests/testthat.R
+```
+
+Snapshots are OS-keyed under `tests/testthat/_snaps/<platform>/`.
+
+# Deployment
+
+Deployed to `https://nccs-urban.shinyapps.io/sector-in-brief/` via
+`rsconnect`. After authenticating the target shinyapps.io account locally:
+
+```r
+rsconnect::deployApp()
+```
+
+Deploy metadata is committed under
+`deploy/rsconnect/shinyapps.io/<account>/`. The runtime `rsconnect/`
+directory at the repo root is auto-generated and gitignored.
+
+# License
+
+MIT. See [LICENSE.md](LICENSE.md). Copyright Urban Institute, 2024-2026.
 
 ### Script Headers
 
