@@ -1,0 +1,33 @@
+# R session state
+.Rproj.user/
+.Rhistory
+.RData
+.RDataTmp
+.Ruserdata
+
+# renv library (lock is tracked; library is not)
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
+
+# Build / deploy caches
+.Rcheck/
+rsconnect/
+
+# Load testing artefacts
+shinycannon-*.jar
+run*/
+run*.html
+recording.log
+*.log
+bench/
+
+# Local-only data (per ADR 0011 the dashboard will read these from S3)
+data/*.parquet
+
+# OS junk
+.DS_Store
+Thumbs.db
