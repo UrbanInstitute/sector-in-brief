@@ -1,6 +1,7 @@
 app <- function(...) {
   # Load elements
   ensure_data_local()
+  publish_data_dictionary()
   visualpanels <- visualpanel_mapper(visualpanel_args)
   geo_df <- read.csv("data/nested_geographies.csv")
   ui <- bslib::page_navbar(

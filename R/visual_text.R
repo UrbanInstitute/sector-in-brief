@@ -16,7 +16,7 @@ number_of_nonprofits <- htmltools::tagList(
     "NCCS's ",
     htmltools::a(href = "https://urbaninstitute.github.io/nccs/datasets/bmf/", "Unified Business Master File,"),
     "which contains data processed from IRS Business Master Files for calendar years 1989 through 2024. This includes all nonprofits, even those with gross receipts less than or equal to $50,000.",
-    htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 
@@ -38,7 +38,7 @@ finance_header <-
       "which contains data processed from the IRS's ",
       htmltools::a(href = "https://www.irs.gov/statistics/soi-tax-stats-annual-extract-of-tax-exempt-organization-financial-data", "Statistics of Income (SOI) extracts"),
       "for Forms 990, 990-EZ and 990-PF for tax years 1989 through 2021. This panel does not include 990-N data and thus excludes small nonprofits with gross receipts less than or equal to $50,000. More information can be found in the About page.",
-      htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+      htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
     )
   )
 
@@ -78,7 +78,7 @@ pf_header <- htmltools::tagList(
     class = "base",
     htmltools::tags$b("Data Source:"),
     "NCCS's Core Series, which contains data processed from the IRS's Statistics of Income Extracts for Form 990-PF for tax years 1989 through 2021.",
-    htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 
@@ -104,7 +104,7 @@ daf_header <- htmltools::tagList(
     htmltools::tags$b("Data Source:"),
     htmltools::a(href = "https://lecy.github.io/nccs/datasets/efile/", "NCCS' E-Filer Catalog,"),
     "which contains data processed from Schedule D for e-filed IRS Form 990 in tax year 2021. This panel does not include 990-N data and thus excludes small nonprofits with gross receipts less than or equal to $50,000. ",
-    htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 

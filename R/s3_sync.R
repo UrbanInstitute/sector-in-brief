@@ -31,3 +31,17 @@ ensure_data_local <- function(data_dir = "data") {
   }
   invisible()
 }
+
+# Export the parquet data dictionary as a CSV under www/ so the static
+# "Download data dictionary" links in visual_text.R can resolve to it.
+publish_data_dictionary <- function(parquet_path = "data/data_dictionary.parquet",
+                                    csv_path = "www/data_dictionary.csv") {
+  if (!file.exists(parquet_path)) return(invisible())
+  dir.create(dirname(csv_path), showWarnings = FALSE, recursive = TRUE)
+  utils::write.csv(
+    arrow::read_parquet(parquet_path),
+    file = csv_path,
+    row.names = FALSE
+  )
+  invisible()
+}

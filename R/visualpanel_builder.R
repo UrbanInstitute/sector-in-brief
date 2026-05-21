@@ -10,21 +10,23 @@ visualpanel_builder <- function(title,
                                 panel_desc,
                                 panelid,
                                 start_year,
-                                end_year) {
+                                end_year,
+                                parquet_file) {
   choices <- choice_builder(panelid)
   all_cards <- data_ui(panelid, choices, start_year, end_year)
   panel <- bslib::nav_panel(
     title = title,
     page_header_card(panel_header, panel_desc),
+    coverage_notes_card(parquet_file),
     bslib::card(
       class = "card-filter",
       bslib::card_title("Select Your Filters", class = "bg-light-gray"),
       title = "",
       bslib::layout_column_wrap(
-        all_cards[["org_card"]], 
-        all_cards[["subsector_card"]], 
-        all_cards[["size_card"]], 
-        all_cards[["geo_card"]], 
+        all_cards[["org_card"]],
+        all_cards[["subsector_card"]],
+        all_cards[["size_card"]],
+        all_cards[["geo_card"]],
         all_cards[["date_card"]]
       ),
       all_cards[["process_button"]]
