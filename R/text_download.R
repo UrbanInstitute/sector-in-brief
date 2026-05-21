@@ -54,13 +54,3 @@ var_choices_990ez <- list(
   "Public Charity Status: Information on the organization's public charity status" = "00"
 )
 
-usethis::use_data(
-  download_title,
-  download_subtitle,
-  download_geo_para,
-  download_date_para,
-  var_choices_990,
-  var_choices_990ez,
-  internal = TRUE,
-  overwrite = TRUE
-)

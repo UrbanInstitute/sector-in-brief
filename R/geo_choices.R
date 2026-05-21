@@ -67,9 +67,3 @@ states <- list(
 )
 
 
-usethis::use_data(
-  geo_level,
-  states,
-  overwrite = TRUE,
-  internal = TRUE
-)

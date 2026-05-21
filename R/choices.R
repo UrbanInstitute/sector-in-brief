@@ -101,15 +101,6 @@ ctype_other <- c(
   "501(c)(k)"
 )
 
-usethis::use_data(
-  ctype_tree_df,
-  ctype_id,
-  ctype_501c3,
-  ctype_other,
-  overwrite = TRUE,
-  internal = TRUE
-)
-
 
 #' @title Build a list of choices for filters based on panelid
 #' @param panelid The id of the visual page

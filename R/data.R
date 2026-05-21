@@ -1,6 +1,5 @@
 # Internal data for dashboard
 library(reactable)
-library(usethis)
 
 visual_link_page <- "Finances"
 download_link_page <- "Custom Panel Datasets"
@@ -155,13 +154,5 @@ data_source_table <- reactable::reactable(
   bordered = TRUE,
   resizable = TRUE,
   defaultPageSize = 10
-)
-
-usethis::use_data(
-  navbar_title,
-  download_table,
-  data_source_table,
-  internal = TRUE,
-  overwrite = TRUE
 )
 

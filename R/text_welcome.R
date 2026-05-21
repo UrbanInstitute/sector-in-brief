@@ -1,5 +1,4 @@
 # Text on welcome page
-library(usethis)
 
 welcome_title <- htmltools::h2(
   "Nonprofit Sector In Brief Dashboard"
@@ -101,20 +100,3 @@ about <- htmltools::div(
   )
 )
 
-usethis::use_data(
-  welcome_title,
-  welcome_subtitle,
-  welcome_para_1,
-  welcome_para_2,
-  welcome_para_3,
-  welcome_para_4,
-  welcome_para_5,
-  welcome_visual_header,
-  welcome_visual_para,
-  welcome_download_header,
-  welcome_download_para,
-  credits,
-  about,
-  overwrite = TRUE,
-  internal = TRUE
-)
