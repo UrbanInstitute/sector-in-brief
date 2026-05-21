@@ -39,13 +39,12 @@ data_pipeline <- function(input,
     shiny::withProgress(min = 1, max = 5, {
       setProgress(1, message = "Filtering Data...")
       query <- query_builder(inputs, geo_df)
-      filtered_data <- filter_data(data = data, filter_ls = query$filters)
       setProgress(2, message = "Creating Tables...")
-      tables <- summarise_data(
-        data = filtered_data,
-        groupby_var = year_var,
-        sum_var = agg_var,
-        query = query
+      tables <- cached_filter_and_summarise(
+        data = data,
+        query = query,
+        year_var = year_var,
+        agg_var = agg_var
       )
       setProgress(3, message = "Creating Graphs...")
       plots <- plots_build_all(
