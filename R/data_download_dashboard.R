@@ -1,5 +1,5 @@
 dataRequestUI <- function(id, geo_df) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   choices <- choice_builder("download")
   size <- names(choices$size)
   subsector <- choices$subsector

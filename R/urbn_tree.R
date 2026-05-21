@@ -10,7 +10,7 @@ urbn_tree <- function(ns, id, choice_df, selected, ...){
     shinyWidgets::treeInput(
       inputId = ns(id),
       label = NULL,
-      choices = create_tree(choice_df),
+      choices = shinyWidgets::create_tree(choice_df),
       selected = selected,
       returnValue = "text",
       closeDepth = 0,
