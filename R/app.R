@@ -2,6 +2,9 @@ app <- function(...) {
   # Load elements
   sync_result <- ensure_data_local()
   publish_data_dictionary()
+  # Resolve year ranges from the freshly-synced manifest (NA cells in
+  # visualpanel_args get manifest-derived bounds; integer cells stay).
+  visualpanel_args <- resolve_visualpanel_year_ranges(visualpanel_args)
   visualpanels <- visualpanel_mapper(visualpanel_args)
   geo_df <- read.csv("data/nested_geographies.csv")
 
