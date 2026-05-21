@@ -1,6 +1,8 @@
-# Function to load data based on input tab
+# Function to load data based on input tab.
+# Spinner calls are guarded so dataloader is testable outside a Shiny session.
 dataloader <- function(path, cols=NULL) {
-  shinycssloaders::showPageSpinner()
+  in_shiny <- !is.null(shiny::getDefaultReactiveDomain())
+  if (in_shiny) shinycssloaders::showPageSpinner()
   data_select <- arrow::read_parquet(path, as_data_frame = FALSE, col_select = cols)
   if ("Number of DAFs" %in% cols){
     data_select <- data_select |>
@@ -26,6 +28,6 @@ dataloader <- function(path, cols=NULL) {
         dplyr::compute()
     }
   }
-  shinycssloaders::hidePageSpinner()
+  if (in_shiny) shinycssloaders::hidePageSpinner()
   return(data_select)
 }
