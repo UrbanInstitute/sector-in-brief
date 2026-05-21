@@ -21,19 +21,27 @@ data_server <- function(id,
     shiny::observeEvent(input$date_reset, {
       shiny::updateSliderInput(inputId = "date_range", value = c(2000, 2020))
     })
-    data_pipeline(
-      input,
-      geo_filters,
-      time_series,
-      title_prefix,
-      agg_var,
-      year_var,
-      ytitle,
-      xtitle,
-      data,
-      geo_df,
-      output
-    )
+    # Auto-render the default view ONCE after the lazy UI mounts and
+    # filter inputs exist. observeEvent(once = TRUE, ignoreNULL = TRUE)
+    # waits for input$ctype to become available, runs the pipeline, then
+    # destroys itself. Pre-lazy-UI this was an unconditional call here,
+    # which broke under lazy UI because inputs hadn't been rendered yet
+    # when data_server initialized.
+    shiny::observeEvent(input$ctype, once = TRUE, ignoreNULL = TRUE, {
+      data_pipeline(
+        input,
+        geo_filters,
+        time_series,
+        title_prefix,
+        agg_var,
+        year_var,
+        ytitle,
+        xtitle,
+        data,
+        geo_df,
+        output
+      )
+    })
     observeEvent(input$process_data, {
       # Gather all inputs
       # Validate inputs

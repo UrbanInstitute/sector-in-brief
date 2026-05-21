@@ -73,6 +73,26 @@ app <- function(...) {
   )
   
   server <- function(input, output, session) {
+    # Lazy panel UIs: bind a renderUI for each panel's placeholder. Shiny's
+    # default suspendWhenHidden = TRUE means each one only fires when its
+    # tab becomes visible, so app cold-start no longer pays the cost of
+    # building 11 panels up front (~1.8s).
+    for (i in seq_len(nrow(visualpanel_args))) {
+      local({
+        row <- visualpanel_args[i, ]
+        output[[paste0("panel_ui_", row$panelid)]] <- shiny::renderUI({
+          visualpanel_content(
+            panel_header = row$panel_header[[1]],
+            panel_desc   = row$panel_desc[[1]],
+            panelid      = row$panelid,
+            start_year   = row$start_year,
+            end_year     = row$end_year,
+            parquet_file = row$parquet_file
+          )
+        })
+      })
+    }
+
     # Server modules to update county and cbsa options based on State
     # Data Wrangling
     daf_title_prefix <- "Donor Advised Funds For: "
