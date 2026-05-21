@@ -20,8 +20,7 @@ Run from the repo root (an R session with `renv` activated by `.Rprofile`):
 
 - Local dev with AWS SSO: set `SIB_AWS_PROFILE` in `.Renviron` (e.g. `SIB_AWS_PROFILE=thiya`)
 - shinyapps.io / EC2: leave `SIB_AWS_PROFILE` unset; the default IAM credential chain is used
-- Currently pointed at the sandbox prefix (`sector-in-brief-sandbox`). Flip `S3_PREFIX` to `sector-in-brief` once the producer publishes prod
-- Bump `VINTAGE` when the producer publishes a new build
+- Reads from the prod prefix (`s3://nccsdata/sector-in-brief/v{VINTAGE}/`). The producer also publishes a `latest/` mirror, but the dashboard pins a specific `v*` tag so a new producer publish can't silently change shape — bump `VINTAGE` in a follow-up PR after testing the new build
 
 `R/s3_sync.R` also exports `publish_data_dictionary()` which writes `data/data_dictionary.parquet` to `www/data_dictionary.csv` (with a UTF-8 BOM for Excel) so the "Download data dictionary" links resolve.
 
