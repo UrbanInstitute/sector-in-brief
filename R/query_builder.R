@@ -38,11 +38,11 @@ query_builder <- function(inputs, geo_df) {
   if (length(size) < 6) {
     filter_ls[["Size"]] <- size
   }
-  # Date Range
-  if (time_series == TRUE) {
-    years <- seq(year_range[1], year_range[2])
-    filter_ls[[year_var]] <- years
-  }
+  # Date Range — applied unconditionally so the slider works on
+  # single-year panels (DAFs) too. time_series only controls chart
+  # type downstream (line vs bar).
+  years <- seq(year_range[1], year_range[2])
+  filter_ls[[year_var]] <- years
   query_ls <- list(filters = filter_ls, geo_level = geo_level)
   return(query_ls)
 }

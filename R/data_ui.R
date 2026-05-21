@@ -38,7 +38,7 @@ data_ui <- function(id, choices, start_year, end_year) {
     size_card = bslib::card(
       filter_card_header(
         "Organization Size",
-        "Total expenses from the IRS Business Master File grouped in six categories."
+        "Total expenses from NCCS's Core Series (Forms 990 and 990-PF), grouped in six categories. Size=0 indicates an organization with BMF metadata but no CORE filing on record."
       ),
       urbn_checkboxgroup(
         ns = ns,

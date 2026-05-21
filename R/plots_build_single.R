@@ -7,6 +7,9 @@ plots_build_single <- function(table,
                                ytitle,
                                xtitle,
                                year_var) {
+  if (is.null(table) || nrow(table) == 0 || !(year_var %in% names(table))) {
+    return(blank_plot())
+  }
   if (length(unique(table[[year_var]])) > 1) {
     if (is.null(groupby_var)) {
       single_line_plot(table = table, 
