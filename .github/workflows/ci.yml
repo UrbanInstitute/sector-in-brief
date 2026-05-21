@@ -20,18 +20,16 @@ jobs:
           r-version: '4.4'
           use-public-rspm: true
 
-      - name: Cache renv library
-        uses: actions/cache@v4
-        with:
-          path: renv/library
-          key: renv-${{ runner.os }}-r4.4-${{ hashFiles('renv.lock') }}
-          restore-keys: |
-            renv-${{ runner.os }}-r4.4-
-
-      - name: Install renv + restore lockfile
-        run: |
-          Rscript -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
-          Rscript -e 'renv::restore(prompt = FALSE)'
+      # setup-renv handles:
+      #   - installing renv itself
+      #   - caching renv/library across runs (keyed on renv.lock)
+      #   - calling renv::restore()
+      #   - installing system libraries (libcurl-dev, libssl-dev,
+      #     libxml2-dev, etc.) via r-lib/actions/setup-r-dependencies
+      #     under the hood — this is what fixed the source-build failures
+      #     when CI was wired manually.
+      - name: Set up renv
+        uses: r-lib/actions/setup-renv@v2
 
       - name: Run testthat suite
         run: |
