@@ -1,0 +1,17 @@
+# Hand-written: dependencies imported wholesale so bare calls
+# (shiny::reactive, htmltools::div, etc.) resolve under pkgload::load_all().
+# Mirrors the library() calls in app.R.
+
+import(bslib)
+import(bsicons)
+import(dplyr)
+import(ggiraph)
+import(ggplot2)
+import(htmltools)
+import(reactable)
+import(rlang)
+import(shiny)
+import(shinycssloaders)
+import(shinyWidgets)
+
+export(app)

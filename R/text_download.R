@@ -1,16 +1,16 @@
 # Text for data download page
 download_title <- "Create Custom 990 Panel Data Sets "
-download_subtitle <- div(
-    tagList(
-    p(
+download_subtitle <- htmltools::div(
+    htmltools::tagList(
+    htmltools::p(
       "This feature allows you to easily assemble panel datasets as .csv files from the National Center for Charitable Statistics (NCCS) Core Data Series, which contains selected variables from the IRS's ",
-      a(href = soi_link, "Statistics of Income extracts"),
+      htmltools::a(href = soi_link, "Statistics of Income extracts"),
       " for Forms 990 and 990-EZ. The Core Series includes nonprofits with over $50,000 in annual gross receipts in the United States since 1989."
     ),
-    p(
+    htmltools::p(
       "NCCS is the only nonprofit data repository that has cleaned, processed, and published nonprofit tax returns going back to 1989. Using IRS data files, NCCS standardizes names, data types, and definitions for all variables across the various iterations of IRS Form 990. NCCS data link available tax records from every nonprofit filed since 1989 in a single time-series panel, complete with geocoding (mapping each tax record to a latitude and longitude) to the census tract and block levels for easy filtering. These features allow for accurate mapping of NCCS data to all levels of geography."
     ),
-    p(
+    htmltools::p(
       "Request your customized panel dataset and receive it by email. Required sections are denoted with an asterisk (*)."
     )
   )
