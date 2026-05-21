@@ -60,10 +60,10 @@ renv::restore()
 ```
 
 3. Configure AWS credentials so the app can sync the parquet data from
-   `s3://nccsdata/sector-in-brief-sandbox/` on startup (per ADR 0011 —
-   the data is no longer committed). Locally with AWS SSO, set
-   `SIB_AWS_PROFILE` in `.Renviron`; on shinyapps.io / EC2 the default
-   IAM credential chain is used.
+   `s3://nccsdata/sector-in-brief/` on startup (per ADR 0011 — the data
+   is no longer committed). Locally with AWS SSO, set `SIB_AWS_PROFILE`
+   in `.Renviron`; on shinyapps.io / EC2 the default IAM credential
+   chain is used.
 
 4. Run the app from the project root directory
 
@@ -111,7 +111,7 @@ Visualization data lives in `data/` as parquet files
 a manifest (`_manifest.json`), and a geography lookup
 (`nested_geographies.csv`). The parquet files and manifest are
 gitignored — the app pulls them from
-`s3://nccsdata/sector-in-brief-sandbox/v{VINTAGE}/` on startup via
+`s3://nccsdata/sector-in-brief/v{VINTAGE}/` on startup via
 `R/s3_sync.R` (see ADR 0011). Bump `VINTAGE` in `R/s3_sync.R` when the
 producer (`sector-in-brief-data`) publishes a new build.
 

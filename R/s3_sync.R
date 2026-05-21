@@ -1,14 +1,17 @@
 # Pull the sector-in-brief data vintage from S3 at app startup.
 # Per ADR 0011 the dashboard reads from S3, not a committed data/ directory.
-# Bump VINTAGE here when the producer publishes a new build; flip S3_PREFIX
-# to "sector-in-brief" once the producer cuts over from sandbox to prod.
+# Bump VINTAGE here when the producer publishes a new build that has been
+# tested against this dashboard. The prod prefix also mirrors the most
+# recent vintage to s3://nccsdata/sector-in-brief/latest/ — we pin a
+# specific v* tag instead of reading latest/ so the dashboard locks to a
+# tested-good shape and a new producer publish can't silently change it.
 #
 # Shell-out to `aws s3 sync` rather than arrow::s3_bucket so SSO profiles
 # work locally and IAM roles work on the hosting tier without any
 # credential plumbing in this code.
 
 S3_BUCKET <- "nccsdata"
-S3_PREFIX <- "sector-in-brief-sandbox"
+S3_PREFIX <- "sector-in-brief"
 VINTAGE   <- "v2026.05"
 
 ensure_data_local <- function(data_dir = "data") {
