@@ -34,7 +34,22 @@ test_that("size filter is omitted when all 6 sizes selected", {
 
 test_that("size filter is applied when fewer than 6 sizes selected", {
   q <- query_builder(base_inputs(size = c(1, 3, 5)), geo_df = NULL)
-  expect_equal(q$filters$Size, c(1, 3, 5))
+  expect_equal(q$filters$Size, c(1L, 3L, 5L))
+  expect_type(q$filters$Size, "integer")
+})
+
+test_that("size from checkboxGroupInput (character) is coerced to integer", {
+  # Shiny's checkboxGroupInput returns the selected values as character
+  # strings. The Size column in parquet is int32 — arrow's lazy planner
+  # rejects string-vs-int32 comparisons with "no kernel matching".
+  q <- query_builder(base_inputs(size = c("1", "3", "5")), geo_df = NULL)
+  expect_equal(q$filters$Size, c(1L, 3L, 5L))
+  expect_type(q$filters$Size, "integer")
+})
+
+test_that("year_range is coerced to integer even when slider returns doubles", {
+  q <- query_builder(base_inputs(year_range = c(2020, 2022)), geo_df = NULL)
+  expect_type(q$filters$Year, "integer")
 })
 
 test_that("subsector filter is omitted when all 12 selected", {
