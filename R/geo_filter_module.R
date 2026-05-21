@@ -12,14 +12,9 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
 geo_filter_ui <- function(id, state_choices) {
   ns <- shiny::NS(id)
   bslib::card(
-    bslib::card_header(
-      htmltools::tagList(
-        htmltools::h6("Geographic Filters"),
-        htmltools::p(
-          class = "base",
-          "Information about census-defined geographic level is available on the About page."
-        )
-      )
+    filter_card_header(
+      "Geographic Filters",
+      "Information about census-defined geographic level is available on the About page."
     ),
     urbn_radiobuttons(
       ns,

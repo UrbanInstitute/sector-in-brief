@@ -12,3 +12,19 @@ urbn_accordion_panel <- function(title, ...) {
     ...
   )
 }
+
+#' Card header for a filter card: title with a hover-info tooltip,
+#' so verbose descriptions don't stretch the header.
+filter_card_header <- function(title, tooltip_content) {
+  bslib::card_header(
+    htmltools::div(
+      class = "filter-header",
+      htmltools::h6(title, style = "display:inline; margin-right:6px;"),
+      bslib::tooltip(
+        bsicons::bs_icon("info-circle"),
+        tooltip_content,
+        placement = "right"
+      )
+    )
+  )
+}

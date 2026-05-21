@@ -34,14 +34,23 @@ ensure_data_local <- function(data_dir = "data") {
 
 # Export the parquet data dictionary as a CSV under www/ so the static
 # "Download data dictionary" links in visual_text.R can resolve to it.
+# Prepends a UTF-8 BOM so Excel-on-Windows renders en-dashes / em-dashes /
+# inequality signs in coverage_notes correctly.
 publish_data_dictionary <- function(parquet_path = "data/data_dictionary.parquet",
                                     csv_path = "www/data_dictionary.csv") {
   if (!file.exists(parquet_path)) return(invisible())
   dir.create(dirname(csv_path), showWarnings = FALSE, recursive = TRUE)
+  tmp <- tempfile(fileext = ".csv")
   utils::write.csv(
     arrow::read_parquet(parquet_path),
-    file = csv_path,
-    row.names = FALSE
+    file = tmp,
+    row.names = FALSE,
+    fileEncoding = "UTF-8"
   )
+  body <- readBin(tmp, "raw", file.info(tmp)$size)
+  con <- file(csv_path, "wb")
+  on.exit(close(con))
+  writeBin(as.raw(c(0xEF, 0xBB, 0xBF)), con)
+  writeBin(body, con)
   invisible()
 }
