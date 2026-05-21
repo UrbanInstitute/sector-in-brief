@@ -12,14 +12,9 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
 geo_filter_ui <- function(id, state_choices) {
   ns <- shiny::NS(id)
   bslib::card(
-    bslib::card_header(
-      htmltools::tagList(
-        htmltools::h6("Geographic Filters"),
-        htmltools::p(
-          class = "base",
-          "Information about census-defined geographic level is available on the About page."
-        )
-      )
+    filter_card_header(
+      "Geographic Filters",
+      "Information about census-defined geographic level is available on the About page."
     ),
     urbn_radiobuttons(
       ns,
@@ -59,7 +54,7 @@ geo_filter_ui <- function(id, state_choices) {
         choices = states,
         multiple = FALSE
       ),
-      condition = "input.geo_level == 'Census County' | input.geo_level == 'Census CBSA'",
+      condition = "input.geo_level == 'Census County' | input.geo_level == 'Metro/Micro Area'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
@@ -83,7 +78,7 @@ geo_filter_ui <- function(id, state_choices) {
         multiple = TRUE,
         options = list(maxItems = 5)
       ),
-      condition = "input.geo_level == 'Census CBSA'",
+      condition = "input.geo_level == 'Metro/Micro Area'",
       ns = shiny::NS(id)
     )
   )
@@ -103,7 +98,7 @@ geo_filter_server <- function(id, geo_df) {
                       "cbsa",
                       input$state_single,
                       geo_df,
-                      "Census.CBSA")
+                      "Metro.Micro.Area")
     })
     shiny::observeEvent(input$geo_reset, {
       shiny::updateSelectizeInput(inputId = "geo_level", selected = "National")

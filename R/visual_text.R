@@ -7,7 +7,7 @@ number_of_nonprofits <- htmltools::tagList(
   ),
   
   htmltools::p(
-    "The chart below shows the number of organizations for the nonprofit sector overall. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by organization type, subsector, geography, or asset size."
+    "The chart below shows the number of organizations for the nonprofit sector overall. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by organization type, subsector, geography, or size."
   ),
   
   htmltools::p(
@@ -16,7 +16,7 @@ number_of_nonprofits <- htmltools::tagList(
     "NCCS's ",
     htmltools::a(href = "https://urbaninstitute.github.io/nccs/datasets/bmf/", "Unified Business Master File,"),
     "which contains data processed from IRS Business Master Files for calendar years 1989 through 2024. This includes all nonprofits, even those with gross receipts less than or equal to $50,000.",
-    htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 
@@ -29,7 +29,7 @@ finance_header <-
       "including 501(c)3 public charities and private foundations and 501(c)4 organizations."
     ),
     htmltools::p(
-      "Select a financial metric to view, and then use filters to customize the graph by organization type, subsector, asset size, geography, or data range. Use the tabs to change the view from overall data to view by subsector, geography, or asset size."
+      "Select a financial metric to view, and then use filters to customize the graph by organization type, subsector, size, geography, or data range. Use the tabs to change the view from overall data to view by subsector, geography, or size."
     ),
     htmltools::p(
       class = "base",
@@ -38,7 +38,7 @@ finance_header <-
       "which contains data processed from the IRS's ",
       htmltools::a(href = "https://www.irs.gov/statistics/soi-tax-stats-annual-extract-of-tax-exempt-organization-financial-data", "Statistics of Income (SOI) extracts"),
       "for Forms 990, 990-EZ and 990-PF for tax years 1989 through 2021. This panel does not include 990-N data and thus excludes small nonprofits with gross receipts less than or equal to $50,000. More information can be found in the About page.",
-      htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+      htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
     )
   )
 
@@ -71,14 +71,14 @@ pf_header <- htmltools::tagList(
       "The IRS has not released tax records for tax years 2016 through 2018. Missing data points from these years are represented with a dotted line."
     ),
     htmltools::p(
-      "The chart below shows grantmaking data for all private foundations. Select the nonprofit sizes, geographies, and date range you’re interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or asset size."
+      "The chart below shows grantmaking data for all private foundations. Select the nonprofit sizes, geographies, and date range you’re interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or size."
     )
   ),
   htmltools::p(
     class = "base",
     htmltools::tags$b("Data Source:"),
     "NCCS's Core Series, which contains data processed from the IRS's Statistics of Income Extracts for Form 990-PF for tax years 1989 through 2021.",
-    htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 
@@ -97,14 +97,14 @@ daf_header <- htmltools::tagList(
     "Data begin in tax year 2021 because this is the first year that full nonprofit 990 e-file records are available from the IRS."
   ),
   htmltools::p(
-    "The chart below shows DAF data for all private foundations. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or asset size."
+    "The chart below shows DAF data for all private foundations. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or size."
   ),
   htmltools::p(
     class = "base",
     htmltools::tags$b("Data Source:"),
     htmltools::a(href = "https://lecy.github.io/nccs/datasets/efile/", "NCCS' E-Filer Catalog,"),
     "which contains data processed from Schedule D for e-filed IRS Form 990 in tax year 2021. This panel does not include 990-N data and thus excludes small nonprofits with gross receipts less than or equal to $50,000. ",
-    htmltools::a(href = "https://nccsdata.s3.us-east-1.amazonaws.com/dataexplorer/visuals/data_dictionary.xlsx", "Download data dictionary.")
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 

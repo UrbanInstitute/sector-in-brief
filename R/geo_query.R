@@ -23,7 +23,7 @@ geo_query <- function(filter_ls,
     }
   } else if (level == "Census County") {
     filter_ls[[level]] <- county
-  } else if (level == "Census CBSA") {
+  } else if (level == "Metro/Micro Area") {
     filter_ls[[level]] <- cbsa
   }
   return(filter_ls)

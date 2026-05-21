@@ -15,6 +15,17 @@ dataloader <- function(path, cols=NULL) {
       ) |>
       dplyr::compute()
   }
+  # daf.parquet now covers every BMF-active cell (dollar metrics are NA for
+  # no-DAF cells). Dollar-metric DAF views must exclude those so breakdowns
+  # don't render $0 entries; DAF Proportion keeps them as the denominator.
+  if (grepl("daf\\.parquet$", path)) {
+    dollar_col <- intersect(c("Total Contributions", "Total Grants", "Total Value"), cols)
+    if (length(dollar_col) == 1 && !("Has DAF" %in% cols)) {
+      data_select <- data_select |>
+        dplyr::filter(!is.na(!!rlang::sym(dollar_col))) |>
+        dplyr::compute()
+    }
+  }
   shinycssloaders::hidePageSpinner()
   return(data_select)
 }

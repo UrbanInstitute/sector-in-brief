@@ -25,7 +25,7 @@ welcome_para_3 <- htmltools::p(
   
 
 welcome_para_4 <- htmltools::p(
-  "Now, the Nonprofit Sector in Brief Dashboard aggregates more than three decades of NCCS data to illuminate trends in the nonprofit sector. The dashboard currently provides data up to 2021 and will be continuously updated with the most recent available data. View data and trends by organization type, subsector, asset size, geography, and time period to see a snapshot of the nonprofit sector as seen through IRS data."
+  "Now, the Nonprofit Sector in Brief Dashboard aggregates more than three decades of NCCS data to illuminate trends in the nonprofit sector. The dashboard currently provides data up to 2021 and will be continuously updated with the most recent available data. View data and trends by organization type, subsector, size, geography, and time period to see a snapshot of the nonprofit sector as seen through IRS data."
 )
 
 welcome_para_5 <- htmltools::p(

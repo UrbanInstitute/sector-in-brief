@@ -21,9 +21,9 @@ subsector_body <- htmltools::p(
 tax_year_title <- "Tax Year"
 tax_year_body <- htmltools::p("These years are from the tax periods in the Forms 990, 990-EZ, or 990-PF.")
 
-asset_size_title <- "Asset Size"
+asset_size_title <- "Organization Size"
 asset_size_body <- htmltools::p(
-  "These categories are derived from the total assets reported in the IRS ",
+  "These categories are derived from the total expenses reported in the IRS ",
   htmltools::a(href = bmf_link, "Business Master File."),
   "Missing values are imputed from the nonprofit's most recent Form 990 filing."
 )

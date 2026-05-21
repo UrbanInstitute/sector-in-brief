@@ -11,13 +11,13 @@ table_builder <- function(data,
         group_by(!!sym(groupby_var), !!sym(groupby_var_2)) |>
         summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
         dplyr::collect()
-      if (groupby_var_2 == "Asset Size") {
+      if (groupby_var_2 == "Size") {
         table <- table_builder_size(table, groupby_var, sum_var, is_pf)
       } else if (groupby_var_2 == "Subsector") {
         table <- table_builder_subsector(table, groupby_var, sum_var, is_pf)
       } else if (groupby_var_2 == "Organization Type") {
         table <- table_builder_ctype(table, groupby_var, sum_var)
-      } else if (groupby_var_2 %in% c("Census CBSA", "Census State", "Census Region", "Census County")) {
+      } else if (groupby_var_2 %in% c("Metro/Micro Area", "Census State", "Census Region", "Census County")) {
         table <- table_builder_geo(table, groupby_var, groupby_var_2, sum_var, is_pf)
       }
     }
