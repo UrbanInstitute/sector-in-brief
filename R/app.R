@@ -1,9 +1,22 @@
 app <- function(...) {
   # Load elements
-  ensure_data_local()
+  sync_result <- ensure_data_local()
   publish_data_dictionary()
   visualpanels <- visualpanel_mapper(visualpanel_args)
   geo_df <- read.csv("data/nested_geographies.csv")
+
+  stale_banner <- if (identical(sync_result$status, "stale")) {
+    htmltools::div(
+      class = "alert alert-warning",
+      role = "alert",
+      style = "margin: 0; border-radius: 0; text-align: center;",
+      htmltools::strong("Data may be stale. "),
+      sprintf("The latest data sync from S3 failed; showing vintage %s. ",
+              sync_result$vintage),
+      "Reported metrics remain accurate as of that vintage."
+    )
+  } else NULL
+
   ui <- bslib::page_navbar(
     id = "tabs",
     padding = "10px",
@@ -13,6 +26,7 @@ app <- function(...) {
     htmltools::tags$head(
       htmltools::includeCSS("www/sib_style.css")
     ),
+    header = stale_banner,
     bslib::nav_spacer(),
     welcomeUI,
     aboutUI(), 

@@ -13,8 +13,10 @@ test_that("ensure_data_local is a no-op when local manifest reports the target v
   called <- FALSE
   mockery::stub(ensure_data_local, "system2", function(...) { called <<- TRUE; 0L })
 
-  ensure_data_local(data_dir = tmp)
+  res <- ensure_data_local(data_dir = tmp)
   expect_false(called)
+  expect_equal(res$status, "fresh")
+  expect_equal(res$vintage, sub("^v", "", VINTAGE))
 })
 
 test_that("ensure_data_local invokes aws s3 sync when the manifest is missing", {
@@ -46,10 +48,25 @@ test_that("ensure_data_local invokes sync when manifest vintage doesn't match", 
   expect_true(called)
 })
 
-test_that("ensure_data_local stops with an informative error when aws sync fails", {
+test_that("ensure_data_local stops only when sync fails AND no local data exists", {
   tmp <- withr::local_tempdir()
   mockery::stub(ensure_data_local, "system2", function(...) 1L)
-  expect_error(ensure_data_local(data_dir = tmp), "aws s3 sync failed")
+  expect_error(ensure_data_local(data_dir = tmp),
+               "no local data to fall back to")
+})
+
+test_that("ensure_data_local falls back to stale local data on sync failure", {
+  tmp <- withr::local_tempdir()
+  manifest <- file.path(tmp, "_manifest.json")
+  jsonlite::write_json(list(vintage = "1900.01"), path = manifest, auto_unbox = TRUE)
+  mockery::stub(ensure_data_local, "system2", function(...) 1L)
+
+  expect_warning(
+    res <- ensure_data_local(data_dir = tmp),
+    "serving stale local data"
+  )
+  expect_equal(res$status, "stale")
+  expect_equal(res$vintage, "1900.01")
 })
 
 test_that("ensure_data_local appends --profile <PROFILE> when SIB_AWS_PROFILE is set", {

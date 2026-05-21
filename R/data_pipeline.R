@@ -31,8 +31,9 @@ data_pipeline <- function(input,
   input_validation_msg <- validate_inputs(inputs)
   if (input_validation_msg != TRUE) {
     shiny::showModal(modal(input_validation_msg))
+    return(invisible())
   }
-  else {
+  tryCatch({
     title <- plot_title(inputs)
     caption <- plot_caption(inputs)
     shiny::withProgress(min = 1, max = 5, {
@@ -59,14 +60,19 @@ data_pipeline <- function(input,
         year_var = year_var
       )
       setProgress(4, message = "Displaying Results...")
-      render_outputs(plots = plots, 
-                     tables = tables, 
-                     output = output, 
+      render_outputs(plots = plots,
+                     tables = tables,
+                     output = output,
                      query = query,
                      agg_var = agg_var,
                      year_var = year_var,
                      table_title_prefix = title)
       setProgress(5, message = "Done!")
     })
-  }
+  }, error = function(e) {
+    # Server-side log gets the full error for debugging.
+    message(sprintf("[data_pipeline] panel=%s err=%s",
+                    title_prefix, conditionMessage(e)))
+    shiny::showModal(error_modal(conditionMessage(e)))
+  })
 }

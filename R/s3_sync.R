@@ -14,11 +14,24 @@ S3_BUCKET <- "nccsdata"
 S3_PREFIX <- "sector-in-brief"
 VINTAGE   <- "v2026.05"
 
+# Returns a list:
+#   $status  one of "fresh" (synced or cache hit), "stale" (sync failed,
+#            fell back to existing local data), "missing" (sync failed
+#            and no local data — this is the only fatal case)
+#   $vintage the vintage now available in data_dir, or NA if missing
+# Callers (app()) check $status to surface a "data may be stale" banner.
 ensure_data_local <- function(data_dir = "data") {
   manifest <- file.path(data_dir, "_manifest.json")
+  read_vintage <- function() {
+    if (!file.exists(manifest)) return(NULL)
+    tryCatch(jsonlite::read_json(manifest)$vintage, error = function(e) NULL)
+  }
+
   if (file.exists(manifest)) {
-    have <- tryCatch(jsonlite::read_json(manifest)$vintage, error = function(e) NULL)
-    if (identical(have, sub("^v", "", VINTAGE))) return(invisible())
+    have <- read_vintage()
+    if (identical(have, sub("^v", "", VINTAGE))) {
+      return(list(status = "fresh", vintage = have))
+    }
   }
   if (!dir.exists(data_dir)) dir.create(data_dir, recursive = TRUE)
   src <- sprintf("s3://%s/%s/%s/", S3_BUCKET, S3_PREFIX, VINTAGE)
@@ -28,11 +41,19 @@ ensure_data_local <- function(data_dir = "data") {
   profile <- Sys.getenv("SIB_AWS_PROFILE", "")
   if (nzchar(profile)) args <- c(args, "--profile", profile)
   status <- system2("aws", args)
-  if (status != 0) {
-    stop("aws s3 sync failed (exit ", status, ") from ", src,
-         " - check AWS credentials")
+
+  if (status == 0) {
+    return(list(status = "fresh", vintage = read_vintage()))
   }
-  invisible()
+  # Sync failed. Fall back to whatever's on disk if we have something.
+  if (file.exists(manifest)) {
+    have <- read_vintage()
+    warning("aws s3 sync failed (exit ", status, ") from ", src,
+            "; serving stale local data (vintage ", have, ").")
+    return(list(status = "stale", vintage = have))
+  }
+  stop("aws s3 sync failed (exit ", status, ") from ", src,
+       " and no local data to fall back to - check AWS credentials")
 }
 
 # Export the parquet data dictionary as a CSV under www/ so the static
