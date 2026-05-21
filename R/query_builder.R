@@ -34,14 +34,17 @@ query_builder <- function(inputs, geo_df) {
   if (length(subsector) < 12){
     filter_ls[["Subsector"]] <- subsector
   }
-  # Size
+  # Size — coerce to integer; checkboxGroupInput returns strings but the
+  # Size column is int32 in the parquet (arrow's lazy planner rejects
+  # string-vs-int32 comparisons).
   if (length(size) < 6) {
-    filter_ls[["Size"]] <- size
+    filter_ls[["Size"]] <- as.integer(size)
   }
   # Date Range — applied unconditionally so the slider works on
   # single-year panels (DAFs) too. time_series only controls chart
-  # type downstream (line vs bar).
-  years <- seq(year_range[1], year_range[2])
+  # type downstream (line vs bar). Coerce to integer for the same
+  # arrow type-match reason as Size above.
+  years <- seq(as.integer(year_range[1]), as.integer(year_range[2]))
   filter_ls[[year_var]] <- years
   query_ls <- list(filters = filter_ls, geo_level = geo_level)
   return(query_ls)
