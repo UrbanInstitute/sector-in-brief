@@ -1,3 +1,30 @@
+# R session state
+.Rproj.user/
+.Rhistory
+.RData
+.RDataTmp
+.Ruserdata
+
+# renv library (lock is tracked; library is not)
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
+
+# Build / deploy caches
+.Rcheck/
+rsconnect/
+
+# Load testing artefacts
+shinycannon-*.jar
+run*/
+run*.html
+recording.log
+*.log
+bench/
+
 # Data files synced from S3 at app startup (per ADR 0011)
 data/*.parquet
 data/_manifest.json
