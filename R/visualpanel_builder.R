@@ -1,10 +1,14 @@
-#' @title Function to create nav panel template for each visual page
-#' @param title The title of the visual page
-#' @param panel_header The header of the visual page
-#' @param panel_desc The description of the visual page
-#' @param panelid The id of the visual page
-#' @param start_year The start year of the data
-#' @param end_year The end year of the data
+#' @title Lazy nav_panel shell for a visualization page.
+#'
+#' Returns just the title + a uiOutput placeholder. The actual content
+#' (filter cards, plot panels, coverage notes) is rendered on demand by
+#' a server-side renderUI tied to `panel_ui_<panelid>`. Shiny's default
+#' suspendWhenHidden=TRUE means inactive tabs never run the builder.
+#'
+#' Other arguments (panel_header, panel_desc, start_year, end_year,
+#' parquet_file) are accepted for purrr::pmap compatibility with
+#' visualpanel_args but consumed later by visualpanel_content() at
+#' render time.
 visualpanel_builder <- function(title,
                                 panel_header,
                                 panel_desc,
@@ -12,28 +16,8 @@ visualpanel_builder <- function(title,
                                 start_year,
                                 end_year,
                                 parquet_file) {
-  choices <- choice_builder(panelid)
-  all_cards <- data_ui(panelid, choices, start_year, end_year)
-  panel <- bslib::nav_panel(
+  bslib::nav_panel(
     title = title,
-    page_header_card(panel_header, panel_desc),
-    coverage_notes_card(parquet_file),
-    bslib::card(
-      class = "card-filter",
-      bslib::card_title("Select Your Filters", class = "bg-light-gray"),
-      title = "",
-      bslib::layout_column_wrap(
-        all_cards[["org_card"]],
-        all_cards[["subsector_card"]],
-        all_cards[["size_card"]],
-        all_cards[["geo_card"]],
-        all_cards[["date_card"]]
-      ),
-      all_cards[["process_button"]]
-    ),
-    plot_ui(panelid)
+    shiny::uiOutput(paste0("panel_ui_", panelid))
   )
-  return(panel)
 }
-
-
