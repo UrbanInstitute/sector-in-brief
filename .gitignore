@@ -1,0 +1,3 @@
+# Data files synced from S3 at app startup (per ADR 0011)
+data/*.parquet
+data/_manifest.json
