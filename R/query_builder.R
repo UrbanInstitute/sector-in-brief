@@ -34,9 +34,9 @@ query_builder <- function(inputs, geo_df) {
   if (length(subsector) < 12){
     filter_ls[["Subsector"]] <- subsector
   }
-  # Asset Size
+  # Size
   if (length(size) < 6) {
-    filter_ls[["Asset Size"]] <- size
+    filter_ls[["Size"]] <- size
   }
   # Date Range
   if (time_series == TRUE) {

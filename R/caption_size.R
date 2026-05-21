@@ -10,6 +10,6 @@ caption_size <- function(caption, size, asset_size_ls) {
       asset_size_ls[[x]]
     }
   ))
-  caption <- paste(caption, "Asset Size(s):", paste(sizes, collapse = ", "), "\n")
+  caption <- paste(caption, "Size(s):", paste(sizes, collapse = ", "), "\n")
   return(caption)
 }

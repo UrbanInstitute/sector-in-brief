@@ -7,7 +7,7 @@ plot_subtitle <- function(groupby_var, selected_groups) {
   if (is.null(groupby_var)) {
     subtitle <- ""
   } else {
-    if (groupby_var == "Census CBSA") {
+    if (groupby_var == "Metro/Micro Area") {
       subtitle <- "By Metro Area"
     } else {
       subtitle <- paste("By ", groupby_var)

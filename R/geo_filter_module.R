@@ -59,7 +59,7 @@ geo_filter_ui <- function(id, state_choices) {
         choices = states,
         multiple = FALSE
       ),
-      condition = "input.geo_level == 'Census County' | input.geo_level == 'Census CBSA'",
+      condition = "input.geo_level == 'Census County' | input.geo_level == 'Metro/Micro Area'",
       ns = shiny::NS(id)
     ),
     shiny::conditionalPanel(
@@ -83,7 +83,7 @@ geo_filter_ui <- function(id, state_choices) {
         multiple = TRUE,
         options = list(maxItems = 5)
       ),
-      condition = "input.geo_level == 'Census CBSA'",
+      condition = "input.geo_level == 'Metro/Micro Area'",
       ns = shiny::NS(id)
     )
   )
@@ -103,7 +103,7 @@ geo_filter_server <- function(id, geo_df) {
                       "cbsa",
                       input$state_single,
                       geo_df,
-                      "Census.CBSA")
+                      "Metro.Micro.Area")
     })
     shiny::observeEvent(input$geo_reset, {
       shiny::updateSelectizeInput(inputId = "geo_level", selected = "National")

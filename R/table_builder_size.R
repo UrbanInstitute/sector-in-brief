@@ -7,8 +7,8 @@
 table_builder_size <- function(table, groupby_var, sum_var, is_pf) {
   table <- table |>
     dplyr::mutate(
-      "Asset Size" = dplyr::case_match(
-        `Asset Size`,
+      "Size" = dplyr::case_match(
+        `Size`,
         1 ~ "Under $100,000",
         2 ~ "$100,000 - $499,999",
         3 ~ "$500,000 - $999,999",
@@ -28,7 +28,7 @@ table_builder_size <- function(table, groupby_var, sum_var, is_pf) {
         )
       )
     ) |>
-    dplyr::group_by(!!sym(groupby_var), `Asset Size`) |>
+    dplyr::group_by(!!sym(groupby_var), `Size`) |>
     dplyr::summarise(!!sum_var := sum(!!sym(sum_var), na.rm = TRUE)) |>
     dplyr::collect()
   if (is_pf == TRUE){

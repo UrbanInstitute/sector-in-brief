@@ -7,6 +7,6 @@ plot_ui <- function(id, selected_geographies) {
     plotpanels[["By Organization Type"]],
     plotpanels[["By Subsector"]],
     plotpanels[["By Geography"]],
-    plotpanels[["By Asset Size"]]
+    plotpanels[["By Size"]]
   )
 }

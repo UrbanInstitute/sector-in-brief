@@ -31,7 +31,7 @@ caption_geo <- function(caption,
                      paste(county, collapse = ", "),
                      "\n")
   }
-  else if (geo_level == "Census CBSA") {
+  else if (geo_level == "Metro/Micro Area") {
     caption <- paste(
       "State:",
       state_single,

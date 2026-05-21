@@ -80,7 +80,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("size_select"),
               label = htmltools::tagList(
-                htmltools::tags$b("Asset Size *"),
+                htmltools::tags$b("Organization Size *"),
                 htmltools::p(
                   "Total assets from the IRS Business Master File grouped in five categories."
                 )
@@ -131,7 +131,7 @@ dataRequestUI <- function(id, geo_df) {
               ns,
               "cbsa_select",
               label = htmltools::tags$b("Optional - Select Metro Areas(s)"),
-              choices = unique(geo_df[["Census.CBSA"]])
+              choices = unique(geo_df[["Metro.Micro.Area"]])
             ),
             ns = ns
           )
@@ -266,7 +266,7 @@ dataRequestUI <- function(id, geo_df) {
             )
           ),
           htmltools::tagList(
-            htmltools::h4("Asset Size", class = "center-justify"),
+            htmltools::h4("Organization Size", class = "center-justify"),
             htmltools::div(
               shiny::textOutput(ns("selected_size")),
               class = "center-justify"
@@ -344,7 +344,7 @@ dataRequestServer <- function(id, geo_df) {
         sendSweetAlert(
           session = session,
           title = "Error",
-          text = "Please select at least one asset size",
+          text = "Please select at least one size",
           type = "error"
         )
       } else if (length(input$subsector_select) == 0){
@@ -405,7 +405,7 @@ dataRequestServer <- function(id, geo_df) {
         )
         shinyWidgets::updateVirtualSelect(
           inputId = "cbsa_select",
-          choices = unique(geo_df[["Census.CBSA"]][geo_df[["Census.State"]] %in% input$geo_select])
+          choices = unique(geo_df[["Metro.Micro.Area"]][geo_df[["Census.State"]] %in% input$geo_select])
         )
       }
     })

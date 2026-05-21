@@ -7,7 +7,7 @@ number_of_nonprofits <- htmltools::tagList(
   ),
   
   htmltools::p(
-    "The chart below shows the number of organizations for the nonprofit sector overall. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by organization type, subsector, geography, or asset size."
+    "The chart below shows the number of organizations for the nonprofit sector overall. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by organization type, subsector, geography, or size."
   ),
   
   htmltools::p(
@@ -29,7 +29,7 @@ finance_header <-
       "including 501(c)3 public charities and private foundations and 501(c)4 organizations."
     ),
     htmltools::p(
-      "Select a financial metric to view, and then use filters to customize the graph by organization type, subsector, asset size, geography, or data range. Use the tabs to change the view from overall data to view by subsector, geography, or asset size."
+      "Select a financial metric to view, and then use filters to customize the graph by organization type, subsector, size, geography, or data range. Use the tabs to change the view from overall data to view by subsector, geography, or size."
     ),
     htmltools::p(
       class = "base",
@@ -71,7 +71,7 @@ pf_header <- htmltools::tagList(
       "The IRS has not released tax records for tax years 2016 through 2018. Missing data points from these years are represented with a dotted line."
     ),
     htmltools::p(
-      "The chart below shows grantmaking data for all private foundations. Select the nonprofit sizes, geographies, and date range you’re interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or asset size."
+      "The chart below shows grantmaking data for all private foundations. Select the nonprofit sizes, geographies, and date range you’re interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or size."
     )
   ),
   htmltools::p(
@@ -97,7 +97,7 @@ daf_header <- htmltools::tagList(
     "Data begin in tax year 2021 because this is the first year that full nonprofit 990 e-file records are available from the IRS."
   ),
   htmltools::p(
-    "The chart below shows DAF data for all private foundations. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or asset size."
+    "The chart below shows DAF data for all private foundations. Select the nonprofit sizes, geographies, and date range you're interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or size."
   ),
   htmltools::p(
     class = "base",
