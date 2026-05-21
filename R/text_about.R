@@ -222,17 +222,3 @@ faq <- white_flexbox(
 
 
 
-usethis::use_data(
-  about_title,
-  customization,
-  data_sources,
-  bmf_link,
-  ntee_link,
-  soi_link,
-  tract_link,
-  nccs_link,
-  unified_bmf_link,
-  core_link,
-  internal = TRUE,
-  overwrite = TRUE
-)

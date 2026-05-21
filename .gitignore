@@ -30,3 +30,4 @@ data/*.parquet
 data/_manifest.json
 # Data dictionary CSV is regenerated from data/data_dictionary.parquet on boot
 www/data_dictionary.csv
+R/sysdata.rda

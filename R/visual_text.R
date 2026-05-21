@@ -132,20 +132,3 @@ daf_proportion_desc <- htmltools::p(
   "Percentage of nonprofits that sponsor DAFs, defined as holding and operating DAF accounts, captures the prevalence of DAFs among public charities."
 )
 
-usethis::use_data(
-  number_of_nonprofits,
-  finance_header,
-  revenue_desc,
-  expenses_desc,
-  benefits_desc,
-  pf_header,
-  grants_desc,
-  daf_header,
-  daf_number_desc,
-  daf_contributions_desc,
-  daf_value_desc,
-  daf_grants_desc,
-  daf_proportion_desc,
-  overwrite = TRUE,
-  internal = TRUE
-)
