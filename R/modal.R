@@ -1,6 +1,16 @@
-# User-facing modal for unexpected server errors. The detail string is
-# the raw R error message — useful for support, ugly for end users — so
-# it's tucked into a collapsed details element.
+# User-facing modal for unexpected server errors caught by the
+# tryCatch in data_pipeline(). Validation errors are NOT shown here —
+# those go inline under the offending filter card via
+# render_validation_messages.R. This modal is only for thrown
+# exceptions from arrow/dplyr/ggplot etc.
+
+#' Build the "Something went wrong" modal for runtime errors.
+#'
+#' Raw error message is useful for support but ugly for end users, so
+#' it's tucked into a collapsed `<details>` element.
+#'
+#' @param detail Raw error message string from `conditionMessage()`.
+#' @return A `shiny::modalDialog`.
 error_modal <- function(detail) {
   shiny::modalDialog(
     title = "Something went wrong",

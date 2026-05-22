@@ -1,5 +1,28 @@
+# Top-level Shiny app. Returns a shinyApp object — the script in
+# `app.R` (repo root) calls this with `app()` to launch.
+#
+# Boot path (runs once when app() is called):
+#   1. ensure_data_local()       — pull or reuse the pinned data vintage
+#   2. validate_parquet_schemas()— hard-stop on producer schema drift
+#   3. publish_data_dictionary() — write www/data_dictionary.csv for downloads
+#   4. resolve_visualpanel_year_ranges() — fill NA year overrides from manifest
+#   5. visualpanel_mapper()      — build 11 LAZY nav_panel shells
+#   6. read.csv(nested_geographies) — geo lookup
+#   7. assemble bslib::page_navbar UI with welcome/about/visualizations/
+#      custom-download tabs
+#   8. server() — bind lazy renderUI per panel + per-section observers
+#      that dispatch to data_server_wrapper() when a tab activates
+#
+# Each visualization panel is a per-panel Shiny module (see
+# data_server.R + data_pipeline.R); the modules only construct when
+# their tab is first visited (PR #28 lazy-UI optimization).
+
+#' Construct the sector-in-brief shinyApp object.
+#'
+#' @param ... Accepted for symmetry with `shiny::shinyApp`; currently
+#'   ignored.
+#' @return A `shiny::shinyApp` object ready to pass to `runApp()`.
 app <- function(...) {
-  # Load elements
   sync_result <- ensure_data_local()
   validate_parquet_schemas()
   publish_data_dictionary()

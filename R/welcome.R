@@ -1,4 +1,8 @@
-# Module for welcome page
+# The Welcome tab — first tab a user sees. Static content built from
+# the strings in R/text_welcome.R: title/subtitle box, intro
+# paragraphs, two "what's inside" sections (visualizations,
+# downloads), and the credits/about block at the bottom.
+
 welcomeUI <- bslib::nav_panel(
   title = "Welcome",
   htmltools::div(

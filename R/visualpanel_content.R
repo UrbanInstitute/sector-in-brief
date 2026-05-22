@@ -3,6 +3,17 @@
 # uiOutput can drop it in. Splitting this out from visualpanel_builder
 # means a tab's heavy widgets (plot_ui, data_ui, coverage_notes_card)
 # only run when the tab activates, not at app boot.
+
+#' Render the lazy contents of one visualization panel.
+#'
+#' @param panel_header Bold heading shown above the filters.
+#' @param panel_desc Descriptive paragraph below the header.
+#' @param panelid Module id (also used as the parent uiOutput slot).
+#' @param start_year,end_year Date-slider bounds (resolved from the
+#'   manifest at boot — see `resolve_visualpanel_year_ranges()`).
+#' @param parquet_file Source filename, used by the coverage-notes
+#'   card to look up per-file notes from `data_dictionary.parquet`.
+#' @return A `htmltools::tagList`.
 visualpanel_content <- function(panel_header,
                                 panel_desc,
                                 panelid,

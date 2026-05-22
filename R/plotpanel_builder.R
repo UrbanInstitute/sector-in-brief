@@ -1,3 +1,15 @@
+# Build one of the 5 plot/table sub-tabs inside a visualization panel.
+# Each sub-tab pairs a girafe plot (with spinner) and a collapsible
+# accordion showing the reactable table + download button.
+
+#' Build one plot/table sub-tab.
+#'
+#' @param id Parent panel's module id (used by `shiny::NS`).
+#' @param title Sub-tab title shown in the navset_card_underline.
+#' @param plot_id,table_id,download_id,table_title_id Output slot IDs
+#'   the corresponding girafe/reactable/downloadButton/textOutput
+#'   widgets bind to — set by `render_outputs()`.
+#' @return A `bslib::nav_panel`.
 plotpanel_builder <- function(id, title, plot_id, table_id, download_id, table_title_id){
   bslib::nav_panel(
     title = title,

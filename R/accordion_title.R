@@ -1,7 +1,8 @@
-#' @title Function to style the title of accordion panels1
-#' @param title A character string to be displayed as the title of the accordion panel
-#' @param size A character string to specify the size of the title. Default is "md"
-#' @return A styled title for the accordion panel
+#' Wrap an accordion title in an `<h5>` so the typography matches the
+#' rest of the dashboard's accordion panels.
+#'
+#' @param title Title text.
+#' @return A `<h5>` tag.
 accordion_title <- function(title){
   title <- htmltools::h5(
     title
