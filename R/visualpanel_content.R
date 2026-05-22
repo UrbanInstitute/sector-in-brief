@@ -22,6 +22,7 @@ visualpanel_content <- function(panel_header,
                                 parquet_file) {
   choices <- choice_builder(panelid)
   all_cards <- data_ui(panelid, choices, start_year, end_year)
+  ns <- shiny::NS(panelid)
   htmltools::tagList(
     page_header_card(panel_header, panel_desc),
     coverage_notes_card(parquet_file),
@@ -38,6 +39,9 @@ visualpanel_content <- function(panel_header,
       ),
       all_cards[["process_button"]]
     ),
+    # Active-filter chips, rendered by data_server() from the inputs
+    # snapshot. Empty when no filter is narrowed from default.
+    shiny::uiOutput(ns("filter_chips"), class = "filter-chip-row"),
     plot_ui(panelid)
   )
 }

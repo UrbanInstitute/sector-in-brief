@@ -16,6 +16,12 @@
 # Each visualization panel is a per-panel Shiny module (see
 # data_server.R + data_pipeline.R); the modules only construct when
 # their tab is first visited (PR #28 lazy-UI optimization).
+#
+# URL state: the app uses Shiny's URL-bookmarking (enableBookmarking
+# = "url"). The auto-bookmark observer below pushes filter selections
+# into the query string so users can share or refresh a specific
+# view. The ui closure takes `request` because that's the bookmarked
+# UI contract — Shiny replays the saved input values during restore.
 
 #' Construct the sector-in-brief shinyApp object.
 #'
@@ -44,65 +50,66 @@ app <- function(...) {
     )
   } else NULL
 
-  # tags$head() goes outside page_navbar in a tagList; passing it
-  # positionally inside page_navbar's `...` triggers a bslib warning
-  # because that slot expects nav_panel / nav_menu children.
-  ui <- htmltools::tagList(
-  htmltools::tags$head(
-    htmltools::includeCSS("www/sib_style.css")
-  ),
-  bslib::page_navbar(
-    id = "tabs",
-    padding = "10px",
-    title = navbar_title(title = "     | NCCS"),
-    bg = "#0096d2",
-    fillable = FALSE,
-    header = stale_banner,
-    bslib::nav_spacer(),
-    welcomeUI,
-    aboutUI(), 
-    bslib::nav_menu(
-      title = "Data Visualizations",
-      visualpanels[["Numbers"]],
-      bslib::nav_panel(
-        title = "Finances",
-        finance_header,
-        bslib::navset_card_pill(
-          id = "finances",
-          visualpanels[["Assets"]],
-          visualpanels[["Revenues"]],
-          visualpanels[["Expenses"]],
-          visualpanels[["Benefits"]]      )
+  ui <- function(request) {
+    htmltools::tagList(
+      htmltools::tags$head(
+        htmltools::includeCSS("www/sib_style.css")
       ),
-      bslib::nav_panel(
-        title = "Private Foundation Grantmaking",
-        pf_header,
-        bslib::navset_card_pill(
-          id = "private_foundation_grants",
-          visualpanels[["Private Foundation Grants"]]
-        )
-      ),
-      bslib::nav_panel(
-        title = "Donor Advised Funds",
-        daf_header,
-        bslib::navset_card_pill(
-          id = "daf",
-          visualpanels[["Number of DAFs"]],
-          visualpanels[["DAF Contributions"]],
-          visualpanels[["DAF Grants"]],
-          visualpanels[["DAF Value"]],
-          visualpanels[["DAF Proportion"]]        )
+      bslib::page_navbar(
+        id = "tabs",
+        padding = "10px",
+        title = navbar_title(title = "     | NCCS"),
+        bg = "#0096d2",
+        fillable = FALSE,
+        header = stale_banner,
+        bslib::nav_spacer(),
+        welcomeUI,
+        aboutUI(),
+        bslib::nav_menu(
+          title = "Data Visualizations",
+          visualpanels[["Numbers"]],
+          bslib::nav_panel(
+            title = "Finances",
+            finance_header,
+            bslib::navset_card_pill(
+              id = "finances",
+              visualpanels[["Assets"]],
+              visualpanels[["Revenues"]],
+              visualpanels[["Expenses"]],
+              visualpanels[["Benefits"]]
+            )
+          ),
+          bslib::nav_panel(
+            title = "Private Foundation Grantmaking",
+            pf_header,
+            bslib::navset_card_pill(
+              id = "private_foundation_grants",
+              visualpanels[["Private Foundation Grants"]]
+            )
+          ),
+          bslib::nav_panel(
+            title = "Donor Advised Funds",
+            daf_header,
+            bslib::navset_card_pill(
+              id = "daf",
+              visualpanels[["Number of DAFs"]],
+              visualpanels[["DAF Contributions"]],
+              visualpanels[["DAF Grants"]],
+              visualpanels[["DAF Value"]],
+              visualpanels[["DAF Proportion"]]
+            )
+          )
+        ),
+        bslib::nav_panel(
+          title = "Custom Panel Datasets",
+          page_header_card(header = download_title,
+                           subheader = download_subtitle),
+          dataRequestUI("data_download", geo_df)
+        ),
+        footer = text_footer
       )
-    ),
-    bslib::nav_panel(
-      title = "Custom Panel Datasets",
-      page_header_card(header = download_title, 
-                       subheader = download_subtitle),
-      dataRequestUI("data_download", geo_df)
-    ),
-    footer = text_footer
-  )
-  )
+    )
+  }
 
   server <- function(input, output, session) {
     # Lazy panel UIs: bind a renderUI for each panel's placeholder. Shiny's
@@ -125,24 +132,26 @@ app <- function(...) {
       })
     }
 
-    # Server modules to update county and cbsa options based on State
-    # Data Wrangling
     daf_title_prefix <- "Donor Advised Funds For: "
-    data_select <- observeEvent( input$tabs, {
-      if (input$tabs == "Finances"){
+    observeEvent(input$tabs, {
+      if (input$tabs == "Finances") {
         observeEvent(input$finances, {
-          data_server_wrapper(input$finances, data_server_args, geo_df)
+          data_server_wrapper(input$finances, data_server_args,
+                              geo_df, visualpanel_args)
         })
-      } else if (input$tabs == "Donor Advised Funds"){
+      } else if (input$tabs == "Donor Advised Funds") {
         observeEvent(input$daf, {
-          data_server_wrapper(input$daf, data_server_args, geo_df)
+          data_server_wrapper(input$daf, data_server_args,
+                              geo_df, visualpanel_args)
         })
       } else if (input$tabs == "Private Foundation Grantmaking") {
         observeEvent(input$private_foundation_grants, {
-          data_server_wrapper(input$private_foundation_grants, data_server_args, geo_df)
-        })    
-      } else if (input$tabs == "Numbers"){
-        data_server_wrapper(input$tabs, data_server_args, geo_df)
+          data_server_wrapper(input$private_foundation_grants,
+                              data_server_args, geo_df, visualpanel_args)
+        })
+      } else if (input$tabs == "Numbers") {
+        data_server_wrapper(input$tabs, data_server_args,
+                            geo_df, visualpanel_args)
       }
     })
     dataRequestServer("data_download", geo_df)
@@ -152,6 +161,26 @@ app <- function(...) {
     observeEvent(input$download_link, {
       shiny::updateTabsetPanel(session, "tabs", selected = download_link_page)
     })
+
+    # Exclude high-frequency / non-state inputs from the URL. Click
+    # counters add noise and would push the URL past most clients'
+    # length budgets after enough interaction.
+    shiny::setBookmarkExclude(c(
+      "visual_link", "download_link", "data_download-start_form"
+    ))
+
+    # Auto-bookmark on input change. reactiveValuesToList() touches
+    # every input so the observer re-runs whenever any changes;
+    # doBookmark() → onBookmarked() → updateQueryString() pushes the
+    # current state into the URL bar.
+    shiny::observe({
+      shiny::reactiveValuesToList(input)
+      session$doBookmark()
+    })
+    shiny::onBookmarked(function(url) {
+      shiny::updateQueryString(url)
+    })
   }
-  shinyApp(ui = ui, server = server)
+
+  shiny::shinyApp(ui = ui, server = server, enableBookmarking = "url")
 }

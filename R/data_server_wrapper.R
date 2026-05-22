@@ -10,20 +10,25 @@
 #'   `R/data_server_args.R`.
 #' @param geo_df Nested geographies lookup, passed through to the
 #'   server module for state → county/CBSA cascading.
-data_server_wrapper <- function(page, data_server_args, geo_df) {
-  data <- dataloader(
-    path = data_server_args[[page]][["path"]],
-    cols = data_server_args[[page]][["vars"]]
-  )
+#' @param visualpanel_args The visualpanel driver tibble — used to
+#'   look up the panel's year-range bounds for the reset observer.
+data_server_wrapper <- function(page, data_server_args,
+                                geo_df, visualpanel_args) {
+  cfg <- data_server_args[[page]]
+  data <- dataloader(path = cfg[["path"]], cols = cfg[["vars"]])
+  vp_row <- visualpanel_args[visualpanel_args$title == page, ]
   data_server(
-    id = data_server_args[[page]][["id"]],
-    data = data,
-    geo_df = geo_df,
-    year_var = data_server_args[[page]][["year_var"]],
-    agg_var = data_server_args[[page]][["agg_var"]],
-    ytitle = data_server_args[[page]][["ytitle"]],
-    xtitle = data_server_args[[page]][["xtitle"]],
-    title_prefix = data_server_args[[page]][["title_prefix"]],
-    time_series = data_server_args[[page]][["time_series"]]
+    id            = cfg[["id"]],
+    data          = data,
+    geo_df        = geo_df,
+    year_var      = cfg[["year_var"]],
+    agg_var       = cfg[["agg_var"]],
+    ytitle        = cfg[["ytitle"]],
+    xtitle        = cfg[["xtitle"]],
+    title_prefix  = cfg[["title_prefix"]],
+    time_series   = cfg[["time_series"]],
+    choices       = choice_builder(cfg[["id"]]),
+    start_year    = vp_row$start_year,
+    end_year      = vp_row$end_year
   )
 }
