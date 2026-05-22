@@ -28,9 +28,9 @@ data_pipeline <- function(input,
                          title_prefix = title_prefix, 
                          year_var = year_var,
                          agg_var = agg_var)
-  input_validation_msg <- validate_inputs(inputs)
-  if (input_validation_msg != TRUE) {
-    shiny::showModal(modal(input_validation_msg))
+  validation <- validate_inputs(inputs)
+  render_validation_messages(validation$errors, output)
+  if (!validation$valid) {
     return(invisible())
   }
   tryCatch({

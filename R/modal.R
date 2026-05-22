@@ -1,11 +1,3 @@
-# Function to create a modal dialog box
-modal <- function(message){
-  shiny::modalDialog(
-    title = message,
-    easyClose = TRUE
-  )
-}
-
 # User-facing modal for unexpected server errors. The detail string is
 # the raw R error message — useful for support, ugly for end users — so
 # it's tucked into a collapsed details element.
@@ -26,7 +18,3 @@ error_modal <- function(detail) {
   )
 }
 
-modal_titles <-
-  list(
-    "invalid_inputs" = "Invalid Filter Selection"
-  )
