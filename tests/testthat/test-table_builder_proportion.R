@@ -43,6 +43,33 @@ test_that("two-group proportion with Size rewrites integer bands to labels", {
   )
 })
 
+test_that("Metro/Micro Area breakdown truncates to top-N and recomputes pooled proportion", {
+  # 20 metros; top 15 + Other should appear, with Other's proportion
+  # computed from pooled counts (not averaged from per-metro proportions).
+  metros <- paste0("Metro_", sprintf("%02d", 1:20))
+  df <- tibble::tibble(
+    Year                   = rep(2022L, 20),
+    `Metro/Micro Area`     = metros,
+    `Has DAF`              = c(rep(10, 15), rep(2, 5)),
+    `Number of Nonprofits` = c(rep(100, 15), rep(50, 5))
+  )
+  out <- table_builder_proportion(
+    df,
+    groupby_var    = "Year",
+    groupby_var_2  = "Metro/Micro Area",
+    sum_var        = "Has DAF",
+    sum_var_2      = "Number of Nonprofits",
+    proportion_var = "Proportion with DAFs"
+  )
+  expect_equal(nrow(out), 16)
+  other <- out[out$`Metro/Micro Area` == "Other (5)", ]
+  expect_equal(nrow(other), 1)
+  # Other pools 5 metros: HasDAF=10, Nonprofits=250, prop=4%
+  expect_equal(other$`Has DAF`, 10)
+  expect_equal(other$`Number of Nonprofits`, 250)
+  expect_equal(other$`Proportion with DAFs`, round(10 / 250, 2) * 100)
+})
+
 test_that("returns a 'No Data Available' tribble on error", {
   out <- table_builder_proportion(
     NULL,

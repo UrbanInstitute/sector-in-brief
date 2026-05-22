@@ -19,6 +19,9 @@ table_builder <- function(data,
         table <- table_builder_ctype(table, groupby_var, sum_var)
       } else if (groupby_var_2 %in% c("Metro/Micro Area", "Census State", "Census Region", "Census County")) {
         table <- table_builder_geo(table, groupby_var, groupby_var_2, sum_var, is_pf)
+        if (groupby_var_2 %in% c("Metro/Micro Area", "Census County")) {
+          table <- truncate_to_topn(table, group_col = groupby_var_2, value_col = sum_var)
+        }
       }
     }
     return(table)
