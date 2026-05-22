@@ -117,24 +117,48 @@ producer (`sector-in-brief-data`) publishes a new build.
 
 # Deployment
 
-Two environments:
+Two environments, both on the **urban-main** shinyapps.io account,
+both on the **Xlarge instance (8 GB RAM)**:
 
 | Env | URL | Trigger |
 |---|---|---|
-| **Staging** | <https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/> | Auto on every push to `main` (`.github/workflows/deploy-staging.yml`) |
-| **Production** | <https://nccs-urban.shinyapps.io/sector-in-brief/> | Manual `rsconnect::deployApp()` after authenticating locally |
+| **Staging** | <https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/> | Auto on push to `main` (`deploy-staging.yml`) |
+| **Production** | <https://urban-main.shinyapps.io/sector-in-brief/> | Auto on push to `prod` (`deploy-prod.yml`) |
 
-Both deploys run on the **Xlarge shinyapps.io instance (8 GB RAM)**.
+There's a separate **legacy** prod URL at
+<https://nccs-urban.shinyapps.io/sector-in-brief/> that remains the
+publicly cited link until the migration to urban-main is announced.
+Update external references and `R/text_welcome.R`'s citation when
+that flip happens.
+
+## Promotion model
+
+1. PRs land on `main` → staging auto-redeploys.
+2. Verify staging with `docs/UI_TESTING.md`.
+3. Promote staging → prod with `git push origin main:prod` (or a PR
+   from `main` into `prod`). The prod workflow fires and redeploys
+   production.
+4. Rollback: revert the `prod` branch to the previous commit, push,
+   the workflow redeploys.
+
+The `prod` branch *is* the answer to "what's in production right now?".
+
+## Data + secrets
+
 Data is **not** bundled into the deploy artifact — the runtime pulls
 the pinned vintage from S3 at boot per `R/s3_sync.R` (ADR 0011). The
 shinyapps.io app needs `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`
-set as per-app environment variables in its dashboard so the default
-IAM credential chain can reach the `nccsdata` bucket.
+set as per-app environment variables (in the shinyapps.io dashboard,
+not the GitHub repo) so the default IAM credential chain can reach
+the `nccsdata` bucket.
+
+CI auth uses two repo Actions secrets shared by both workflows:
+`SHINYAPPS_TOKEN`, `SHINYAPPS_SECRET`. Generate from the urban-main
+shinyapps.io account: Tokens → Add Token.
 
 Bump `VINTAGE` in `R/s3_sync.R` when the producer
 (`sector-in-brief-data`) publishes a new build, then merge to `main`
-to roll the staging deploy. Production gets the same `VINTAGE` once
-staging verification (`docs/UI_TESTING.md`) passes.
+to roll staging. Promote to prod once staging verification passes.
 
 Deploy metadata is committed under
 `deploy/rsconnect/shinyapps.io/<account>/`. The runtime `rsconnect/`
