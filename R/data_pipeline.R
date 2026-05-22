@@ -1,16 +1,25 @@
-#' @title pipeline for server side data processing
-#' @param input list of input values
-#' @param geo_filters list of geo filters
-#' @param time_series boolean. If TRUE, the data is time series
-#' @param title_prefix character scalar. The prefix for the plot title
-#' @param agg_var character scalar. The variable to aggregate
-#' @param year_var character scalar. The variable to use as year
-#' @param ytitle character scalar. The title for the y-axis
-#' @param xtitle character scalar. The title for the x-axis
-#' @param data arrow table. The filtered data to render in output tables and plots
-#' @param geo_df data.frame. data set of nested geographies
-#' @param output list of shiny outputs
-#' @return list of shiny outputs
+# Orchestrator for a single panel update. Runs the
+#   format_input → validate_inputs → query_builder
+#   → cached_filter_and_summarise (filter + summarise)
+#   → plots_build_all → render_outputs
+# chain inside a withProgress() wrapper for the spinner, with a
+# tryCatch() that converts unexpected errors into a friendly modal
+# (added in PR #25). Validation errors are surfaced inline under the
+# offending filter card (PR #30), not via modal.
+
+#' Run the panel pipeline for one UPDATE DATA click.
+#'
+#' @param input Shiny `input` reactive object for the panel module.
+#' @param geo_filters Reactive list from `geo_filter_server()`.
+#' @param time_series TRUE → line plots; FALSE → bar plots.
+#' @param title_prefix Title prefix for plots and tables.
+#' @param agg_var Metric column to aggregate.
+#' @param year_var Time column ("Year").
+#' @param ytitle,xtitle Axis labels.
+#' @param data Lazy arrow Dataset from `dataloader()`.
+#' @param geo_df Nested geographies lookup, used by `query_builder()`.
+#' @param output The module's `output` object — written by
+#'   `render_outputs()` (plots) and `render_validation_messages()`.
 data_pipeline <- function(input,
                           geo_filters,
                           time_series,

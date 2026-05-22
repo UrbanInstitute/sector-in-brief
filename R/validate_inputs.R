@@ -1,13 +1,17 @@
+# Pure-function validation of the formatted Shiny inputs. Decoupled
+# from any rendering so it can be tested without a reactive context.
+# Returns a structured (valid, errors) record; data_pipeline pairs it
+# with render_validation_messages() to surface errors inline.
+
 #' Validate user filter selections before running the data pipeline.
-#'
-#' Returns a structured result so callers can surface messages inline
-#' next to the offending filter card rather than via a single modal.
 #'
 #' @param inputs The list produced by `format_input()`.
 #' @return list with:
 #'   - `valid`: TRUE if no problems
-#'   - `errors`: named list keyed by filter group (`geo`, `subsector`, `size`),
-#'     each value a single user-facing message. Only populated keys appear.
+#'   - `errors`: named list keyed by filter group (`geo`, `subsector`,
+#'     `size`), each value a single user-facing message. Only populated
+#'     keys appear; downstream callers iterate over the names to know
+#'     which slot to write into.
 validate_inputs <- function(inputs) {
   errors <- list()
 

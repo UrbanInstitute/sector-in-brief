@@ -1,3 +1,25 @@
+# Per-panel Shiny module server. One instance is created for each of
+# the 11 visualization panels (driven by data_server_args.R). Wires the
+# panel's filter UI to data_pipeline() via two observers:
+#
+#   1. A one-shot observer that fires when input$ctype first appears
+#      (i.e. after the lazy panel UI has mounted), to render the
+#      default view without requiring a user click.
+#   2. A per-click observer on the UPDATE DATA task button.
+#
+# Also handles the per-filter "reset" buttons.
+
+#' Per-panel server module.
+#'
+#' @param id Module id (matches the panel's `id` in `data_server_args`).
+#' @param geo_df Nested geographies lookup (state → county/CBSA).
+#' @param data Lazy arrow Dataset from `dataloader()` for this panel.
+#' @param year_var Column to plot on the x-axis ("Year").
+#' @param agg_var Column to aggregate (panel-specific metric).
+#' @param title_prefix Title shown above the panel's plots.
+#' @param ytitle,xtitle Axis labels.
+#' @param time_series TRUE for multi-year line plots; FALSE for
+#'   single-year bar plots (DAF panels).
 data_server <- function(id,
                         geo_df,
                         data,

@@ -1,11 +1,14 @@
-#' @title Function to edit query for geographic filters
-#' @param filter_ls list of filters
-#' @param level character scalar. Census geographic unit
-#' @param region character vector. Census region
-#' @param state_single character scalar. Census state
-#' @param state_mult character vector. Multiple census states
-#' @param county character vector. Census county
-#' @param cbsa character vector. Census CBSA
+#' Add the geo-level predicate to a query filter list.
+#'
+#' Called from `query_builder()`. Picks the right vector to filter on
+#' based on the active geo_level (state_mult vs state_single, county
+#' vs cbsa, etc.).
+#'
+#' @param filter_ls In-progress filter list.
+#' @param level Active geo level (e.g. "Census State", "Metro/Micro Area").
+#' @param region,state_single,state_mult,county,cbsa Selections from
+#'   the geo filter UI; only the one matching `level` is consumed.
+#' @return `filter_ls` with one new entry added.
 geo_query <- function(filter_ls,
                       level,
                       region,
