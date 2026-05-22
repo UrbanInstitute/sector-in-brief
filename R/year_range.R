@@ -11,6 +11,19 @@
 # because e-file ingest is incomplete). Those panels still need an
 # explicit override in visualpanel_args.
 
+#' Derive a panel's year-range bounds from the manifest.
+#'
+#' Reads the producer's per-year row-count, then trims trailing years
+#' whose count cliffs below `cliff_ratio` of the previous year (catches
+#' partial publishes — e.g. finances 2024 at ~25% of 2023). Early
+#' legitimately-low years (1989-1994 numbers) pass through.
+#'
+#' @param parquet_file Filename key in the manifest's `files` map.
+#' @param manifest_path Path to `_manifest.json` (default
+#'   `data/_manifest.json`).
+#' @param cliff_ratio Trailing-year drop threshold for the trim.
+#' @return Length-2 integer vector `c(min_year, max_year)`, or
+#'   `c(NA, NA)` if the manifest can't be read.
 panel_year_range <- function(parquet_file,
                              manifest_path = "data/_manifest.json",
                              cliff_ratio = 0.5) {
@@ -37,9 +50,15 @@ panel_year_range <- function(parquet_file,
   c(min(yrs), yrs[n])
 }
 
-# Resolve the year range for a panel, honoring per-panel overrides.
-# If start_year_override / end_year_override are non-NA, use them;
-# otherwise pull from the manifest.
+#' Resolve a panel's year range, honoring per-panel overrides.
+#'
+#' If `start_override` / `end_override` are non-NA, use them; otherwise
+#' fall back to manifest-derived bounds from `panel_year_range()`.
+#'
+#' @param parquet_file Filename key in the manifest.
+#' @param start_override,end_override Integer year overrides from
+#'   `visualpanel_args` (NA = derive from manifest).
+#' @return Length-2 integer vector `c(start, end)`.
 resolve_panel_year_range <- function(parquet_file,
                                      start_override = NA_integer_,
                                      end_override = NA_integer_) {

@@ -1,8 +1,11 @@
-#' @title Wrapper function for Urban Themed R Shiny slider object
-#' @param ns The namespace of the shiny app
-#' @param id The id of the slider
-#' @param start_year The start year of the slider
-#' @param end_year The end year of the slider
+#' Urban-themed year-range sliderInput.
+#'
+#' Fixed to a year-range double-slider; bounds passed in by
+#' `data_ui()` from the manifest-derived per-panel year range.
+#'
+#' @param ns Module namespace function (from `shiny::NS`).
+#' @param id Input id (will be namespaced).
+#' @param start_year,end_year Slider min/max.
 urbn_slider <- function(ns, id, start_year, end_year) {
   htmltools::div(
     class = "filter__text",
