@@ -16,24 +16,28 @@ urbn_accordion_panel <- function(title, ...) {
   )
 }
 
-#' Build a filter card header (title + info-icon tooltip).
+#' Build a filter section header (title + info-icon tooltip).
 #'
 #' Verbose explanations live in the tooltip so they don't stretch the
-#' card header. Used by every filter card in `data_ui()`.
+#' header. Used by every filter section in `data_ui()` inside the
+#' panel's sidebar.
 #'
-#' @param title Card title text.
+#' Originally wrapped each header in `bslib::card_header` for the
+#' pre-sidebar layout where each filter was its own card. Now uses a
+#' plain styled div so the same component renders cleanly in the
+#' sidebar context without nested card chrome.
+#'
+#' @param title Section title text.
 #' @param tooltip_content Content shown when the user hovers the
 #'   info icon — can be plain text, htmltools tags, or a tagList.
 filter_card_header <- function(title, tooltip_content) {
-  bslib::card_header(
-    htmltools::div(
-      class = "filter-header",
-      htmltools::h6(title, style = "display:inline; margin-right:6px;"),
-      bslib::tooltip(
-        bsicons::bs_icon("info-circle"),
-        tooltip_content,
-        placement = "right"
-      )
+  htmltools::div(
+    class = "filter-header",
+    htmltools::h6(title, style = "display:inline; margin-right:6px;"),
+    bslib::tooltip(
+      bsicons::bs_icon("info-circle"),
+      tooltip_content,
+      placement = "right"
     )
   )
 }

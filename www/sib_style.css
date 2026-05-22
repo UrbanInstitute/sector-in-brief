@@ -418,11 +418,22 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
 .navbar .nav-underline .nav-link, .navbar .nav-underline :where(ul.nav.navbar-nav > li) > a {
   padding-bottom: 0;
 }
-.card-filter {
-  max-height: none;
-  @media screen and (max-width: 992px) {
-        max-height: none;
-    };
+/* Filter sections inside the sidebar (PR-B). Each section is a div
+   wrapping a header + the input widget. Spacing keeps them readable
+   without the previous nested-card chrome. */
+.filter-section {
+  padding: 0.6rem 0 0.6rem 0;
+  border-bottom: 1px solid #eaeaea;
+}
+.filter-section:last-of-type {
+  border-bottom: none;
+}
+.filter-header {
+  margin-bottom: 0.5rem;
+}
+.filter-header h6 {
+  font-weight: 700;
+  margin: 0;
 }
 .validation-msg {
   margin: 0.35rem 0 0.5rem 0;

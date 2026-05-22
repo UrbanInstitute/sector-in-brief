@@ -1,8 +1,23 @@
-# Build the inside of a visualization panel — header, coverage notes,
-# filter card, plot/table UI. Returned as a tagList so a wrapping
-# uiOutput can drop it in. Splitting this out from visualpanel_builder
-# means a tab's heavy widgets (plot_ui, data_ui, coverage_notes_card)
-# only run when the tab activates, not at app boot.
+# Build the inside of a visualization panel — header + sidebar of
+# filters + main column with coverage notes, chips, and plot/table
+# UI. Returned as a tagList so a wrapping uiOutput can drop it in.
+# Splitting this out from visualpanel_builder means a tab's heavy
+# widgets (plot_ui, data_ui, coverage_notes_card) only run when the
+# tab activates, not at app boot.
+#
+# Layout (PR-B):
+#
+#   [page_header_card — full width]
+#   [-------- bslib::layout_sidebar --------]
+#   [ sidebar       ] [ main                  ]
+#   [               ] [                       ]
+#   [ filter cards  ] [ coverage notes        ]
+#   [ Update/Reset  ] [ chip row              ]
+#   [               ] [ plot/table sub-tabs   ]
+#   [---------------] [-----------------------]
+#
+# The sidebar is bslib's standard layout_sidebar which collapses to a
+# toggleable drawer on mobile (handled by bslib's CSS, not us).
 
 #' Render the lazy contents of one visualization panel.
 #'
@@ -25,23 +40,22 @@ visualpanel_content <- function(panel_header,
   ns <- shiny::NS(panelid)
   htmltools::tagList(
     page_header_card(panel_header, panel_desc),
-    coverage_notes_card(parquet_file),
-    bslib::card(
-      class = "card-filter",
-      bslib::card_title("Select Your Filters", class = "bg-light-gray"),
-      title = "",
-      bslib::layout_column_wrap(
+    bslib::layout_sidebar(
+      sidebar = bslib::sidebar(
+        title = "Filters",
+        width = 320,
         all_cards[["org_card"]],
         all_cards[["subsector_card"]],
         all_cards[["size_card"]],
         all_cards[["geo_card"]],
-        all_cards[["date_card"]]
+        all_cards[["date_card"]],
+        all_cards[["process_button"]]
       ),
-      all_cards[["process_button"]]
-    ),
-    # Active-filter chips, rendered by data_server() from the inputs
-    # snapshot. Empty when no filter is narrowed from default.
-    shiny::uiOutput(ns("filter_chips"), class = "filter-chip-row"),
-    plot_ui(panelid)
+      coverage_notes_card(parquet_file),
+      # Active-filter chips, rendered by data_server() from the inputs
+      # snapshot. Empty when no filter is narrowed from default.
+      shiny::uiOutput(ns("filter_chips"), class = "filter-chip-row"),
+      plot_ui(panelid)
+    )
   )
 }
