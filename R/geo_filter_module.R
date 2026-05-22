@@ -41,7 +41,8 @@ geo_filter_ui <- function(id, state_choices) {
         id = "state_mult",
         label = "Select State(s)",
         choices = states,
-        multiple = TRUE
+        multiple = TRUE,
+        options = list(maxItems = 5)
       ),
       condition = "input.geo_level == 'Census State'",
       ns = shiny::NS(id)
