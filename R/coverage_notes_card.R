@@ -6,6 +6,15 @@
 
 .dict_cache <- new.env(parent = emptyenv())
 
+#' Read (and memoise) the parquet data dictionary.
+#'
+#' Cached for the session via a module-level env. Tests can replace
+#' `.dict_cache$df` directly via `local_dict_fixture()` (see
+#' helper-fixtures.R) to avoid touching disk.
+#'
+#' @param path Path to `data_dictionary.parquet`.
+#' @return Tibble with columns file, column, datatype, description,
+#'   form_source, coverage, coverage_notes.
 load_data_dictionary <- function(path = "data/data_dictionary.parquet") {
   if (is.null(.dict_cache$df)) {
     .dict_cache$df <- arrow::read_parquet(path)
@@ -13,6 +22,15 @@ load_data_dictionary <- function(path = "data/data_dictionary.parquet") {
   .dict_cache$df
 }
 
+#' Build the per-panel coverage-notes accordion.
+#'
+#' Filters the data dictionary to rows for the panel's parquet file
+#' that have non-empty `coverage_notes`, formats them as a bulleted
+#' list inside a collapsed accordion. NULL when no notes apply.
+#'
+#' @param parquet_file Filename for the active panel (matches
+#'   data_dictionary's `file` column).
+#' @return A `bslib::accordion` or NULL.
 coverage_notes_card <- function(parquet_file) {
   if (is.na(parquet_file) || !nzchar(parquet_file)) return(NULL)
   dd <- load_data_dictionary()

@@ -1,9 +1,12 @@
-#' @title Wrapper function for Urban themed bslib input task button
-#' @param ns The namespace of the shiny app
-#' @param id The id of the button
-#' @param label The label of the button
-#' @param label_busy The label of the button when busy
-#' @return A bslib input task button
+#' Urban-themed bslib input_task_button.
+#'
+#' Used as the "UPDATE DATA" button in `data_ui()`. Shows `label_busy`
+#' and disables itself while the pipeline is running.
+#'
+#' @param ns Module namespace function (from `shiny::NS`).
+#' @param id Input id (will be namespaced).
+#' @param label Idle button text.
+#' @param label_busy In-flight button text.
 urbn_task_button <- function(ns, id, label, label_busy) {
   bslib::input_task_button(
     id = ns(id),

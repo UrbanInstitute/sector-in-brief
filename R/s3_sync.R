@@ -14,12 +14,18 @@ S3_BUCKET <- "nccsdata"
 S3_PREFIX <- "sector-in-brief"
 VINTAGE   <- "v2026.05"
 
-# Returns a list:
-#   $status  one of "fresh" (synced or cache hit), "stale" (sync failed,
-#            fell back to existing local data), "missing" (sync failed
-#            and no local data — this is the only fatal case)
-#   $vintage the vintage now available in data_dir, or NA if missing
-# Callers (app()) check $status to surface a "data may be stale" banner.
+#' Sync the pinned data vintage from S3 into `data_dir`.
+#'
+#' Short-circuits to "fresh" if `data_dir/_manifest.json` already
+#' reports the target VINTAGE (no S3 call). On sync failure with
+#' existing local data, returns "stale" + a warning so app() can show
+#' the user a banner. On sync failure with no local fallback,
+#' `stop()`s — the only fatal path.
+#'
+#' @param data_dir Target directory (default "data").
+#' @return List with:
+#'   - `status`: one of "fresh", "stale".
+#'   - `vintage`: the vintage now available, or NA if unknown.
 ensure_data_local <- function(data_dir = "data") {
   manifest <- file.path(data_dir, "_manifest.json")
   read_vintage <- function() {
@@ -56,10 +62,15 @@ ensure_data_local <- function(data_dir = "data") {
        " and no local data to fall back to - check AWS credentials")
 }
 
-# Export the parquet data dictionary as a CSV under www/ so the static
-# "Download data dictionary" links in visual_text.R can resolve to it.
-# Prepends a UTF-8 BOM so Excel-on-Windows renders en-dashes / em-dashes /
-# inequality signs in coverage_notes correctly.
+#' Export the parquet data dictionary as a CSV under www/.
+#'
+#' Resolves the static "Download data dictionary" links in
+#' visual_text.R. Prepends a UTF-8 BOM so Excel-on-Windows renders
+#' en-dashes / em-dashes / inequality signs in coverage_notes
+#' correctly. No-op if the parquet doesn't exist (e.g. tests).
+#'
+#' @param parquet_path Source parquet (typically `data/data_dictionary.parquet`).
+#' @param csv_path Destination CSV under `www/`.
 publish_data_dictionary <- function(parquet_path = "data/data_dictionary.parquet",
                                     csv_path = "www/data_dictionary.csv") {
   if (!file.exists(parquet_path)) return(invisible())

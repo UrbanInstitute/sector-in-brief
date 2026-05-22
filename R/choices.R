@@ -1,4 +1,15 @@
-# Choices for filters - excludes geo filters
+# Static choice lists for the non-geo filters:
+#   - ctype_tree_df: two-level tree of 501(c) types feeding urbn_tree()
+#     in data_ui(). Top-level node groups child types and selecting it
+#     in the UI cascades to all children.
+#   - ctype_id: map from user-facing label → list of values stored in
+#     the parquet's `Organization Type` column. Used by ctype_query().
+#   - ctype_501c3 / ctype_other: groupings used by table_builder_ctype
+#     for roll-up rules ("All 501(c)(3)" merge and "Other" tail collapse).
+#
+# `choice_builder(panelid)` below returns the panel-specific subset
+# (e.g. PF panels offer only the private-foundation org type).
+
 ctype_tree_df <- tibble::tribble(
   ~level1, ~level2,
   "501(c)(3) Organizations", "501(c)(3) - Public Charities",
@@ -102,8 +113,16 @@ ctype_other <- c(
 )
 
 
-#' @title Build a list of choices for filters based on panelid
-#' @param panelid The id of the visual page
+#' Build the per-panel filter choice list.
+#'
+#' Most panels share the same choices; PF panels override `ctype` to
+#' offer only private foundations, and the download flow uses a
+#' panelid of `"download"` to get a different size/subsector preset.
+#'
+#' @param panelid The active panel id from `visualpanel_args`, or
+#'   `"download"` for the Custom Panel Datasets flow.
+#' @return Named list with `ctype_tree_df`, `ctype_id`, `ctype`,
+#'   `subsector`, `size`.
 choice_builder <- function(panelid){
   choice_ls <- list(
     ctype_tree_df = ctype_tree_df,

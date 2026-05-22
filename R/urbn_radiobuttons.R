@@ -1,11 +1,9 @@
-#' @title Urban theming for shiny radiobuttons
-#' @param ns The namespace of the shiny app
-#' @param id The id of the radiobuttons
-#' @param label The label of the radiobuttons
-#' @param choices The choices of the radiobuttons
-#' @param selected The selected choice of the radiobuttons
-#' @param class The div class of the radiobutton
-#' @return A shiny radiobuttons
+#' Urban-themed radioButtons.
+#'
+#' @param ns Module namespace function (from `shiny::NS`).
+#' @param id Input id (will be namespaced).
+#' @param label,choices,selected Standard `radioButtons` args.
+#' @param class CSS class applied to the wrapping div.
 urbn_radiobuttons <- function(ns, id, label, choices, selected, class){
   htmltools::div(
     class = class,
