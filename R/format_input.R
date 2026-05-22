@@ -1,11 +1,17 @@
-#' @title Format inputs for data pipeline
-#' @param input A list of reactive user inputs
-#' @param geo_filters A list of reactive geographic filters
-#' @param time_series A boolean indicating time series data
-#' @param title_prefix A character vector to prefix plot titles
-#' @param year_var A character vector defining the year column
-#' @param agg_var A character vector defining the column to aggregate
-#' @return A list of formatted inputs
+# Resolve a panel's Shiny inputs + reactive geo filters into a plain
+# named list, so downstream functions (query_builder, validate_inputs)
+# can be unit-tested without a reactive context. This is the boundary
+# between the reactive world and pure functions.
+
+#' Snapshot Shiny inputs into a plain named list for the pipeline.
+#'
+#' @param input The Shiny `input` reactive (current values are read here).
+#' @param geo_filters The reactive return value of
+#'   `geo_filter_server()` — a list of reactives, called here to
+#'   resolve them to values.
+#' @param time_series TRUE for line plots, FALSE for bar plots.
+#' @param title_prefix Prefix used by `plot_title()` downstream.
+#' @param year_var,agg_var Column names from `data_server_args`.
 format_input <- function(input,
                          geo_filters,
                          time_series,

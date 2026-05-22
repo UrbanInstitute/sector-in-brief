@@ -1,7 +1,20 @@
-# Wrapper function for data_server() and dataloader()
-data_server_wrapper <- function(page, data_server_args, geo_df){
-  data <- dataloader(path = data_server_args[[page]][["path"]], 
-                     cols = data_server_args[[page]][["vars"]])
+# Bridge between visualpanel_content (which knows only the panel title)
+# and data_server() (which needs the full per-panel config). Looks up
+# the panel's row in data_server_args, loads the parquet via
+# dataloader(), and starts the moduleServer.
+
+#' Mount the per-panel data server for a given panel title.
+#'
+#' @param page Panel title — must match a name in `data_server_args`.
+#' @param data_server_args The driver list defined in
+#'   `R/data_server_args.R`.
+#' @param geo_df Nested geographies lookup, passed through to the
+#'   server module for state → county/CBSA cascading.
+data_server_wrapper <- function(page, data_server_args, geo_df) {
+  data <- dataloader(
+    path = data_server_args[[page]][["path"]],
+    cols = data_server_args[[page]][["vars"]]
+  )
   data_server(
     id = data_server_args[[page]][["id"]],
     data = data,

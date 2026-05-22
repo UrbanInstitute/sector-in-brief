@@ -1,4 +1,16 @@
-# List of vars to load for each data set
+# Driver list for the 11 visualization panels.
+#
+# Each entry maps a panel title (the navset_card_pill tab) to its
+# runtime configuration: which parquet to read, which columns to
+# select, the Shiny module id, axis labels, the metric to aggregate,
+# and whether to render as time series (line) or single-year (bar).
+#
+# `data_server_wrapper()` looks up an entry by panel title and passes
+# the values into `dataloader()` + `data_server()`. Adding a new panel
+# is purely a matter of adding a new entry here and a matching row in
+# `visualpanel_args`.
+
+# Columns every panel loads (org + geo + size dimensions).
 default_vars <- c(
   "Organization Type",
   "Subsector",

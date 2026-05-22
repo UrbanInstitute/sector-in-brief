@@ -5,6 +5,22 @@
 
 .dataset_cache <- new.env(parent = emptyenv())
 
+#' Open a panel's parquet as a lazy arrow Dataset.
+#'
+#' Memoised per `path` for the session so repeated panel switches don't
+#' re-read parquet metadata. The returned object is lazy — predicates
+#' from `filter_data()` push down into the row-group scan.
+#'
+#' Applies two panel-specific filters here, before downstream code sees
+#' the data: outlier clamps on DAF count / total assets, and a
+#' `!is.na(dollar_col)` filter on dollar-metric DAF views (since
+#' `daf.parquet` covers every BMF-active cell, including those with no
+#' DAF activity where the dollar columns are NA).
+#'
+#' @param path Path to the parquet on disk.
+#' @param cols Character vector of columns to select. NULL = all.
+#' @return A lazy arrow Dataset reference, optionally column-subset and
+#'   pre-filtered.
 dataloader <- function(path, cols = NULL) {
   in_shiny <- !is.null(shiny::getDefaultReactiveDomain())
   if (in_shiny) shinycssloaders::showPageSpinner()

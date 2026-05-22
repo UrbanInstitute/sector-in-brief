@@ -1,7 +1,28 @@
-# This function creates a named list of queries for the data
+# Translate the formatted Shiny inputs into a query specification that
+# filter_data() can push down into arrow. Output shape:
+#
+#   list(filters   = named-list of column → allowed-values,
+#        geo_level = string)
+#
+# geo_level is forwarded separately because summarise_data() needs to
+# know which column to use as the geographic breakdown axis, in
+# addition to filtering on it.
+#
+# Subsector and Size are only added to the filter list when the user
+# narrowed from the default (all 12 / all 6); otherwise they are
+# omitted so the arrow scan can skip the comparison entirely. Year is
+# always filtered — the date slider exists on every panel.
+
+#' Build the filter + geo-level query for the pipeline.
+#'
+#' @param inputs Named list from `format_input()` (Shiny inputs +
+#'   panel context resolved to plain values).
+#' @param geo_df Geographic lookup table (unused at present; passed
+#'   through to keep the signature stable across geo_query rewrites).
+#' @return `list(filters, geo_level)`. National view rewrites
+#'   `geo_level` to "Census Region" with all four regions selected so
+#'   the by-geo breakdown shows region totals instead of being empty.
 query_builder <- function(inputs, geo_df) {
-  # TODO: Figure out why private foundation code is being transformed incorrectly
-  # Load params
   ctype <- inputs$ctype
   geo_level <- inputs$geo_level
   region <- inputs$geo_region
@@ -14,11 +35,10 @@ query_builder <- function(inputs, geo_df) {
   year_range <- inputs$year_range
   year_var <- inputs$year_var
   time_series <- inputs$time_series
-  # Create query list
+
   filter_ls <- list()
-  # Organization Type
   filter_ls <- ctype_query(filter_ls, ctype)
-  # Geographies
+
   if (geo_level == "National") {
     geo_level <- "Census Region"
     region <- c("Northeast", "Midwest", "South", "West")
@@ -30,22 +50,20 @@ query_builder <- function(inputs, geo_df) {
                          state_mult,
                          county,
                          cbsa)
-  # Subsector
-  if (length(subsector) < 12){
+
+  if (length(subsector) < 12) {
     filter_ls[["Subsector"]] <- subsector
   }
-  # Size — coerce to integer; checkboxGroupInput returns strings but the
-  # Size column is int32 in the parquet (arrow's lazy planner rejects
-  # string-vs-int32 comparisons).
+  # checkboxGroupInput returns strings; Size is int32 in the parquet
+  # and arrow's lazy planner rejects string-vs-int32 comparisons.
   if (length(size) < 6) {
     filter_ls[["Size"]] <- as.integer(size)
   }
-  # Date Range — applied unconditionally so the slider works on
-  # single-year panels (DAFs) too. time_series only controls chart
-  # type downstream (line vs bar). Coerce to integer for the same
-  # arrow type-match reason as Size above.
+  # Applied unconditionally so the slider works on single-year panels
+  # (DAFs) too. time_series only controls chart type downstream (line
+  # vs bar). Integer coercion for the same arrow type-match reason.
   years <- seq(as.integer(year_range[1]), as.integer(year_range[2]))
   filter_ls[[year_var]] <- years
-  query_ls <- list(filters = filter_ls, geo_level = geo_level)
-  return(query_ls)
+
+  list(filters = filter_ls, geo_level = geo_level)
 }
