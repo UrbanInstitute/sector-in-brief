@@ -124,10 +124,10 @@ For each panel below, just confirm the Overall plot draws without errors and the
 - [ ] **Finances → Assets** — dollar y-axis with "$" prefix in tooltip.
 - [ ] **Finances → Revenues** — caption mentions "Other revenue sources" disclaimer.
 - [ ] **Finances → Expenses** — caption mentions "Other expenses" disclaimer.
-- [ ] **Finances → Benefits** — draws without error.
-- [ ] **Private Foundation Grants** — change Organization Type to include "Private Foundations" — the plot should show a dashed line spanning 2016-2018 (NA gap) rather than a zero or a jump. Caption appends "The IRS has not released 990 PF tax records for tax years 2016 through 2018."
-- [ ] **DAFs → Number of DAFs** — bar chart, not a line (single year per `data_server_args::time_series=FALSE`).
-- [ ] **DAFs → DAF Contributions / DAF Grants / DAF Value** — same single-year bar style; dollar y-axis.
+- [ ] **Finances → Benefits** — a chart appears with no error message and no "No Data Available" placeholder.
+- [ ] **Private Foundation Grants** — change Organization Type to include "Private Foundations" — the plot should show a dashed line spanning 2016-2018 (a known data gap) rather than dropping to zero or jumping. The caption underneath should mention "The IRS has not released 990 PF tax records for tax years 2016 through 2018."
+- [ ] **DAFs → Number of DAFs** — the chart is a **single-year bar chart** (not a multi-year line chart). DAF panels only have 2021-2023 of data, and a single year is shown by default.
+- [ ] **DAFs → DAF Contributions / DAF Grants / DAF Value** — each is a single-year bar chart like Number of DAFs, but the y-axis shows dollar amounts (e.g. `$1,234,567` or `$1.2M`).
 - [ ] **DAFs → DAF Proportion** — percentage y-axis ("Percentage" label, not "$").
 
 ## 6. Custom Panel Datasets (~3 min)
