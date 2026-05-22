@@ -1,5 +1,23 @@
-# Module for geographic filters - need to update choices argument
+# Geographic filter Shiny module — both the UI (geo_filter_ui) and the
+# server (geo_filter_server). Splits the geo selection into a level
+# radio + level-specific selectizes, with conditionalPanel hiding the
+# ones that don't apply. State-then-county and state-then-CBSA
+# cascading is handled server-side by substate_filter().
+#
+# Used inside `data_ui()` as one of the filter cards. The server
+# returns a list of reactives (state_single(), state_mult(), region(),
+# geo_level(), county(), cbsa()) consumed by `format_input()` to
+# snapshot into pure inputs.
 
+#' Refresh the choices for a downstream geo selectize from the parent
+#' state. Called on state_single change to update county/CBSA lists.
+#'
+#' @param session Active Shiny session.
+#' @param id Target selectize input id (e.g. "county").
+#' @param geo_input Parent state value.
+#' @param geo_df Nested geographies lookup.
+#' @param geo_var Column in `geo_df` to pull values from.
+#' @param server Forwarded to `updateSelectizeInput`.
 substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TRUE) {
   shiny::updateSelectizeInput(
     session = session,
@@ -9,6 +27,12 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
   )
 }
 
+#' Build the Geographic Filters card UI.
+#'
+#' @param id Sub-module id (typically the parent's `"geo_filter"`).
+#' @param state_choices Accepted for backwards compatibility; the
+#'   actual state list comes from `R/geo_choices.R::states`.
+#' @return A `bslib::card`.
 geo_filter_ui <- function(id, state_choices) {
   ns <- shiny::NS(id)
   bslib::card(
@@ -85,6 +109,15 @@ geo_filter_ui <- function(id, state_choices) {
   )
 }
 
+#' Server half of the geo filter module.
+#'
+#' Wires the state→county and state→CBSA cascades, the geo_reset
+#' handler, and exposes the active selections as reactives so the
+#' parent module's `format_input()` can snapshot them.
+#'
+#' @param id Sub-module id.
+#' @param geo_df Nested geographies lookup.
+#' @return Named list of reactives consumed by `format_input()`.
 geo_filter_server <- function(id, geo_df) {
   shiny::moduleServer(id, function(input, output, session) {
     observeEvent(input$state_single, {

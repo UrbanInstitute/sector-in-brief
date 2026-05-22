@@ -1,3 +1,9 @@
+# Driver tibble for the 5 plot/table sub-tabs inside each
+# visualization panel (Overall, By Org Type, By Subsector, By
+# Geography, By Size). Maps each sub-tab title to the output slot IDs
+# its girafe/reactable/downloadButton bind against. The IDs here must
+# match the names set in `render_outputs()` (output$plot_overall etc).
+
 plotpanel_args <-
   tibble::tribble(
     ~title, ~plot_id, ~table_id, ~download_id, ~table_title_id,

@@ -1,3 +1,11 @@
+# Driver tibble for the 11 visualization panels — the UI counterpart
+# to data_server_args.R. Each row defines a navset_card_pill tab in
+# the Data Visualizations section: header text, descriptive copy,
+# panel id (used to namespace the Shiny module + output slots),
+# year-range bounds, and the parquet file the panel reads from.
+#
+# Adding a new panel is one row here + one entry in data_server_args.
+#
 # start_year / end_year are RESOLVED at app() boot from the manifest's
 # year_counts (see R/year_range.R + resolve_visualpanel_year_ranges()
 # below). The values declared here act as overrides: NA = derive from
@@ -23,9 +31,15 @@ visualpanel_args <- tibble::tribble(
   "DAF Proportion", "Percentage of organizations that maintain a DAF", daf_proportion_desc, "daf_proportion", 2021L, 2023L, "daf.parquet",
 )
 
-# Replace NA start_year / end_year cells with manifest-derived bounds.
-# Called from app() AFTER ensure_data_local() has populated data/, so
-# data/_manifest.json is guaranteed present.
+#' Resolve NA year-range overrides against the live manifest.
+#'
+#' Called from `app()` after `ensure_data_local()`. For each row in
+#' visualpanel_args, NA cells get replaced with year bounds derived
+#' from `data/_manifest.json`'s `year_counts` (see `panel_year_range()`);
+#' explicit integer cells pass through unchanged.
+#'
+#' @param args A copy of `visualpanel_args` (or a subset for testing).
+#' @return The same tibble with start_year/end_year filled in.
 resolve_visualpanel_year_ranges <- function(args = visualpanel_args) {
   resolved <- mapply(
     resolve_panel_year_range,

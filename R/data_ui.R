@@ -1,4 +1,22 @@
-# Module for data processing in Shiny App
+# Filter cards for one panel: Organization Type, Subsector, Size,
+# Geographic Filters, Date Range, plus the UPDATE DATA task button.
+# Returned as a named tagList so `visualpanel_content()` can place the
+# cards in a specific layout (column_wrap) rather than receiving a
+# pre-laid-out container.
+#
+# Each card includes a `uiOutput(ns("validation_<key>"))` slot below
+# it (see render_validation_messages.R) where invalid-selection
+# messages appear inline rather than via modal.
+
+#' Build the filter-card tagList for one panel.
+#'
+#' @param id Parent panel's module id.
+#' @param choices Named list of filter choices from `choice_builder()`
+#'   (ctype tree, subsectors, size bands).
+#' @param start_year,end_year Date-slider bounds (manifest-derived).
+#' @return Named tagList with one entry per filter card plus the
+#'   process button (`org_card`, `geo_card`, `subsector_card`,
+#'   `size_card`, `date_card`, `process_button`).
 data_ui <- function(id, choices, start_year, end_year) {
   ns <- shiny::NS(id)
   htmltools::tagList(
