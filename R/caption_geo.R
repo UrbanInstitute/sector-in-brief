@@ -1,12 +1,14 @@
-#' @title Function to format plot captions for selected geographies
-#' @param caption A character string containing the plot caption
-#' @param geo_level A character string indicating the level of geography
-#' @param region A character vector of regions
-#' @param state_single A character scalar of single states used with county/cbsa
-#' @param state_mult A character vector of multiple states
-#' @param county A character vector of counties
-#' @param cbsa A character vector of CBSAs
-#' @return A character string with the plot caption edited in place
+# One of six caption_*.R helpers. Each appends a per-section line to
+# the running plot caption assembled by `plot_caption()`. Only the
+# argument matching the active geo level is consumed.
+
+#' Add the geography line(s) to a plot caption.
+#'
+#' @param caption Running caption string.
+#' @param geo_level Active level (e.g. "Census State", "National").
+#' @param region,state_single,state_mult,county,cbsa Selections; only
+#'   the one(s) matching `geo_level` are read.
+#' @return Updated caption string.
 caption_geo <- function(caption,
                       geo_level,
                       region,

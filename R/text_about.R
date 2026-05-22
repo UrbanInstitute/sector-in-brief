@@ -1,4 +1,6 @@
-# HTML formatted text for the about page
+# All static copy for the About tab — titles, bodies, FAQ Q+A pairs.
+# Composed into accordion panels by `aboutUI()` (R/about.R) using
+# `urbn_accordion_panel()`.
 
 # Text for the about page
 about_title <- "About"

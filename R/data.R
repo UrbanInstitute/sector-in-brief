@@ -1,4 +1,14 @@
-# Internal data for dashboard
+# Shared constants and reusable data objects loaded at package init:
+#   - Link URLs to external resources (IRS, NCCS, Census, Qualtrics)
+#   - `html_orgtype` — anchor tag reused in the org-type tooltip
+#   - `navbar_title` — header img + branding for the page navbar
+#   - `form_data` / `download_table` — IRS form-type comparison
+#     reactable shown on the Custom Panel Datasets page
+#   - `data_sources` / `data_source_table` — same shape, but for the
+#     "Data Sources" accordion on the About page
+#   - `irs.data.sets` / `nccs.data.sets` — strings reused in the
+#     About page accordion content
+
 library(reactable)
 
 visual_link_page <- "Finances"

@@ -1,4 +1,13 @@
-query_builder_download <- function(inputs){
+# Packages the Custom Panel Datasets form into the JSON payload the
+# NCCS data-extract API expects. Companion to query_builder.R (which
+# builds the in-process arrow filter spec); this one targets an
+# external service and a different schema (UPPER_SNAKE column names).
+
+#' Build the data-extract API request from the form's inputs.
+#'
+#' @param inputs Form inputs gathered by `dataRequestServer()`.
+#' @return A JSON string ready to POST to the data-extract endpoint.
+query_builder_download <- function(inputs) {
   filters <- list()
   vars <- list(
     "var" = c(

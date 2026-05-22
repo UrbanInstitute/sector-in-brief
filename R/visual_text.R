@@ -1,4 +1,9 @@
-# This script contains the text that goes into the Data Visualizations page
+# Per-panel descriptive copy for the 11 visualization panels (intro
+# paragraphs shown above the filters via `visualpanel_content()`).
+# Each variable here is referenced by name in `visualpanel_args`'s
+# `panel_desc` column:
+#   number_of_nonprofits, assets_desc, revenue_desc, expenses_desc,
+#   benefits_desc, grants_desc, daf_*_desc, daf_proportion_desc
 number_of_nonprofits <- htmltools::tagList(
   htmltools::p(
     "Understanding the number of nonprofit organizations registered with the IRS provides a sense of the overall size and growth of the sector. NCCS data encompass all tax-exempt ",

@@ -1,4 +1,11 @@
-#' @title Plot captions for finances
+#' Add a finance-specific definition line to a plot caption when the
+#' panel's metric is Total Assets / Total Revenues / Total Expenses
+#' (expands what "Other" means in the underlying breakdown). No-op for
+#' any other metric.
+#'
+#' @param caption Running caption string.
+#' @param agg_var Panel's metric column name.
+#' @return Updated caption string.
 caption_finance <- function(caption, agg_var) {
   if (agg_var == "Total Assets") {
     caption <- paste(

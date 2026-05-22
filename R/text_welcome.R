@@ -1,4 +1,6 @@
-# Text on welcome page
+# All static copy for the Welcome tab (R/welcome.R). Title,
+# subtitle, intro paragraphs, the two "what's inside" sections, and
+# the credits/about block at the bottom.
 
 welcome_title <- htmltools::h2(
   "Nonprofit Sector In Brief Dashboard"

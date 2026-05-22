@@ -1,3 +1,9 @@
+# Static choice lists for the geo filter UI:
+#   - geo_level: label → internal name for the Census level radio
+#   - states:    state-name → 2-letter postal code for the state
+#                selectizes (used in both geo_filter_module and the
+#                Custom Panel Datasets download flow)
+
 geo_level <- list(
   "National" = "National",
   "Region" = "Census Region",
