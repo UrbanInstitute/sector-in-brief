@@ -44,15 +44,19 @@ app <- function(...) {
     )
   } else NULL
 
-  ui <- bslib::page_navbar(
+  # tags$head() goes outside page_navbar in a tagList; passing it
+  # positionally inside page_navbar's `...` triggers a bslib warning
+  # because that slot expects nav_panel / nav_menu children.
+  ui <- htmltools::tagList(
+  htmltools::tags$head(
+    htmltools::includeCSS("www/sib_style.css")
+  ),
+  bslib::page_navbar(
     id = "tabs",
     padding = "10px",
     title = navbar_title(title = "     | NCCS"),
     bg = "#0096d2",
     fillable = FALSE,
-    htmltools::tags$head(
-      htmltools::includeCSS("www/sib_style.css")
-    ),
     header = stale_banner,
     bslib::nav_spacer(),
     welcomeUI,
@@ -98,7 +102,8 @@ app <- function(...) {
     ),
     footer = text_footer
   )
-  
+  )
+
   server <- function(input, output, session) {
     # Lazy panel UIs: bind a renderUI for each panel's placeholder. Shiny's
     # default suspendWhenHidden = TRUE means each one only fires when its

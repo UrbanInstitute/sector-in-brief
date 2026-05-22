@@ -128,8 +128,6 @@ For each panel below, just confirm the Overall plot draws without errors and the
 
 These are tracked separately and are **not** regressions to log:
 
-- A `bslib` warning at boot ("Navigation containers expect ...") because `tags$head` is passed positionally to `page_navbar` in `R/app.R:29-31`. Cosmetic; queued for a fix.
-- `R/caption_year.R` hardcodes "until tax year 2021" in caption text. Stale literal; queued for a fix that derives from the manifest.
 - The Geographic Filters card has no "Reset" button next to its label, while some early UI sketches suggested one. Intentional (the geo_level radio acts as the reset).
 - The PF panel's 2016-2018 NA handling shows a dashed line gap; this is by design (`table_builder_pf.R`).
 
