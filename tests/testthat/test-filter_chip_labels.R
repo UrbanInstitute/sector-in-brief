@@ -126,6 +126,15 @@ test_that("multiple narrowings produce multiple chips in expected order", {
   expect_match(out[5], "^Years")
 })
 
+test_that("long ctype labels are truncated with an ellipsis", {
+  long_label <- "501(c)(12) - Benevolent Life Insurance Associations, Mutual Ditch or Irrigation Companies, ..."
+  defaults <- defaults_for()
+  defaults$ctype_default <- c(long_label, "A", "B")  # realized default includes it
+  out <- filter_chip_labels(base_inputs(ctype = long_label), defaults)
+  expect_match(out, "…$")
+  expect_lt(nchar(out), nchar(long_label) + 30)
+})
+
 test_that("narrowed ctype to >=4 collapses to count", {
   # Simulate the urbn_tree expanded-leaf case: realized default has
   # many leaves, user narrows to a subset that's still ≥4 items.

@@ -32,6 +32,18 @@
 #'   of the raw integer values.
 #' @return Character vector of chip labels, in display order. Empty
 #'   when no filter is narrowed.
+CHIP_ITEM_MAX_CHARS <- 50
+
+# Trim a single chip item so one wide IRS-legalese label can't blow
+# up the chip row. The longest 501(c)(N) descriptions in
+# choices.R::ctype_tree_df are 250+ chars; without truncation a
+# single ctype chip can wrap to 3+ lines.
+truncate_chip_item <- function(x, n = CHIP_ITEM_MAX_CHARS) {
+  ifelse(nchar(x) > n,
+         paste0(substr(x, 1, n - 1), "…"),
+         x)
+}
+
 filter_chip_labels <- function(inputs, defaults) {
   chips <- character()
 
@@ -44,7 +56,8 @@ filter_chip_labels <- function(inputs, defaults) {
     if (is.null(selected) || length(selected) == 0) return(NULL)
     if (setequal(selected, default)) return(NULL)
     if (length(display) <= 3) {
-      sprintf("%s: %s", label, paste(display, collapse = ", "))
+      sprintf("%s: %s", label,
+              paste(truncate_chip_item(display), collapse = ", "))
     } else {
       sprintf("%s: %d selected", label, length(display))
     }

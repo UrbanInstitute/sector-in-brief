@@ -89,6 +89,33 @@ Pick the **Numbers** panel for the canonical happy-path run.
 
 - [ ] Slider bounds match the panel's year coverage (Numbers: 1989-present; DAF panels: 2021-2023; PF: 1989-2023). Drag both handles together to a single year and confirm the plot redraws as a single bar/lollipop, not a line.
 
+### Active filter feedback (URL state, reset, chips)
+
+These features keep the user oriented as they narrow filters.
+
+#### URL state
+
+- [ ] On the Numbers panel, change one filter (e.g. switch geo to a specific state). Look at the browser address bar — it should update to include query parameters reflecting the new selection.
+- [ ] Copy the URL, open it in a new tab. The dashboard should land on the same panel with the same filter selections already applied.
+- [ ] Refresh the page. Selections should persist, not reset to defaults.
+
+#### Reset filters button
+
+- [ ] Narrow several filters (e.g. uncheck some subsectors, pick a state, drag the year range). Click **Reset filters** (next to UPDATE DATA). All filters snap back to their defaults; any inline validation messages also clear.
+
+#### Active filter chip row
+
+The chip row appears between the filter card and the plot tabs.
+
+- [ ] At first load, the chip row is empty — no chips for default selections.
+- [ ] Uncheck all but 1 subsector. A chip appears: `Subsector: <code>` (e.g. "Subsector: ART"). Codes, not full names — intentional to keep chips short.
+- [ ] Uncheck all but 4 subsectors. The chip collapses to `Subsector: 4 selected` instead of listing them.
+- [ ] Uncheck all but 1 size band. The chip shows the dollar-range label (e.g. "Size: Under $100,000") — **not** the raw integer "Size: 1".
+- [ ] Narrow Organization Type to a single 501(c) sub-type. The chip reads e.g. `Org Type: 501(c)(3) - Public Charities` — verify the labels are recognizable IRS terminology. Very long descriptions (notably 501(c)(12)'s 250-char IRS legalese) are truncated to ~50 chars with an ellipsis to keep the chip on one line; the full label is still in the filter card.
+- [ ] Switch geo to a specific state. A chip appears: `State: <state-abbr>`.
+- [ ] Drag the date slider in. A chip appears: `Years: 2010-2020`.
+- [ ] Click Reset filters — all chips disappear.
+
 ## 5. Per-panel quick checks (~3 min)
 
 For each panel below, just confirm the Overall plot draws without errors and the caption text is present. **You do not need to exhaustively re-run filter tests.**
