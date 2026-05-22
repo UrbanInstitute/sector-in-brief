@@ -1,3 +1,17 @@
+# Multi-series interactive line chart (time series, multiple groups).
+# Default for the by_ctype / by_geo / by_subsector / by_size views on
+# Numbers, Finances, and PF Grants panels. The double-line trick
+# (solid + dashed-on-NA) keeps a continuous trace through years where
+# the metric is NA (e.g. 2016-2018 for private foundations).
+
+#' Build a multi-series interactive line chart.
+#'
+#' @param table Long-format tibble: one row per (year, group).
+#' @param groupby_var Column that supplies series identity + colour.
+#' @param title,caption Pre-computed strings.
+#' @param yvar,xvar,ytitle,xtitle Standard ggplot aesthetics / labels.
+#' @param num_groups Series count — drives the colourpalette length.
+#' @return A girafe interactive plot.
 group_line_plot <- function(table,
                             groupby_var,
                             title,

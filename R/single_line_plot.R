@@ -1,3 +1,14 @@
+# Single-series interactive line chart (time series, no breakdown).
+# The "overall" view on Numbers / Finances / PF Grants panels. Like
+# group_line_plot, uses solid + dashed-on-NA layers to keep a
+# continuous trace across NA years.
+
+#' Build a single-series interactive line chart.
+#'
+#' @param table Long-format tibble with one row per year.
+#' @param title,caption Pre-computed strings.
+#' @param yvar,xvar,xtitle,ytitle Standard ggplot aesthetics / labels.
+#' @return A girafe interactive plot.
 single_line_plot <- function(table,
                              title,
                              caption,

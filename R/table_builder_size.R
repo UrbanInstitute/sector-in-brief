@@ -1,9 +1,16 @@
-#' @title Build downloadable tile for results aggregated by asset size category
-#' @param table A arrow table containing filtered data
-#' @param groupby_var A character string of the first variable to group by
-#' @param sum_var A character string of the variable to sum
-#' @param is_pf A logical value indicating if the table is for private foundations
-#' @return A tibble
+# By-Size aggregation. Rewrites the integer Size band (1-6) to a
+# human-readable dollar-range label, with the level ordering preserved
+# via a factor (so charts plot small → large rather than alphabetical).
+# Despite the historical column name, Size is total expenses, not
+# assets (see CLAUDE.md).
+
+#' Build the by-Size summary table.
+#'
+#' @param table Pre-aggregated arrow Table from `table_builder()`.
+#' @param groupby_var Primary axis ("Year").
+#' @param sum_var Metric to aggregate.
+#' @param is_pf TRUE → apply 2016-2018 NA replacement for PFs.
+#' @return A tibble with one row per (year, size band).
 table_builder_size <- function(table, groupby_var, sum_var, is_pf) {
   table <- table |>
     dplyr::mutate(

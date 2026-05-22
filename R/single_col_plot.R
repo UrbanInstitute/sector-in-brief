@@ -1,3 +1,14 @@
+# Single-data-point lollipop chart (single year, no breakdown, or a
+# breakdown that collapsed to one group). Used for the "Total" view on
+# DAF panels where time_series = FALSE and the user hasn't picked a
+# breakdown.
+
+#' Build a single-point lollipop chart.
+#'
+#' @param table Single-row tibble.
+#' @param title,caption Pre-computed strings.
+#' @param yvar,xvar,xtitle,ytitle Standard ggplot aesthetics / labels.
+#' @return A girafe interactive plot.
 single_col_plot <- function(table,
                             title,
                             caption,

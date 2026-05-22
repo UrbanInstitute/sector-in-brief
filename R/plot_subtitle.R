@@ -1,7 +1,13 @@
-#' @title Function to create a subtitle for plot based on groupby variable
-#' @param groupby_var A character string that is the name of the variable to group by
-#' @param selected_groups A character vector of the selected groups
-#' @return A character string that is the subtitle for the plot
+# Compose the per-plot subtitle from the active second-group variable.
+# Strips "Census " from official names ("Census State" → "By State")
+# and rewrites "Metro/Micro Area" to the more readable "By Metro Area".
+
+#' Build the plot subtitle for a breakdown view.
+#'
+#' @param groupby_var Second-group column name, or NULL for overall.
+#' @param selected_groups Accepted for signature compatibility; not
+#'   currently used in the output.
+#' @return A character scalar (empty string for the overall view).
 plot_subtitle <- function(groupby_var, selected_groups) {
   subtitle <- ""
   if (is.null(groupby_var)) {

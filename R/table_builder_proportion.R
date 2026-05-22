@@ -1,3 +1,21 @@
+# Numerator / denominator * 100 builder for the DAF Proportion panel.
+# Sums two count columns then computes the proportion as a percentage.
+# Unlike the standard path, this builder is responsible for emitting
+# the proportion column itself, since the source data only has the
+# underlying counts (Has DAF, Number of Nonprofits).
+#
+# The Size variant rewrites integer bands to dollar-range labels post-
+# aggregation so the legend / x-axis reads naturally.
+
+#' Build the DAF Proportion summary table.
+#'
+#' @param data Filtered arrow Table.
+#' @param groupby_var Primary axis ("Year").
+#' @param groupby_var_2 Second group column, or NULL for overall.
+#' @param sum_var Numerator column ("Has DAF").
+#' @param sum_var_2 Denominator column ("Number of Nonprofits").
+#' @param proportion_var Output column name ("Proportion with DAFs").
+#' @return A tibble with sum_var, sum_var_2, and proportion_var.
 table_builder_proportion <- function(data,
                                      groupby_var,
                                      groupby_var_2,

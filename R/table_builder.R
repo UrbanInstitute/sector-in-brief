@@ -1,3 +1,21 @@
+# Standard table-builder dispatcher. Picks the right per-dimension
+# variant (default / size / subsector / ctype / geo) based on the
+# second group column from summarise_data(). All variants apply the PF
+# 2016-2018 NA replacement when is_pf = TRUE.
+#
+# The proportion path (DAF Proportion panel) is handled separately by
+# table_builder_proportion.
+
+#' Build one summary table.
+#'
+#' @param data Filtered arrow Table.
+#' @param groupby_var Primary axis (typically "Year").
+#' @param groupby_var_2 Second group column, or NULL for the overall
+#'   view. Dispatches to one of the table_builder_* variants when set.
+#' @param sum_var Metric to aggregate (column name).
+#' @param is_pf TRUE if the active org type is private foundations —
+#'   triggers the 2016-2018 NA replacement after aggregation.
+#' @return A tibble.
 table_builder <- function(data,
                           groupby_var,
                           groupby_var_2,

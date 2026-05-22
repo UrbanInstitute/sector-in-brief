@@ -1,12 +1,19 @@
-#' @title Render outputs
-#' @param plots list of plots
-#' @param tables list of tables
-#' @param output list of shiny outputs
-#' @param query list query
-#' @param agg_var character scalar. The variable to aggregate
-#' @param year_var character scalar. The variable to use as year
-#' @param table_title_prefix character scalar. The prefix title of the table
-#' @return list of shiny outputs
+# Last step of data_pipeline(): wire the five built plots, tables, and
+# download handlers into the panel module's `output` object. Each
+# panel UI exposes five (plot, table, download) triplets with fixed
+# IDs (plot_overall, plot_ctype, plot_subsector, plot_geo, plot_size
+# and matching table_*/dl_* IDs) — this function assigns each
+# rendered object to the right slot.
+
+#' Wire built plots/tables/downloads into a panel's outputs.
+#'
+#' @param plots Named list from `plots_build_all()` (5 entries).
+#' @param tables Named list from `summarise_data()` (5 entries).
+#' @param output Shiny module `output` object.
+#' @param query Query spec — used here for the by_geo column name.
+#' @param agg_var Metric column name (drives number/dollar formatting).
+#' @param year_var Time column name.
+#' @param table_title_prefix Prefix for the per-table titles.
 render_outputs <- function(plots, tables, output, query, agg_var, year_var, table_title_prefix){
   output_plots <- render_plots(plots)
   output_tables <- render_tables(tables,

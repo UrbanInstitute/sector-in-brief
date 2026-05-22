@@ -1,10 +1,15 @@
-#' @title Modify reactive table for private foundations
-#' @description replacing years 2016-2018 with NA values because those years have
-#' missing data
-#' @param table A arrow table containing filtered data
-#' @param groupby_var A character string of the first variable to group by
-#' @param sum_var A character string of the variable to sum
-#' @return A tibble
+# PF-specific post-aggregation fix-up: replace the metric with NA for
+# tax years 2016-2018 because the producer's coverage of private
+# foundations is incomplete for those years. The single-line plot
+# layer (geom_line + geom_line dashed on !is.na) preserves a visible
+# trace across the gap so users see "data missing" rather than "zero".
+
+#' Replace 2016-2018 metric values with NA for private foundations.
+#'
+#' @param table Pre-aggregated tibble.
+#' @param groupby_var Primary axis (Year column).
+#' @param sum_var Metric column to NA-out for the gap years.
+#' @return The input tibble with the gap years set to NA.
 table_builder_pf <- function(table, groupby_var, sum_var) {
   table <- table |>
     dplyr::mutate(

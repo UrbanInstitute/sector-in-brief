@@ -1,3 +1,8 @@
+# Shared ggplot2 theme applied to every plot in the dashboard. Defines
+# Urban Institute font (Lato) and typography hierarchy, horizontal grid
+# lines, and consistent margins. Used additively (`+ plot_theme`) by
+# every *_plot.R builder.
+
 plot_theme <- ggplot2::theme_classic() +
   ggplot2::theme(
     text = ggplot2::element_text(family = "Lato"),
