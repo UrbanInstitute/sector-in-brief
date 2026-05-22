@@ -42,12 +42,23 @@ data_server <- function(id,
   shiny::moduleServer(id, function(input, output, session) {
     geo_filters <- geo_filter_server("geo_filter", geo_df)
 
-    # Defaults captured at module init so the reset observer can
-    # restore them without re-deriving from `choices` each click.
+    # Static defaults from the panel config — used by the reset
+    # observer to drive update*Input() calls.
     ctype_default     <- choices$ctype
     subsector_default <- choices$subsector
     size_default      <- choices$size
     year_default      <- c(start_year, end_year)
+
+    # Realized defaults captured the FIRST time the panel mounts and
+    # the filter inputs materialize. urbn_tree expands a parent
+    # selection into all descendant leaves, so comparing chip-state
+    # against the static `choices$ctype` (which is the parent labels)
+    # mis-flags the unfiltered default as narrowed. Capturing the
+    # realized values once gives the chip helper a baseline to diff
+    # against from then on.
+    realized_defaults <- shiny::reactiveValues(
+      ctype = NULL, subsector = NULL, size = NULL, year_range = NULL
+    )
 
     # Reset all filters to panel defaults. Replaces the cluster of
     # per-card reset observers that referenced inputs that never
@@ -92,10 +103,10 @@ data_server <- function(id,
         year_range       = input$date_range
       )
       defaults <- list(
-        ctype_default     = ctype_default,
-        subsector_default = unlist(subsector_default),
-        size_default      = unlist(size_default),
-        year_default      = year_default
+        ctype_default     = realized_defaults$ctype,
+        subsector_default = realized_defaults$subsector,
+        size_default      = realized_defaults$size,
+        year_default      = realized_defaults$year_range
       )
       chips <- filter_chip_labels(inputs, defaults)
       if (length(chips) == 0) return(NULL)
@@ -113,6 +124,14 @@ data_server <- function(id,
     # which broke under lazy UI because inputs hadn't been rendered yet
     # when data_server initialized.
     shiny::observeEvent(input$ctype, once = TRUE, ignoreNULL = TRUE, {
+      # Snapshot the realized initial selections — what urbn_tree
+      # actually returned with the panel's defaults applied. These
+      # become the baseline for chip-narrowing detection.
+      realized_defaults$ctype      <- input$ctype
+      realized_defaults$subsector  <- input$subsector
+      realized_defaults$size       <- input$size
+      realized_defaults$year_range <- input$date_range
+
       data_pipeline(
         input, geo_filters, time_series, title_prefix,
         agg_var, year_var, ytitle, xtitle, data, geo_df, output

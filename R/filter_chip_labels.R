@@ -5,26 +5,50 @@
 #' can see their active filters at a glance without scrolling back
 #' to the filter card.
 #'
+#' Defaults are the *realized* values captured the first time the
+#' panel mounts (see `data_server()`'s once-only observer). Doing
+#' that, rather than comparing against the static `choices` list,
+#' matters for tree inputs: `urbn_tree` expands a parent selection
+#' into a flat list of all descendant leaves, so static comparison
+#' would mis-flag the unfiltered default as "narrowed" and stick a
+#' chip on every panel at first load.
+#'
+#' Chip text caps at 3 listed items; longer selections collapse to
+#' "<filter>: N selected" so the chip row never grows wider than the
+#' plot.
+#'
 #' Pure function — testable without a reactive context.
 #'
 #' @param inputs Snapshot of the panel's inputs in the shape produced
 #'   by `format_input()` (named list with ctype, geo_level, subsector,
 #'   size, year_range, plus the conditional geo selections).
-#' @param defaults Named list with the panel's default values:
-#'   `ctype_default`, `subsector_default`, `size_default`,
-#'   `year_default` (length-2 integer vector).
+#' @param defaults Named list with the panel's realized default
+#'   values: `ctype_default`, `subsector_default`, `size_default`,
+#'   `year_default` (length-2 integer vector). NULL values are
+#'   treated as "defaults not yet captured" → no chip emitted for
+#'   that filter.
 #' @return Character vector of chip labels, in display order. Empty
-#'   when no filter is narrowed (the chip row will then render nothing).
+#'   when no filter is narrowed.
 filter_chip_labels <- function(inputs, defaults) {
   chips <- character()
 
-  # Organization type — chip when the user narrowed from the default set.
-  if (!is.null(inputs$ctype) &&
-      !setequal(inputs$ctype, defaults$ctype_default)) {
-    chips <- c(chips, sprintf("Org Type: %s", paste(inputs$ctype, collapse = ", ")))
+  # Helper for the multi-select filters (ctype, subsector, size).
+  # Suppresses the chip when defaults haven't been captured yet so
+  # the row stays empty at first paint.
+  chip_for_set <- function(label, selected, default) {
+    if (is.null(default)) return(NULL)
+    if (is.null(selected) || length(selected) == 0) return(NULL)
+    if (setequal(selected, default)) return(NULL)
+    if (length(selected) <= 3) {
+      sprintf("%s: %s", label, paste(selected, collapse = ", "))
+    } else {
+      sprintf("%s: %d selected", label, length(selected))
+    }
   }
 
-  # Geography — chip whenever the level isn't National (the open default).
+  c1 <- chip_for_set("Org Type", inputs$ctype, defaults$ctype_default)
+  if (!is.null(c1)) chips <- c(chips, c1)
+
   if (!is.null(inputs$geo_level) && inputs$geo_level != "National") {
     selection <- switch(
       inputs$geo_level,
@@ -34,28 +58,28 @@ filter_chip_labels <- function(inputs, defaults) {
       "Metro/Micro Area" = inputs$geo_cbsa,
       NULL
     )
-    label <- if (length(selection) > 0) {
-      sprintf("%s: %s",
-              sub("^Census ", "", inputs$geo_level),
-              paste(selection, collapse = ", "))
-    } else {
-      sub("^Census ", "", inputs$geo_level)
-    }
-    chips <- c(chips, label)
+    geo_label <- sub("^Census ", "", inputs$geo_level)
+    chips <- c(
+      chips,
+      if (length(selection) == 0) {
+        geo_label
+      } else if (length(selection) <= 3) {
+        sprintf("%s: %s", geo_label, paste(selection, collapse = ", "))
+      } else {
+        sprintf("%s: %d selected", geo_label, length(selection))
+      }
+    )
   }
 
-  if (!is.null(inputs$subsector) &&
-      length(inputs$subsector) < length(defaults$subsector_default)) {
-    chips <- c(chips, sprintf("Subsector: %s",
-                              paste(inputs$subsector, collapse = ", ")))
-  }
+  c2 <- chip_for_set("Subsector", inputs$subsector,
+                     defaults$subsector_default)
+  if (!is.null(c2)) chips <- c(chips, c2)
 
-  if (!is.null(inputs$size) &&
-      length(inputs$size) < length(defaults$size_default)) {
-    chips <- c(chips, sprintf("Size: %s", paste(inputs$size, collapse = ", ")))
-  }
+  c3 <- chip_for_set("Size", inputs$size, defaults$size_default)
+  if (!is.null(c3)) chips <- c(chips, c3)
 
-  if (!is.null(inputs$year_range) &&
+  if (!is.null(defaults$year_default) &&
+      !is.null(inputs$year_range) &&
       !identical(as.integer(inputs$year_range),
                  as.integer(defaults$year_default))) {
     chips <- c(chips, sprintf("Years: %d-%d",
