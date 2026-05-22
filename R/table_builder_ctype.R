@@ -1,8 +1,17 @@
-#' @title Build reactive table for results aggregated by organization type
-#' @param table A arrow table containing filtered data
-#' @param groupby_var A character string of the first variable to group by
-#' @param sum_var A character string of the variable to sum
-#' @return A tibble
+# By-Organization-Type aggregation, with two roll-up rules:
+#   1. If all four 501(c)(3) ctypes are present, collapse them to a
+#      single "All 501(c)(3) Organizations" row.
+#   2. If the total ctype count exceeds 8, collapse the long tail
+#      (ctype_other) to a single "Other Organizations" row.
+# Also applies the PF 2016-2018 NA replacement post-aggregation when
+# private foundations are part of the result set.
+
+#' Build the by-Organization-Type summary table.
+#'
+#' @param table Pre-aggregated arrow Table from `table_builder()`.
+#' @param groupby_var Primary axis ("Year").
+#' @param sum_var Metric to aggregate.
+#' @return A tibble with one row per (year, organization type).
 table_builder_ctype <- function(table, groupby_var, sum_var) {
   table_ctypes <- unique(table[["Organization Type"]])
   if (all(ctype_501c3 %in% table_ctypes)) {

@@ -1,3 +1,15 @@
+# Horizontal grouped bar chart (single year, multiple groups).
+# Used by plots_build_single for the by_ctype / by_geo / by_subsector /
+# by_size views on DAF panels (where time_series = FALSE).
+
+#' Build a horizontal grouped bar plot (single year, ≥2 groups).
+#'
+#' @param table Tibble with one row per group.
+#' @param groupby_var Column that supplies bar identity + fill colour.
+#' @param title,caption Pre-computed strings.
+#' @param yvar,xvar,ytitle,xtitle Standard ggplot aesthetics / labels.
+#' @param num_groups Group count — drives the colourpalette length.
+#' @return A girafe interactive plot.
 group_col_plot <- function(table,
                            groupby_var,
                            title,

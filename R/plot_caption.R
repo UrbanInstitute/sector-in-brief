@@ -1,7 +1,13 @@
-#' @title Function to format plot caption
-#' @description This function formats the caption for the plot based on the inputs provided by the user
-#' @param inputs A list of inputs provided by the user, formatted
-#' 
+# Assemble the multi-line plot caption from the user's active filters.
+# Delegates to caption_geo / caption_size / caption_pf / caption_finance
+# / caption_year for the per-section text, then appends a standard
+# disclaimer about IRS-derived data.
+
+#' Build the plot caption for a panel.
+#'
+#' @param inputs Formatted input list from `format_input()`.
+#' @return A multi-line character scalar (newline-separated).
+
 plot_caption <- function(inputs) {
   # Params needed for caption
   caption <- ""

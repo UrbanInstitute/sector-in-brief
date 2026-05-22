@@ -1,9 +1,13 @@
-#' @title Function to build overall table
-#' @param data A arrow table containing filtered data
-#' @param groupby_var A character string of the first variable to group by
-#' @param sum_var A character string of the variable to sum
-#' @param is_pf A logical value indicating if the table is for private foundations
-#' @return A tibble
+# Single-axis aggregation (no second group column). The "overall" view
+# in summarise_data's groupby_ls.
+
+#' Build the overall (single-axis) summary table.
+#'
+#' @param data Filtered arrow Table.
+#' @param groupby_var Primary axis ("Year").
+#' @param sum_var Metric to aggregate.
+#' @param is_pf TRUE → apply 2016-2018 NA replacement for PFs.
+#' @return A tibble with one row per `groupby_var` value.
 table_builder_default <- function(data, groupby_var, sum_var, is_pf) {
   table <- data |>
     group_by(!!sym(groupby_var)) |>

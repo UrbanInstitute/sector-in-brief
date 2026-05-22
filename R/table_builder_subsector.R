@@ -1,9 +1,14 @@
-#' @title Build downloadable tile for results aggregated by subsector
-#' @param table A arrow table containing filtered data
-#' @param groupby_var A character string of the first variable to group by
-#' @param sum_var A character string of the variable to sum
-#' @param is_pf A logical value indicating if the table is for private foundations
-#' @return A tibble
+# By-Subsector aggregation. Expands the 3-letter NTEE codes (ART,
+# EDU, HEL, ...) to the human-readable subsector labels used in
+# legends and tooltips. Any unmapped value falls into "Other".
+
+#' Build the by-Subsector summary table.
+#'
+#' @param table Pre-aggregated arrow Table from `table_builder()`.
+#' @param groupby_var Primary axis ("Year").
+#' @param sum_var Metric to aggregate.
+#' @param is_pf TRUE → apply 2016-2018 NA replacement for PFs.
+#' @return A tibble with one row per (year, subsector).
 table_builder_subsector <- function(table, groupby_var, sum_var, is_pf) {
   table <- table |>
     dplyr::mutate(
