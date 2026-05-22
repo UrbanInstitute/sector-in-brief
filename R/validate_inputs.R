@@ -20,15 +20,11 @@ validate_inputs <- function(inputs) {
       errors$geo <- "Please select at least one state."
     }
   } else if (inputs$geo_level == "Census County") {
-    if (length(inputs$geo_state_single) == 0) {
-      errors$geo <- "Please select a state."
-    } else if (length(inputs$geo_county) == 0) {
+    if (length(inputs$geo_county) == 0) {
       errors$geo <- "Please select at least one county."
     }
   } else if (inputs$geo_level == "Metro/Micro Area") {
-    if (length(inputs$geo_state_single) == 0) {
-      errors$geo <- "Please select a state."
-    } else if (length(inputs$geo_cbsa) == 0) {
+    if (length(inputs$geo_cbsa) == 0) {
       errors$geo <- "Please select at least one Metro/Micro Area."
     }
   }

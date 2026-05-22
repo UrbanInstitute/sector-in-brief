@@ -53,13 +53,10 @@ test_that("Census State without selection flags geo", {
   expect_match(res$errors$geo, "state", ignore.case = TRUE)
 })
 
-test_that("Census County without state asks for state first", {
-  res <- validate_inputs(make_inputs(geo_level = "Census County"))
-  expect_false(res$valid)
-  expect_match(res$errors$geo, "state", ignore.case = TRUE)
-})
-
-test_that("Census County with state but no county asks for county", {
+test_that("Census County without county selection flags geo", {
+  # The state_single selectize always has a default (multiple=FALSE
+  # auto-picks the first state), so the only failure mode in practice
+  # is an empty county selection.
   res <- validate_inputs(make_inputs(
     geo_level = "Census County",
     geo_state_single = "California"
