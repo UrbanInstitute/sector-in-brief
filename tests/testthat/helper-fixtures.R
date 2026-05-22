@@ -34,6 +34,70 @@ fixture_to <- function(path, df = make_daf_fixture()) {
   invisible(path)
 }
 
+# Stage a minimal but complete data/ + www/ tree in a tempdir and chdir
+# into it for the lifetime of `.local_envir`. Used by the app-boot smoke
+# test so app() can construct without S3 sync or real production data.
+#
+# Files written:
+#   data/{four parquets}    — 1 row each, schema matches expected_parquet_schemas
+#   data/data_dictionary.parquet  — empty tibble with the live column shape
+#   data/nested_geographies.csv   — single MA row covering all geo levels
+#   data/_manifest.json     — vintage matching VINTAGE in R/s3_sync.R so
+#                             ensure_data_local short-circuits to "fresh"
+#   www/sib_style.css       — empty stub so htmltools::includeCSS resolves
+stage_app_fixtures <- function(.local_envir = parent.frame()) {
+  root <- withr::local_tempdir(.local_envir = .local_envir)
+  dir.create(file.path(root, "data"))
+  dir.create(file.path(root, "www"))
+
+  scalar_for_type <- function(t) {
+    switch(t, "string" = "x", "int32" = 1L, "double" = 1.0,
+           stop("unhandled fixture type: ", t))
+  }
+  for (file in names(expected_parquet_schemas)) {
+    schema <- expected_parquet_schemas[[file]]
+    df <- as.data.frame(lapply(schema, scalar_for_type),
+                        stringsAsFactors = FALSE)
+    names(df) <- names(schema)
+    arrow::write_parquet(df, file.path(root, "data", file))
+  }
+
+  arrow::write_parquet(
+    tibble::tibble(
+      file = character(), column = character(), datatype = character(),
+      description = character(), form_source = character(),
+      coverage = character(), coverage_notes = character()
+    ),
+    file.path(root, "data", "data_dictionary.parquet")
+  )
+
+  writeLines(
+    c('"Census State","Census County","Metro/Micro Area","Census Region"',
+      '"MA","Suffolk","Boston-Cambridge-Newton, MA-NH","Northeast"'),
+    file.path(root, "data", "nested_geographies.csv")
+  )
+
+  year_counts <- list("2021" = 100L, "2022" = 100L, "2023" = 100L)
+  manifest <- list(
+    vintage  = sub("^v", "", VINTAGE),
+    built_at = format(Sys.time()),
+    files = stats::setNames(
+      lapply(names(expected_parquet_schemas), function(f) {
+        list(file = f, sha256 = "0", bytes = 0L, row_count = 1L,
+             year_counts = year_counts)
+      }),
+      names(expected_parquet_schemas)
+    )
+  )
+  jsonlite::write_json(manifest, file.path(root, "data", "_manifest.json"),
+                       auto_unbox = TRUE)
+
+  file.create(file.path(root, "www", "sib_style.css"))
+
+  withr::local_dir(root, .local_envir = .local_envir)
+  invisible(root)
+}
+
 # Inject an in-memory data-dictionary fixture into coverage_notes_card's
 # module-level cache so the tests don't need data/data_dictionary.parquet.
 local_dict_fixture <- function(.local_envir = parent.frame()) {
