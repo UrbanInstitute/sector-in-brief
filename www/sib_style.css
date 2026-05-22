@@ -424,6 +424,16 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
         max-height: none;
     };
 }
+.validation-msg {
+  margin: 0.35rem 0 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Lato';
+  font-size: 0.9rem;
+  color: #762a83;
+  background-color: #f5e6f0;
+  border-left: 3px solid #762a83;
+  border-radius: 2px;
+}
 .body {
     font-family: 'Lato';
     font-size: 16px;

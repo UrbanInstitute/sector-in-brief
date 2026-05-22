@@ -15,37 +15,46 @@ data_ui <- function(id, choices, start_year, end_year) {
         width = "500px"
       )
     ),
-    geo_card = geo_filter_ui(shiny::NS(id, "geo_filter"), state_choices),
-    subsector_card = bslib::card(
-      filter_card_header(
-        "Subsector",
-        htmltools::tagList(
-          "12 general categories of the ",
-          htmltools::a(
-            href = "https://urbaninstitute.github.io/nccs-legacy/ntee/ntee-history.html",
-            "National Taxonomy of Exempt Entities (NTEE)"
-          ),
-          " code system."
+    geo_card = htmltools::tagList(
+      geo_filter_ui(shiny::NS(id, "geo_filter"), state_choices),
+      shiny::uiOutput(ns("validation_geo"))
+    ),
+    subsector_card = htmltools::tagList(
+      bslib::card(
+        filter_card_header(
+          "Subsector",
+          htmltools::tagList(
+            "12 general categories of the ",
+            htmltools::a(
+              href = "https://urbaninstitute.github.io/nccs-legacy/ntee/ntee-history.html",
+              "National Taxonomy of Exempt Entities (NTEE)"
+            ),
+            " code system."
+          )
+        ),
+        urbn_checkboxgroup(
+          ns = ns,
+          id = "subsector",
+          choices = choices$subsector,
+          selected = choices$subsector
         )
       ),
-      urbn_checkboxgroup(
-        ns = ns,
-        id = "subsector",
-        choices = choices$subsector,
-        selected = choices$subsector
-      )
+      shiny::uiOutput(ns("validation_subsector"))
     ),
-    size_card = bslib::card(
-      filter_card_header(
-        "Organization Size",
-        "Total expenses from NCCS's Core Series (Forms 990 and 990-PF), grouped in six categories. Size=0 indicates an organization with BMF metadata but no CORE filing on record."
+    size_card = htmltools::tagList(
+      bslib::card(
+        filter_card_header(
+          "Organization Size",
+          "Total expenses from NCCS's Core Series (Forms 990 and 990-PF), grouped in six categories. Size=0 indicates an organization with BMF metadata but no CORE filing on record."
+        ),
+        urbn_checkboxgroup(
+          ns = ns,
+          id = "size",
+          choices = choices$size,
+          selected = choices$size
+        )
       ),
-      urbn_checkboxgroup(
-        ns = ns,
-        id = "size",
-        choices = choices$size,
-        selected = choices$size
-      )
+      shiny::uiOutput(ns("validation_size"))
     ),
     date_card = bslib::card(
       filter_card_header(
