@@ -434,6 +434,40 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
   border-left: 3px solid #762a83;
   border-radius: 2px;
 }
+.filter-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.btn-reset {
+  font-family: 'Lato';
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1696d2;
+  background: transparent;
+  border: 1px solid #1696d2;
+  padding: 0.45rem 1rem;
+  border-radius: 2px;
+}
+.btn-reset:hover {
+  background: #e8f3fa;
+}
+.filter-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0.25rem 0;
+}
+.filter-chip {
+  display: inline-block;
+  font-family: 'Lato';
+  font-size: 0.85rem;
+  color: #1696d2;
+  background-color: #e8f3fa;
+  padding: 0.25rem 0.6rem;
+  border-radius: 1rem;
+}
 .body {
     font-family: 'Lato';
     font-size: 16px;

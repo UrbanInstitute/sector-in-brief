@@ -81,11 +81,19 @@ data_ui <- function(id, choices, start_year, end_year) {
       ),
       urbn_slider(ns, "date_range", start_year, end_year)
     ),
-    process_button = urbn_task_button(
-      ns = ns,
-      id = "process_data",
-      label = "UPDATE DATA",
-      label_busy = "VISUALIZING..."
+    process_button = htmltools::div(
+      class = "filter-actions",
+      urbn_task_button(
+        ns = ns,
+        id = "process_data",
+        label = "UPDATE DATA",
+        label_busy = "VISUALIZING..."
+      ),
+      shiny::actionButton(
+        inputId = ns("reset_filters"),
+        label = "Reset filters",
+        class = "btn-reset"
+      )
     )
   )
 }
