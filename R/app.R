@@ -1,6 +1,7 @@
 app <- function(...) {
   # Load elements
   sync_result <- ensure_data_local()
+  validate_parquet_schemas()
   publish_data_dictionary()
   # Resolve year ranges from the freshly-synced manifest (NA cells in
   # visualpanel_args get manifest-derived bounds; integer cells stay).
