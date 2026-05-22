@@ -1,5 +1,6 @@
 # ensure_data_local: cached fast-path when local manifest matches VINTAGE,
-# falls back to aws s3 sync otherwise. We never touch the real network.
+# falls back to HTTPS-driven download otherwise. We never touch the real
+# network.
 
 test_that("ensure_data_local is a no-op when local manifest reports the target vintage", {
   tmp <- withr::local_tempdir()
@@ -11,7 +12,8 @@ test_that("ensure_data_local is a no-op when local manifest reports the target v
   )
 
   called <- FALSE
-  mockery::stub(ensure_data_local, "system2", function(...) { called <<- TRUE; 0L })
+  mockery::stub(ensure_data_local, "utils::download.file",
+                function(...) { called <<- TRUE; 0L })
 
   res <- ensure_data_local(data_dir = tmp)
   expect_false(called)
@@ -19,47 +21,73 @@ test_that("ensure_data_local is a no-op when local manifest reports the target v
   expect_equal(res$vintage, sub("^v", "", VINTAGE))
 })
 
-test_that("ensure_data_local invokes aws s3 sync when the manifest is missing", {
+test_that("ensure_data_local downloads from the public HTTPS endpoint when the manifest is missing", {
   tmp <- withr::local_tempdir()
   # No manifest written.
 
-  call_args <- NULL
-  mockery::stub(ensure_data_local, "system2", function(command, args, ...) {
-    call_args <<- list(command = command, args = args)
+  urls_called <- character()
+  fake_dl <- function(url, destfile, ...) {
+    urls_called <<- c(urls_called, url)
+    # Synthesise a tiny manifest so the loop has something to iterate.
+    if (grepl("_manifest\\.json$", url)) {
+      jsonlite::write_json(
+        list(
+          vintage = sub("^v", "", VINTAGE),
+          files = list("number_nonprofits.parquet" = list(file = "number_nonprofits.parquet"))
+        ),
+        path = destfile,
+        auto_unbox = TRUE
+      )
+    } else {
+      file.create(destfile)
+    }
     0L
-  })
+  }
+  mockery::stub(ensure_data_local, "utils::download.file", fake_dl)
 
-  ensure_data_local(data_dir = tmp)
-  expect_equal(call_args$command, "aws")
-  expect_equal(head(call_args$args, 2), c("s3", "sync"))
-  expect_match(call_args$args[3], "^s3://nccsdata/")
-  expect_equal(call_args$args[4], tmp)
+  res <- ensure_data_local(data_dir = tmp)
+  # First call is the manifest, then each parquet from the synthesised manifest.
+  expect_match(urls_called[1], "^https://nccsdata\\.s3\\.amazonaws\\.com/.*_manifest\\.json$")
+  expect_true(any(grepl("number_nonprofits\\.parquet$", urls_called)))
+  expect_equal(res$status, "fresh")
 })
 
-test_that("ensure_data_local invokes sync when manifest vintage doesn't match", {
+test_that("ensure_data_local downloads again when manifest vintage doesn't match", {
   tmp <- withr::local_tempdir()
   manifest <- file.path(tmp, "_manifest.json")
   jsonlite::write_json(list(vintage = "1900.01"), path = manifest, auto_unbox = TRUE)
 
   called <- FALSE
-  mockery::stub(ensure_data_local, "system2", function(...) { called <<- TRUE; 0L })
+  fake_dl <- function(url, destfile, ...) {
+    called <<- TRUE
+    if (grepl("_manifest\\.json$", url)) {
+      jsonlite::write_json(
+        list(vintage = sub("^v", "", VINTAGE), files = list()),
+        path = destfile, auto_unbox = TRUE
+      )
+    } else file.create(destfile)
+    0L
+  }
+  mockery::stub(ensure_data_local, "utils::download.file", fake_dl)
 
   ensure_data_local(data_dir = tmp)
   expect_true(called)
 })
 
-test_that("ensure_data_local stops only when sync fails AND no local data exists", {
+test_that("ensure_data_local stops only when download fails AND no local data exists", {
   tmp <- withr::local_tempdir()
-  mockery::stub(ensure_data_local, "system2", function(...) 1L)
+  mockery::stub(ensure_data_local, "utils::download.file",
+                function(...) stop("404 not found"))
   expect_error(ensure_data_local(data_dir = tmp),
                "no local data to fall back to")
 })
 
-test_that("ensure_data_local falls back to stale local data on sync failure", {
+test_that("ensure_data_local falls back to stale local data on download failure", {
   tmp <- withr::local_tempdir()
   manifest <- file.path(tmp, "_manifest.json")
   jsonlite::write_json(list(vintage = "1900.01"), path = manifest, auto_unbox = TRUE)
-  mockery::stub(ensure_data_local, "system2", function(...) 1L)
+  mockery::stub(ensure_data_local, "utils::download.file",
+                function(...) stop("network down"))
 
   expect_warning(
     res <- ensure_data_local(data_dir = tmp),
@@ -69,25 +97,10 @@ test_that("ensure_data_local falls back to stale local data on sync failure", {
   expect_equal(res$vintage, "1900.01")
 })
 
-test_that("ensure_data_local appends --profile <PROFILE> when SIB_AWS_PROFILE is set", {
-  tmp <- withr::local_tempdir()
-  withr::local_envvar(SIB_AWS_PROFILE = "ci-profile")
-
-  call_args <- NULL
-  mockery::stub(ensure_data_local, "system2", function(command, args, ...) {
-    call_args <<- args
-    0L
-  })
-
-  ensure_data_local(data_dir = tmp)
-  expect_true("--profile" %in% call_args)
-  expect_equal(call_args[which(call_args == "--profile") + 1], "ci-profile")
-})
-
 test_that("publish_data_dictionary writes a UTF-8 BOM at the start of the CSV", {
   parquet <- withr::local_tempfile(fileext = ".parquet")
   arrow::write_parquet(
-    tibble::tibble(field = "Size", coverage_notes = "1989–2026 expense band"),
+    tibble::tibble(field = "Size", coverage_notes = "1989-2026 expense band"),
     parquet
   )
   csv <- withr::local_tempfile(fileext = ".csv")

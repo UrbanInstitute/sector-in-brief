@@ -8,9 +8,9 @@ name: Deploy to production
 #
 # or a PR from main into prod. There is no auto-promotion from main.
 #
-# Setup is identical to deploy-staging.yml (same shinyapps.io
-# account, same token pair, same AWS env vars set on the deployed
-# app). See that workflow's header for the full setup list.
+# Setup is identical to deploy-staging.yml (same shinyapps.io account,
+# same token pair). No AWS credentials needed — see the staging
+# workflow's header.
 #
 # Note: the old prod URL at nccs-urban.shinyapps.io/sector-in-brief/
 # is unaffected by this workflow — it remains the publicly cited URL

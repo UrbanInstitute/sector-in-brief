@@ -10,11 +10,9 @@ name: Deploy to staging
 #   2. In this repo, Settings → Secrets and variables → Actions:
 #        SHINYAPPS_TOKEN  = <token from step 1>
 #        SHINYAPPS_SECRET = <secret from step 1>
-#   3. Provision the staging app's AWS credentials in shinyapps.io's
-#      per-app environment variables (Settings tab on the staging app):
-#        AWS_ACCESS_KEY_ID
-#        AWS_SECRET_ACCESS_KEY
-#      Same shape as the prod app uses for R/s3_sync.R.
+#
+# No AWS credentials are needed — R/s3_sync.R pulls the data over
+# anonymous HTTPS because the bucket prefix is publicly readable.
 #
 # After that, every push to main triggers a deploy. Concurrent runs
 # are cancelled so a fast-follow merge doesn't queue stale builds.
