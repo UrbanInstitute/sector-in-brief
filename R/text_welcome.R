@@ -92,12 +92,12 @@ about <- htmltools::div(
     "This project is funded by the National Center for Charitable Statistics (NCCS) at the Urban Institute. NCCS processes and publishes comprehensive nonprofit sector data to advance research and deepen public understanding of charitable organizations."
   ),
   htmltools::HTML(
-    '<p class="base">The NCCS data contain standardized names, data types, and definitions for all variables across the different IRS Form 990s. NCCS data links tax records from every nonprofit filed from 1989 to 2022    in a single time-series panel, complete with geocoding to the Census tract and block levels for easy filtering. For more information, see the NCCS <a href="https://nccs.urban.org">homepage</a>.</p>'
+    '<p class="base">The NCCS data contain standardized names, data types, and definitions for all variables across the different IRS Form 990s. NCCS data links tax records from every nonprofit filed from 1989 to the present in a single time-series panel, complete with geocoding to the Census tract and block levels for easy filtering. For more information, see the NCCS <a href="https://nccs.urban.org">homepage</a>.</p>'
   ),
   htmltools::p(
     class = "base",
     htmltools::tags$b("Citing This Dashboard:"),
-    "Nonprofit Sector In Brief Dashboard, Urban Institute, November 21, 2024, [https://nccs-urban.shinyapps.io/sector-in-brief/]."
+    "Nonprofit Sector In Brief Dashboard, Urban Institute, November 21, 2024, [https://urban-main.shinyapps.io/sector-in-brief/]."
   
   )
 )
