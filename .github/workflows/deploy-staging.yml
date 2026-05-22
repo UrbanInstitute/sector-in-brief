@@ -1,0 +1,80 @@
+name: Deploy to staging
+
+# Auto-deploys main to nccs-sector-in-brief-staging on shinyapps.io
+# (https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/).
+# Production stays manual.
+#
+# One-time setup (before this workflow can succeed):
+#   1. In shinyapps.io dashboard, find the account named "urban-main".
+#      Tokens → Add Token → copy the token + secret.
+#   2. In this repo, Settings → Secrets and variables → Actions:
+#        SHINYAPPS_TOKEN  = <token from step 1>
+#        SHINYAPPS_SECRET = <secret from step 1>
+#   3. Provision the staging app's AWS credentials in shinyapps.io's
+#      per-app environment variables (Settings tab on the staging app):
+#        AWS_ACCESS_KEY_ID
+#        AWS_SECRET_ACCESS_KEY
+#      Same shape as the prod app uses for R/s3_sync.R.
+#
+# After that, every push to main triggers a deploy. Concurrent runs
+# are cancelled so a fast-follow merge doesn't queue stale builds.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # allow manual re-deploys from the Actions tab
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4'
+          use-public-rspm: true
+
+      - name: Set up renv
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Deploy to shinyapps.io
+        env:
+          SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
+          SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
+        run: |
+          Rscript -e '
+            rsconnect::setAccountInfo(
+              name   = "urban-main",
+              token  = Sys.getenv("SHINYAPPS_TOKEN"),
+              secret = Sys.getenv("SHINYAPPS_SECRET")
+            )
+            # data/ is gitignored and re-pulled from S3 at app boot
+            # (see R/s3_sync.R), so we exclude it from the bundle to
+            # keep upload size small. renv/ holds the local library
+            # which shinyapps.io rebuilds from renv.lock — we only
+            # need renv/activate.R + renv/settings.json so .Rprofile
+            # can bootstrap.
+            rsconnect::deployApp(
+              appDir      = ".",
+              appName     = "nccs-sector-in-brief-staging",
+              account     = "urban-main",
+              forceUpdate = TRUE,
+              appFiles = c(
+                "app.R",
+                "DESCRIPTION",
+                "renv.lock",
+                ".Rprofile",
+                "renv/activate.R",
+                "renv/settings.json",
+                list.files("R",   full.names = TRUE, recursive = TRUE),
+                list.files("www", full.names = TRUE, recursive = TRUE)
+              )
+            )
+          '

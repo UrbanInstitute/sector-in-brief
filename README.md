@@ -117,12 +117,24 @@ producer (`sector-in-brief-data`) publishes a new build.
 
 # Deployment
 
-Deployed to `https://nccs-urban.shinyapps.io/sector-in-brief/` via
-`rsconnect`. After authenticating the target shinyapps.io account locally:
+Two environments:
 
-```r
-rsconnect::deployApp()
-```
+| Env | URL | Trigger |
+|---|---|---|
+| **Staging** | <https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/> | Auto on every push to `main` (`.github/workflows/deploy-staging.yml`) |
+| **Production** | <https://nccs-urban.shinyapps.io/sector-in-brief/> | Manual `rsconnect::deployApp()` after authenticating locally |
+
+Both deploys run on the **Xlarge shinyapps.io instance (8 GB RAM)**.
+Data is **not** bundled into the deploy artifact — the runtime pulls
+the pinned vintage from S3 at boot per `R/s3_sync.R` (ADR 0011). The
+shinyapps.io app needs `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`
+set as per-app environment variables in its dashboard so the default
+IAM credential chain can reach the `nccsdata` bucket.
+
+Bump `VINTAGE` in `R/s3_sync.R` when the producer
+(`sector-in-brief-data`) publishes a new build, then merge to `main`
+to roll the staging deploy. Production gets the same `VINTAGE` once
+staging verification (`docs/UI_TESTING.md`) passes.
 
 Deploy metadata is committed under
 `deploy/rsconnect/shinyapps.io/<account>/`. The runtime `rsconnect/`
