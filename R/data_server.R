@@ -106,7 +106,8 @@ data_server <- function(id,
         ctype_default     = realized_defaults$ctype,
         subsector_default = realized_defaults$subsector,
         size_default      = realized_defaults$size,
-        year_default      = realized_defaults$year_range
+        year_default      = realized_defaults$year_range,
+        size_choices      = choices$size
       )
       chips <- filter_chip_labels(inputs, defaults)
       if (length(chips) == 0) return(NULL)

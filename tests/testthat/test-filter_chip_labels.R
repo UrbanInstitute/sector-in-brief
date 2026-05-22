@@ -7,7 +7,15 @@ defaults_for <- function() {
     ctype_default     = c("A", "B", "C"),
     subsector_default = letters[1:12],
     size_default      = 1:6,
-    year_default      = c(1989L, 2024L)
+    year_default      = c(1989L, 2024L),
+    size_choices      = list(
+      "Under $100,000"             = 1,
+      "$100,000 - $499,999"        = 2,
+      "$500,000 - $999,999"        = 3,
+      "$1 Million - $4.99 Million" = 4,
+      "$5 Million - $9.99 Million" = 5,
+      "Above $10 Million"          = 6
+    )
   )
 }
 
@@ -57,9 +65,21 @@ test_that("narrowed subsector to >=4 collapses to count", {
   expect_match(out, "^Subsector: 5 selected$")
 })
 
-test_that("narrowed size produces a chip", {
+test_that("narrowed size chip shows the dollar-range labels, not integers", {
   out <- filter_chip_labels(base_inputs(size = c(1, 2)), defaults_for())
+  expect_match(out, "^Size: Under \\$100,000, \\$100,000 - \\$499,999$")
+})
+
+test_that("size chip falls back to integer when size_choices not provided", {
+  defaults <- defaults_for()
+  defaults$size_choices <- NULL
+  out <- filter_chip_labels(base_inputs(size = c(1, 2)), defaults)
   expect_match(out, "^Size: 1, 2$")
+})
+
+test_that("narrowed size to >=4 still collapses to count", {
+  out <- filter_chip_labels(base_inputs(size = c(1, 2, 3, 4)), defaults_for())
+  expect_match(out, "^Size: 4 selected$")
 })
 
 test_that("narrowed year range produces a chip", {

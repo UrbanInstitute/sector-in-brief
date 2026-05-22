@@ -26,23 +26,27 @@
 #'   values: `ctype_default`, `subsector_default`, `size_default`,
 #'   `year_default` (length-2 integer vector). NULL values are
 #'   treated as "defaults not yet captured" → no chip emitted for
-#'   that filter.
+#'   that filter. Optional `size_choices` is the panel's named-list
+#'   of size choices (label → value, from `choice_builder()`); when
+#'   present, size chip text shows the dollar-range labels instead
+#'   of the raw integer values.
 #' @return Character vector of chip labels, in display order. Empty
 #'   when no filter is narrowed.
 filter_chip_labels <- function(inputs, defaults) {
   chips <- character()
 
   # Helper for the multi-select filters (ctype, subsector, size).
-  # Suppresses the chip when defaults haven't been captured yet so
-  # the row stays empty at first paint.
-  chip_for_set <- function(label, selected, default) {
+  # `selected` drives the diff against the realized default;
+  # `display` is what shows up in the chip text (lets size map raw
+  # integer values back to dollar-range labels).
+  chip_for_set <- function(label, selected, default, display = selected) {
     if (is.null(default)) return(NULL)
     if (is.null(selected) || length(selected) == 0) return(NULL)
     if (setequal(selected, default)) return(NULL)
-    if (length(selected) <= 3) {
-      sprintf("%s: %s", label, paste(selected, collapse = ", "))
+    if (length(display) <= 3) {
+      sprintf("%s: %s", label, paste(display, collapse = ", "))
     } else {
-      sprintf("%s: %d selected", label, length(selected))
+      sprintf("%s: %d selected", label, length(display))
     }
   }
 
@@ -75,7 +79,20 @@ filter_chip_labels <- function(inputs, defaults) {
                      defaults$subsector_default)
   if (!is.null(c2)) chips <- c(chips, c2)
 
-  c3 <- chip_for_set("Size", inputs$size, defaults$size_default)
+  # Size values come through as integers (1-6); map back to the
+  # dollar-range labels for the chip text so users don't see
+  # "Size: 1, 2". The diff against the realized default still uses
+  # the integer values (that's what input$size actually is).
+  size_display <- as.character(inputs$size)
+  if (!is.null(inputs$size) && !is.null(defaults$size_choices)) {
+    inv <- stats::setNames(
+      names(defaults$size_choices),
+      as.character(unlist(defaults$size_choices))
+    )
+    matched <- inv[as.character(inputs$size)]
+    size_display <- ifelse(is.na(matched), as.character(inputs$size), matched)
+  }
+  c3 <- chip_for_set("Size", inputs$size, defaults$size_default, size_display)
   if (!is.null(c3)) chips <- c(chips, c3)
 
   if (!is.null(defaults$year_default) &&
