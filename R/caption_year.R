@@ -1,7 +1,13 @@
-#' @title function to add year information to plot caption
-#' @param caption A character string containing the plot caption
-#' @param year_var A character string indicating the year variable
-#' @return A character string with the plot caption edited in place
+#' Add the tax-year disclosure to a plot caption.
+#'
+#' NOTE: the literal year in the disclosure text is stale (says "until
+#' tax year 2021"); the actual cutoff now comes from the manifest. A
+#' future PR could derive this from `year_range.R` so the caption
+#' tracks the producer.
+#'
+#' @param caption Running caption string.
+#' @param year_var Time column name ("Year"); other values are no-op.
+#' @return Updated caption string.
 caption_year <- function(caption, year_var){
   if(year_var == "Year"){
     caption <- paste(caption, 

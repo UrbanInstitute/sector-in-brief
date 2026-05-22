@@ -1,4 +1,5 @@
-# Text for data download page
+# Title + subtitle copy for the Custom Panel Datasets tab. The form
+# itself lives in R/data_download_dashboard.R::dataRequestUI().
 download_title <- "Create Custom 990 Panel Data Sets "
 download_subtitle <- htmltools::div(
     htmltools::tagList(

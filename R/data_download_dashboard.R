@@ -1,3 +1,22 @@
+# Custom Panel Datasets module. This is the dashboard's "secondary"
+# tab — instead of visualizing aggregated data, it lets users
+# request a custom-cut row-level extract of 990 filings delivered to
+# their email.
+#
+# Two halves:
+#   - dataRequestUI()    — the multi-step form (form type, variables,
+#                           filters, email, confirm)
+#   - dataRequestServer()— validates the form, POSTs a JSON request
+#                           (see query_builder_download.R) to the
+#                           NCCS data-extract API, shows confirmation
+#
+# Mounted as the last nav_panel by app.R.
+
+#' Build the Custom Panel Datasets request UI.
+#'
+#' @param id Module id.
+#' @param geo_df Nested geographies lookup (state → county/CBSA).
+#' @return A `bslib::card` containing the multi-step form.
 dataRequestUI <- function(id, geo_df) {
   ns <- shiny::NS(id)
   choices <- choice_builder("download")
@@ -323,6 +342,14 @@ dataRequestUI <- function(id, geo_df) {
 }
 
 # Server function for the module
+#' Server half of the Custom Panel Datasets module.
+#'
+#' Cascades state → county/CBSA choices, validates the form, packages
+#' the user's selections via `query_builder_download()`, POSTs to the
+#' NCCS data-extract API, and shows confirmation (or error).
+#'
+#' @param id Module id (must match the UI half).
+#' @param geo_df Nested geographies lookup.
 dataRequestServer <- function(id, geo_df) {
   moduleServer(id, function(input, output, session) {
     # Update the open panel

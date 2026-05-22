@@ -1,7 +1,10 @@
-#' @title Edit plot caption if plotting private foundations
-#' @param caption A character string containing the plot caption
-#' @param ctype A character string indicating the 501c type
-#' @return A character string with the plot caption edited in place
+#' Add the private-foundation disclosure to a plot caption when the
+#' active org type includes 990-PF filers. Explains that 2016-2018
+#' data are missing from IRS releases (see `table_builder_pf()`).
+#'
+#' @param caption Running caption string.
+#' @param ctype Active org-type selection(s).
+#' @return Updated caption string.
 caption_pf <- function(caption, ctype) {
   if ("501(c)(3) - Private Foundations" %in% ctype) {
     caption <- paste(
