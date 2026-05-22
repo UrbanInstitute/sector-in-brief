@@ -1,0 +1,74 @@
+name: Deploy to production
+
+# Auto-deploys the `prod` branch to sector-in-brief on shinyapps.io
+# (https://urban-main.shinyapps.io/sector-in-brief/). The act of
+# promoting staging → prod is a deliberate merge:
+#
+#     git push origin main:prod
+#
+# or a PR from main into prod. There is no auto-promotion from main.
+#
+# Setup is identical to deploy-staging.yml (same shinyapps.io account,
+# same token pair). No AWS credentials needed — see the staging
+# workflow's header.
+#
+# Note: the old prod URL at nccs-urban.shinyapps.io/sector-in-brief/
+# is unaffected by this workflow — it remains the publicly cited URL
+# until the migration to urban-main is announced and external
+# references (e.g. R/text_welcome.R citation, README) are updated.
+
+on:
+  push:
+    branches: [prod]
+  workflow_dispatch:
+
+concurrency:
+  group: prod-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4'
+          use-public-rspm: true
+
+      - name: Set up renv
+        uses: r-lib/actions/setup-renv@v2
+
+      - name: Deploy to shinyapps.io
+        env:
+          SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
+          SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
+        run: |
+          Rscript -e '
+            rsconnect::setAccountInfo(
+              name   = "urban-main",
+              token  = Sys.getenv("SHINYAPPS_TOKEN"),
+              secret = Sys.getenv("SHINYAPPS_SECRET")
+            )
+            # data/ and renv library excluded for the same reasons as
+            # the staging workflow — see deploy-staging.yml comments.
+            rsconnect::deployApp(
+              appDir      = ".",
+              appName     = "sector-in-brief",
+              account     = "urban-main",
+              forceUpdate = TRUE,
+              appFiles = c(
+                "app.R",
+                "DESCRIPTION",
+                "renv.lock",
+                ".Rprofile",
+                "renv/activate.R",
+                "renv/settings.json",
+                list.files("R",   full.names = TRUE, recursive = TRUE),
+                list.files("www", full.names = TRUE, recursive = TRUE)
+              )
+            )
+          '

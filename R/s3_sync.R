@@ -6,20 +6,31 @@
 # specific v* tag instead of reading latest/ so the dashboard locks to a
 # tested-good shape and a new producer publish can't silently change it.
 #
-# Shell-out to `aws s3 sync` rather than arrow::s3_bucket so SSO profiles
-# work locally and IAM roles work on the hosting tier without any
-# credential plumbing in this code.
+# The bucket allows public GetObject on individual files but NOT
+# anonymous ListObjects — so `aws s3 sync` won't work (it needs to
+# list). Instead we fetch the manifest first via HTTPS, then download
+# each parquet listed in the manifest. No AWS credentials needed
+# anywhere — important because institutional AWS accounts often
+# rotate keys every 24 hours, which would otherwise break static-env
+# setups on shinyapps.io.
 
 S3_BUCKET <- "nccsdata"
 S3_PREFIX <- "sector-in-brief"
 VINTAGE   <- "v2026.05"
 
+# Public HTTPS endpoint for a file in the vintage's prefix.
+vintage_url <- function(file) {
+  sprintf("https://%s.s3.amazonaws.com/%s/%s/%s",
+          S3_BUCKET, S3_PREFIX, VINTAGE, file)
+}
+
 #' Sync the pinned data vintage from S3 into `data_dir`.
 #'
 #' Short-circuits to "fresh" if `data_dir/_manifest.json` already
-#' reports the target VINTAGE (no S3 call). On sync failure with
-#' existing local data, returns "stale" + a warning so app() can show
-#' the user a banner. On sync failure with no local fallback,
+#' reports the target VINTAGE (no network call). Otherwise downloads
+#' the manifest and every parquet it enumerates. On any download
+#' failure with existing local data, returns "stale" + a warning so
+#' app() can show a banner. On failure with no local fallback,
 #' `stop()`s — the only fatal path.
 #'
 #' @param data_dir Target directory (default "data").
@@ -40,26 +51,35 @@ ensure_data_local <- function(data_dir = "data") {
     }
   }
   if (!dir.exists(data_dir)) dir.create(data_dir, recursive = TRUE)
-  src <- sprintf("s3://%s/%s/%s/", S3_BUCKET, S3_PREFIX, VINTAGE)
-  args <- c("s3", "sync", src, data_dir)
-  # Local dev with AWS SSO: set SIB_AWS_PROFILE in .Renviron. Hosted tiers
-  # (shinyapps.io, EC2) leave it empty and use the default IAM credential chain.
-  profile <- Sys.getenv("SIB_AWS_PROFILE", "")
-  if (nzchar(profile)) args <- c(args, "--profile", profile)
-  status <- system2("aws", args)
 
-  if (status == 0) {
+  ok <- tryCatch({
+    utils::download.file(vintage_url("_manifest.json"), manifest,
+                         mode = "wb", quiet = TRUE)
+    m <- jsonlite::read_json(manifest)
+    for (file in names(m$files)) {
+      utils::download.file(vintage_url(file),
+                           file.path(data_dir, file),
+                           mode = "wb", quiet = TRUE)
+    }
+    TRUE
+  }, error = function(e) {
+    message("[s3_sync] download failed from ", vintage_url(""),
+            ": ", conditionMessage(e))
+    FALSE
+  })
+
+  if (ok) {
     return(list(status = "fresh", vintage = read_vintage()))
   }
-  # Sync failed. Fall back to whatever's on disk if we have something.
+  # Download failed. Fall back to whatever's on disk if we have something.
   if (file.exists(manifest)) {
     have <- read_vintage()
-    warning("aws s3 sync failed (exit ", status, ") from ", src,
+    warning("data download failed from ", vintage_url(""),
             "; serving stale local data (vintage ", have, ").")
     return(list(status = "stale", vintage = have))
   }
-  stop("aws s3 sync failed (exit ", status, ") from ", src,
-       " and no local data to fall back to - check AWS credentials")
+  stop("data download failed from ", vintage_url(""),
+       " and no local data to fall back to")
 }
 
 #' Export the parquet data dictionary as a CSV under www/.

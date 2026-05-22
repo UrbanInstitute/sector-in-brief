@@ -59,11 +59,10 @@ receives an email containing the data and the associated data dictionary.
 renv::restore()
 ```
 
-3. Configure AWS credentials so the app can sync the parquet data from
-   `s3://nccsdata/sector-in-brief/` on startup (per ADR 0011 — the data
-   is no longer committed). Locally with AWS SSO, set `SIB_AWS_PROFILE`
-   in `.Renviron`; on shinyapps.io / EC2 the default IAM credential
-   chain is used.
+3. No AWS configuration needed. The app pulls the parquet data from
+   the publicly readable prefix `s3://nccsdata/sector-in-brief/`
+   anonymously over HTTPS at startup (per ADR 0011 — data is no
+   longer committed to the repo).
 
 4. Run the app from the project root directory
 
@@ -92,7 +91,7 @@ The scripts in `R/` are sourced as a flat namespace by Shiny. Key files:
 
 * `app.R` (root): entry point that calls `app()` from `R/app.R`.
 * `R/app.R`: top-level UI + server. Triggers `ensure_data_local()` and `publish_data_dictionary()` at startup.
-* `R/s3_sync.R`: shells out to `aws s3 sync` to pull the current vintage from S3 (no-op when the local manifest matches).
+* `R/s3_sync.R`: pulls the current vintage from a publicly readable S3 prefix over HTTPS at startup (no-op when the local manifest matches).
 * `R/visualpanel_args.R`, `R/visualpanel_builder.R`, `R/visualpanel_mapper.R`: per-visualization-tab UI assembly.
 * `R/data_ui.R`, `R/geo_filter_module.R`: filter cards (Organization Type, Subsector, Size, Date, Geography).
 * `R/coverage_notes_card.R`: surfaces the producer's `coverage_notes` per panel as an inline accordion.
@@ -117,12 +116,47 @@ producer (`sector-in-brief-data`) publishes a new build.
 
 # Deployment
 
-Deployed to `https://nccs-urban.shinyapps.io/sector-in-brief/` via
-`rsconnect`. After authenticating the target shinyapps.io account locally:
+Two environments, both on the **urban-main** shinyapps.io account,
+both on the **Xlarge instance (8 GB RAM)**:
 
-```r
-rsconnect::deployApp()
-```
+| Env | URL | Trigger |
+|---|---|---|
+| **Staging** | <https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/> | Auto on push to `main` (`deploy-staging.yml`) |
+| **Production** | <https://urban-main.shinyapps.io/sector-in-brief/> | Auto on push to `prod` (`deploy-prod.yml`) |
+
+There's a separate **legacy** prod URL at
+<https://nccs-urban.shinyapps.io/sector-in-brief/> that remains the
+publicly cited link until the migration to urban-main is announced.
+Update external references and `R/text_welcome.R`'s citation when
+that flip happens.
+
+## Promotion model
+
+1. PRs land on `main` → staging auto-redeploys.
+2. Verify staging with `docs/UI_TESTING.md`.
+3. Promote staging → prod with `git push origin main:prod` (or a PR
+   from `main` into `prod`). The prod workflow fires and redeploys
+   production.
+4. Rollback: revert the `prod` branch to the previous commit, push,
+   the workflow redeploys.
+
+The `prod` branch *is* the answer to "what's in production right now?".
+
+## Data + secrets
+
+Data is **not** bundled into the deploy artifact — the runtime pulls
+the pinned vintage from S3 at boot per `R/s3_sync.R` (ADR 0011). The
+bucket prefix is publicly readable, so the sync uses
+`aws s3 sync --no-sign-request` and **no AWS credentials are needed**
+anywhere (not locally, not on shinyapps.io, not in CI).
+
+CI auth for the deploy step uses two repo Actions secrets shared by
+both workflows: `SHINYAPPS_TOKEN`, `SHINYAPPS_SECRET`. Generate from
+the urban-main shinyapps.io account: Tokens → Add Token.
+
+Bump `VINTAGE` in `R/s3_sync.R` when the producer
+(`sector-in-brief-data`) publishes a new build, then merge to `main`
+to roll staging. Promote to prod once staging verification passes.
 
 Deploy metadata is committed under
 `deploy/rsconnect/shinyapps.io/<account>/`. The runtime `rsconnect/`

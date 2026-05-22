@@ -16,10 +16,9 @@ Run from the repo root (an R session with `renv` activated by `.Rprofile`):
 
 ## Data sync (ADR 0011)
 
-`R/s3_sync.R` shells out to `aws s3 sync` at app startup to pull the parquet vintage from S3 into `data/`. No-op when the local `_manifest.json` already reports the target `VINTAGE`.
+`R/s3_sync.R` pulls the parquet vintage from S3 into `data/` at app startup via anonymous HTTPS (no AWS CLI, no credentials). The manifest is fetched first to enumerate files, then each file is downloaded. No-op when the local `_manifest.json` already reports the target `VINTAGE`.
 
-- Local dev with AWS SSO: set `SIB_AWS_PROFILE` in `.Renviron` (e.g. `SIB_AWS_PROFILE=thiya`)
-- shinyapps.io / EC2: leave `SIB_AWS_PROFILE` unset; the default IAM credential chain is used
+- The bucket allows public `GetObject` on individual files but NOT anonymous `ListObjects` — that's why we drive enumeration from the manifest rather than using `aws s3 sync`. **No AWS credentials are needed** anywhere (locally, on shinyapps.io, or in CI). Important because institutional AWS accounts often rotate keys every 24 hours, which would break static-env-var setups.
 - Reads from the prod prefix (`s3://nccsdata/sector-in-brief/v{VINTAGE}/`). The producer also publishes a `latest/` mirror, but the dashboard pins a specific `v*` tag so a new producer publish can't silently change shape — bump `VINTAGE` in a follow-up PR after testing the new build
 
 `R/s3_sync.R` also exports `publish_data_dictionary()` which writes `data/data_dictionary.parquet` to `www/data_dictionary.csv` (with a UTF-8 BOM for Excel) so the "Download data dictionary" links resolve.
