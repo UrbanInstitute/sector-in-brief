@@ -1,8 +1,29 @@
-# Build the inside of a visualization panel — header, coverage notes,
-# filter card, plot/table UI. Returned as a tagList so a wrapping
-# uiOutput can drop it in. Splitting this out from visualpanel_builder
-# means a tab's heavy widgets (plot_ui, data_ui, coverage_notes_card)
-# only run when the tab activates, not at app boot.
+# Build the inside of a visualization panel — header + sidebar of
+# accordioned filters + main column with coverage notes, chips, and
+# plot/table UI. Returned as a tagList so a wrapping uiOutput can
+# drop it in.
+#
+# Splitting this out from visualpanel_builder means a tab's heavy
+# widgets (plot_ui, data_ui, coverage_notes_card) only run when the
+# tab activates, not at app boot.
+#
+# Layout:
+#
+#   [page_header_card — full width]
+#   [-------- bslib::layout_sidebar --------]
+#   [ sidebar       ] [ main                  ]
+#   [               ] [                       ]
+#   [ ▸ Date Range  ] [ coverage notes        ]
+#   [ ▸ Org Type    ] [ chip row              ]
+#   [ ▸ Geography   ] [ plot/table sub-tabs   ]
+#   [ ▹ Subsector   ] [                       ]
+#   [ ▹ Size        ] [                       ]
+#   [ Update/Reset  ] [                       ]
+#   [---------------] [-----------------------]
+#
+# Sidebar contents come from data_ui() as a bslib::accordion +
+# action-button block; chevrons signal progressive disclosure
+# (Subsector and Size start collapsed).
 
 #' Render the lazy contents of one visualization panel.
 #'
@@ -21,27 +42,23 @@ visualpanel_content <- function(panel_header,
                                 end_year,
                                 parquet_file) {
   choices <- choice_builder(panelid)
-  all_cards <- data_ui(panelid, choices, start_year, end_year)
+  ui_parts <- data_ui(panelid, choices, start_year, end_year)
   ns <- shiny::NS(panelid)
   htmltools::tagList(
     page_header_card(panel_header, panel_desc),
-    coverage_notes_card(parquet_file),
-    bslib::card(
-      class = "card-filter",
-      bslib::card_title("Select Your Filters", class = "bg-light-gray"),
-      title = "",
-      bslib::layout_column_wrap(
-        all_cards[["org_card"]],
-        all_cards[["subsector_card"]],
-        all_cards[["size_card"]],
-        all_cards[["geo_card"]],
-        all_cards[["date_card"]]
+    bslib::layout_sidebar(
+      sidebar = bslib::sidebar(
+        title = "Filters",
+        width = 320,
+        class = "panel-filter-sidebar",
+        ui_parts[["filter_accordion"]],
+        ui_parts[["process_button"]]
       ),
-      all_cards[["process_button"]]
-    ),
-    # Active-filter chips, rendered by data_server() from the inputs
-    # snapshot. Empty when no filter is narrowed from default.
-    shiny::uiOutput(ns("filter_chips"), class = "filter-chip-row"),
-    plot_ui(panelid)
+      coverage_notes_card(parquet_file),
+      # Active-filter chips, rendered by data_server() from the inputs
+      # snapshot. Empty when no filter is narrowed from default.
+      shiny::uiOutput(ns("filter_chips"), class = "filter-chip-row"),
+      plot_ui(panelid)
+    )
   )
 }

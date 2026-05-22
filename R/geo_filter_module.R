@@ -27,18 +27,24 @@ substate_filter <- function(session, id, geo_input, geo_df, geo_var, server = TR
   )
 }
 
-#' Build the Geographic Filters card UI.
+#' Build the Geographic Filters section UI.
+#'
+#' Returns a plain div with the level radio + the conditional
+#' sub-selectizes. Plain div (not a card) because the parent
+#' `data_ui` wraps each filter in an accordion panel whose own title
+#' acts as the section header — adding a filter_card_header here
+#' would duplicate it.
 #'
 #' @param id Sub-module id (typically the parent's `"geo_filter"`).
 #' @param state_choices Accepted for backwards compatibility; the
 #'   actual state list comes from `R/geo_choices.R::states`.
-#' @return A `bslib::card`.
+#' @return A `htmltools::div`.
 geo_filter_ui <- function(id, state_choices) {
   ns <- shiny::NS(id)
-  bslib::card(
-    filter_card_header(
-      "Geographic Filters",
-      "Information about census-defined geographic level is available on the About page."
+  htmltools::div(
+    htmltools::p(
+      class = "filter-hint",
+      "Census-defined geographic levels — see the About page for details."
     ),
     urbn_radiobuttons(
       ns,
