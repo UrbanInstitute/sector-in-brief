@@ -5,7 +5,8 @@
 # chain inside a withProgress() wrapper for the spinner, with a
 # tryCatch() that converts unexpected errors into a friendly modal
 # (added in PR #25). Validation errors are surfaced inline under the
-# offending filter card (PR #30), not via modal.
+# offending filter section in the sidebar accordion (PR #30), not
+# via modal.
 
 #' Run the panel pipeline for one UPDATE DATA click.
 #'

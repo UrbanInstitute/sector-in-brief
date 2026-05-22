@@ -4,10 +4,10 @@
 # ones that don't apply. State-then-county and state-then-CBSA
 # cascading is handled server-side by substate_filter().
 #
-# Used inside `data_ui()` as one of the filter cards. The server
-# returns a list of reactives (state_single(), state_mult(), region(),
-# geo_level(), county(), cbsa()) consumed by `format_input()` to
-# snapshot into pure inputs.
+# Used inside `data_ui()` as one of the sidebar accordion sections.
+# The server returns a list of reactives (state_single(), state_mult(),
+# region(), geo_level(), county(), cbsa()) consumed by `format_input()`
+# to snapshot into pure inputs.
 
 #' Refresh the choices for a downstream geo selectize from the parent
 #' state. Called on state_single change to update county/CBSA lists.

@@ -1,7 +1,7 @@
 #' Build one lazy nav_panel shell.
 #'
 #' Returns just the title + a `uiOutput("panel_ui_<panelid>")`
-#' placeholder. The actual content (filter cards, plot panels,
+#' placeholder. The actual content (filter sidebar, plot panels,
 #' coverage notes) is rendered on demand by a server-side renderUI
 #' tied to that slot. Shiny's default `suspendWhenHidden = TRUE` means
 #' inactive tabs never run the heavy builder.

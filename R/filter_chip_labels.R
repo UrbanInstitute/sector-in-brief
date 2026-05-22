@@ -3,7 +3,7 @@
 #' Returns one chip per filter that the user has narrowed from its
 #' default. Rendered above the plot area by `data_server()` so users
 #' can see their active filters at a glance without scrolling back
-#' to the filter card.
+#' to the sidebar.
 #'
 #' Defaults are the *realized* values captured the first time the
 #' panel mounts (see `data_server()`'s once-only observer). Doing

@@ -1,8 +1,8 @@
 # User-facing modal for unexpected server errors caught by the
 # tryCatch in data_pipeline(). Validation errors are NOT shown here —
-# those go inline under the offending filter card via
-# render_validation_messages.R. This modal is only for thrown
-# exceptions from arrow/dplyr/ggplot etc.
+# those go inline under the offending filter section in the sidebar
+# accordion via render_validation_messages.R. This modal is only for
+# thrown exceptions from arrow/dplyr/ggplot etc.
 
 #' Build the "Something went wrong" modal for runtime errors.
 #'

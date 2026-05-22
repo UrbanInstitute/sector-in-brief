@@ -1,6 +1,8 @@
 # Action button styled with the Urban Institute "btn-urban" class
 # (yellow background, black text — see www/sib_style.css). Used for
-# filter-reset buttons inside the filter cards.
+# the multi-step "NEXT" / "SUBMIT REQUEST" buttons in the Custom
+# Panel Datasets download flow (R/data_download_dashboard.R). The
+# panel-filter Reset button uses its own .btn-reset styling.
 
 #' Build an Urban-themed action button.
 #'
