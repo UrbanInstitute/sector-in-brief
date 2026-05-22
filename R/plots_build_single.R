@@ -1,17 +1,23 @@
 # Pick the right ggiraph builder for one table based on its shape:
 #
-#   1 unique year                       → single_col_plot (lollipop)
-#                                          OR group_col_plot (horiz bars)
-#   2-3 unique years                    → multi_year_col_plot (vertical
-#                                          bars by year, optionally
-#                                          dodged by group)
-#   ≥4 unique years + no group          → single_line_plot
-#   ≥4 unique years + group             → group_line_plot
+#   ≤3 unique years + no group    → multi_year_col_plot (vertical bars
+#                                    by year — including the 1-year
+#                                    case, which renders as a single
+#                                    bar so it's visually consistent
+#                                    with the 2-3-year case)
+#   ≤3 unique years + group       → multi_year_col_plot (year-dodged
+#                                    clustered bars) for ≥2 years,
+#                                    group_col_plot (horizontal bars)
+#                                    for the 1-year case where
+#                                    horizontal layout reads better
+#                                    with many groups (e.g. 12
+#                                    subsectors)
+#   ≥4 unique years + no group    → single_line_plot
+#   ≥4 unique years + group       → group_line_plot
 #
-# The 2-3-year branch exists because line charts with so few points
-# read as discrete values rather than trends. Bars at low temporal
-# cardinality (currently DAF panels at 2021-2023) give a cleaner
-# year-over-year comparison.
+# The ≤3-year branch uses bars because line charts with so few
+# points read as discrete values rather than trends — bars give a
+# cleaner year-over-year comparison.
 #
 # Empty or column-missing tables short-circuit to blank_plot.
 
@@ -60,11 +66,17 @@ plots_build_single <- function(table,
       num_groups = if (!is.null(groupby_var)) length(unique(table[[groupby_var]])) else 1
     )
   } else {
+    # 1 unique year. Overall (no group) routes through the same
+    # multi_year_col_plot path as 2-3 years so the visual is just
+    # "1 bar" rather than the legacy lollipop. Grouped uses
+    # horizontal bars where the group labels read better on the
+    # y axis than dodged at a single x position.
     if (is.null(groupby_var) ||
         length(unique(table[[groupby_var]])) == 1) {
-      single_col_plot(table = table, title = title, caption = caption,
-                      yvar = yvar, xvar = xvar,
-                      ytitle = ytitle, xtitle = xtitle)
+      multi_year_col_plot(table = table, groupby_var = NULL,
+                          title = title, caption = caption,
+                          yvar = yvar, xvar = xvar,
+                          ytitle = ytitle, xtitle = xtitle)
     } else {
       group_col_plot(table = table, groupby_var = groupby_var,
                      title = title, caption = caption,
