@@ -44,8 +44,22 @@ visualpanel_content <- function(panel_header,
   choices <- choice_builder(panelid)
   ui_parts <- data_ui(panelid, choices, start_year, end_year)
   ns <- shiny::NS(panelid)
+  meta <- manifest_meta()
+  vintage_line <- if (!is.null(meta$vintage)) {
+    parts <- c(
+      sprintf("Data through tax year %d", end_year),
+      sprintf("vintage %s", meta$vintage),
+      if (!is.null(meta$built_at_date)) sprintf("refreshed %s", meta$built_at_date)
+    )
+    htmltools::p(
+      class = "vintage-indicator",
+      paste(parts, collapse = " · ")
+    )
+  } else NULL
+
   htmltools::tagList(
     page_header_card(panel_header, panel_desc),
+    vintage_line,
     bslib::layout_sidebar(
       sidebar = bslib::sidebar(
         title = "Filters",

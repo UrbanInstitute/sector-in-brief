@@ -418,6 +418,16 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
 .navbar .nav-underline .nav-link, .navbar .nav-underline :where(ul.nav.navbar-nav > li) > a {
   padding-bottom: 0;
 }
+/* Vintage indicator below the panel header (PR-C). Small grey text
+   so it's available for trust signal without distracting from the
+   chart. */
+.vintage-indicator {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  color: #5c5859;
+  margin: -0.5rem 0 0.75rem 0;
+}
+
 /* Panel filter sidebar (PR-B). Filters live inside a bslib accordion
    inside a bslib::sidebar. Force Lato everywhere so the sidebar
    matches the rest of the dashboard (bslib defaults to system font

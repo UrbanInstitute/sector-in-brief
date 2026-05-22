@@ -39,7 +39,7 @@ single_line_plot <- function(table,
       color = "#1696d2",
       hover_nearest = TRUE
     ) +
-    plot_scales +
+    y_scale_for(yvar) +
     labs(
       title = title,
       subtitle = subtitle,
