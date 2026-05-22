@@ -11,7 +11,7 @@ filter UI, end-to-end download flows.
 you do not need R, RStudio, or the repo cloned locally. Just open the
 staging URL in a browser.
 
-**Staging URL:** <https://nccs-urban.shinyapps.io/nccs-sector-in-brief-staging/>
+**Staging URL:** <https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/>
 
 **Run before:** every release to production. Trigger is any PR
 landing on `main` that touches `R/app.R`, the filter cards
