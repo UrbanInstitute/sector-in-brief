@@ -7,13 +7,21 @@ suite (`tests/testthat/`) and the boot smoke test (`test-app_boot.R`)
 can't see — visual layout, interactive plot behavior, cascading
 filter UI, end-to-end download flows.
 
-**Run before:** merging any PR that touches `R/app.R`, the filter
-cards (`R/data_ui.R`, `R/geo_filter_module.R`), the plot/table
-builders, or the Custom Panel Datasets module.
+**Who runs this:** any analyst on the team. No programmatic setup —
+you do not need R, RStudio, or the repo cloned locally. Just open the
+staging URL in a browser.
 
-**Run on:** the local dev app (`shiny::runApp(".")`) at minimum.
-For changes that touch the deploy or data sync, also run on the
-shinyapps.io preview.
+**Staging URL:** <https://nccs-urban.shinyapps.io/nccs-sector-in-brief-staging/>
+
+**Run before:** every release to production. Trigger is any PR
+landing on `main` that touches `R/app.R`, the filter cards
+(`R/data_ui.R`, `R/geo_filter_module.R`), the plot/table builders,
+the Custom Panel Datasets module, or the data sync (`R/s3_sync.R`).
+
+**Production runtime:** the dashboard deploys to an **Xlarge
+shinyapps.io instance with 8 GB RAM**. Staging matches this so what
+you see in staging is what production will see — keep that in mind
+when judging "is this fast enough?".
 
 Format: each row has a step you take and the expected outcome. If a
 step's expected outcome doesn't happen, that's a bug — log it and
@@ -23,8 +31,8 @@ keep going (don't bail). Boxes are for tick-marking during the run.
 
 ## 1. Boot & branding (~1 min)
 
-- [ ] App loads at `http://127.0.0.1:<port>` within ~3 seconds. (Cold start was 4.13s pre-optimization; now ~1.64s. Anything over 5s is a regression.)
-- [ ] No red error in the terminal where you launched `runApp`. Warnings about `tags$head` positional arg in `page_navbar` are expected (known issue).
+- [ ] App loads at the staging URL within ~3-5 seconds on a cold start (first hit of the day) or ~1-2 seconds on a warm start. shinyapps.io spins down idle instances, so the first hit after a quiet period pays the spin-up tax. Anything over ~10s on a cold start, or over ~3s on a warm one, is a regression worth flagging.
+- [ ] No error banner or visible crash on load.
 - [ ] Urban Institute logo + "| National Center for Charitable Statistics" appears in the navbar (or "| NCCS" if the window is narrow — resize to confirm both states render).
 - [ ] No "Data may be stale" yellow banner across the top (unless you've intentionally broken S3 sync).
 - [ ] Footer "We want your Feedback" link is present and points to the Qualtrics URL.
@@ -105,8 +113,8 @@ For each panel below, just confirm the Overall plot draws without errors and the
 ## 7. Error & validation paths (~2 min)
 
 - [ ] **Inline validation**: clear every Subsector AND every Size checkbox simultaneously, click UPDATE DATA. **Both** messages appear (one under each card). The pre-fix bug only showed the last error.
-- [ ] **Runtime error modal**: harder to provoke synthetically. Skip unless you've changed pipeline code. If you have, the path to trigger is to introduce a transient error (e.g., a column rename) and confirm the "Something went wrong" modal appears with a `<details>` block holding the raw error.
-- [ ] **Schema contract**: if you bump VINTAGE in `R/s3_sync.R` without updating `R/expected_schema.R`, restart the app — expect a startup `stop()` listing the column diff. (Don't actually do this; just confirm the test in `test-validate_parquet_schemas.R` covers it.)
+- [ ] **Runtime error modal**: hard to provoke from staging without a code change. Skip unless a developer flags a specific case to test. If the modal does appear during normal use, that *is* a bug to log — title is "Something went wrong" with an expandable Technical detail section.
+- [ ] **Schema contract**: not testable from the UI; this is a developer-only check enforced at app boot (see `test-validate_parquet_schemas.R`). Skip.
 
 ## 8. Cross-cutting visual checks (~2 min)
 
@@ -137,4 +145,4 @@ When that track lands, this section will be replaced with mobile-specific checks
 
 ---
 
-**When you find a bug:** open a GitHub issue with the panel name, the filter combination, a screenshot if visual, and the exact step from this checklist that failed. Reference this file's section heading.
+**When you find a bug:** write up the panel name, the exact filter combination, a screenshot if it's visual, and the section heading from this checklist that failed. Send to the dev team (GitHub issue if you have access; email or Slack otherwise).
