@@ -19,25 +19,28 @@ RoxygenNote: 7.0.0
 Imports:
     arrow,
     bsicons,
+    bslib,
+    cachem,
+    digest,
     dplyr,
     ggiraph,
     ggplot2,
+    htmltools,
+    htmlwidgets,
     httr,
     jsonlite,
-    microbenchmark,
-    pkgload,
-    profvis,
-    RColorBrewer,
+    purrr,
     reactable,
+    rlang,
     shiny,
+    shinyWidgets,
     shinycssloaders,
-    tidylog,
-    usdata,
-    usethis
+    tibble
 Depends:
     R (>= 4.0)
 Suggests:
     mockery,
+    pkgload,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 LazyData: true
