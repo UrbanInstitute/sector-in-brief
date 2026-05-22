@@ -418,22 +418,34 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
 .navbar .nav-underline .nav-link, .navbar .nav-underline :where(ul.nav.navbar-nav > li) > a {
   padding-bottom: 0;
 }
-/* Filter sections inside the sidebar (PR-B). Each section is a div
-   wrapping a header + the input widget. Spacing keeps them readable
-   without the previous nested-card chrome. */
-.filter-section {
-  padding: 0.6rem 0 0.6rem 0;
-  border-bottom: 1px solid #eaeaea;
+/* Panel filter sidebar (PR-B). Filters live inside a bslib accordion
+   inside a bslib::sidebar. Force Lato everywhere so the sidebar
+   matches the rest of the dashboard (bslib defaults to system font
+   in the sidebar slot). */
+.panel-filter-sidebar,
+.panel-filter-sidebar * {
+  font-family: 'Lato', sans-serif;
 }
-.filter-section:last-of-type {
-  border-bottom: none;
-}
-.filter-header {
-  margin-bottom: 0.5rem;
-}
-.filter-header h6 {
+.panel-filter-sidebar .accordion-button {
   font-weight: 700;
-  margin: 0;
+  padding: 0.6rem 0.75rem;
+}
+.panel-filter-sidebar .accordion-body {
+  padding: 0.75rem;
+}
+/* One-line hint shown above each input in the accordion body. */
+.filter-hint {
+  font-size: 0.8rem;
+  color: #5c5859;
+  margin: 0 0 0.5rem 0;
+}
+/* Slightly smaller checkbox/radio labels so the longer subsector
+   strings ("Arts, Culture, and Humanities") fit on one line in
+   the 320px sidebar. */
+.panel-filter-sidebar .shiny-input-checkboxgroup label,
+.panel-filter-sidebar .shiny-input-radiogroup label {
+  font-size: 0.9rem;
+  line-height: 1.25;
 }
 .validation-msg {
   margin: 0.35rem 0 0.5rem 0;
@@ -447,19 +459,27 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
 }
 .filter-actions {
   display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  margin-top: 0.5rem;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin-top: 0.75rem;
 }
-.btn-reset {
+/* Make both buttons share the sidebar width 50/50 and match in
+   height. Without this the bslib input_task_button (UPDATE DATA) is
+   noticeably taller than the plain actionButton (Reset filters). */
+.filter-actions .bslib-input-task-button,
+.filter-actions .btn-reset {
+  flex: 1 1 0;
   font-family: 'Lato';
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 2px;
+  min-height: 0;
+}
+.btn-reset {
   color: #1696d2;
   background: transparent;
   border: 1px solid #1696d2;
-  padding: 0.45rem 1rem;
-  border-radius: 2px;
 }
 .btn-reset:hover {
   background: #e8f3fa;

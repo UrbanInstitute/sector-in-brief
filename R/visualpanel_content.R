@@ -1,23 +1,29 @@
 # Build the inside of a visualization panel — header + sidebar of
-# filters + main column with coverage notes, chips, and plot/table
-# UI. Returned as a tagList so a wrapping uiOutput can drop it in.
+# accordioned filters + main column with coverage notes, chips, and
+# plot/table UI. Returned as a tagList so a wrapping uiOutput can
+# drop it in.
+#
 # Splitting this out from visualpanel_builder means a tab's heavy
 # widgets (plot_ui, data_ui, coverage_notes_card) only run when the
 # tab activates, not at app boot.
 #
-# Layout (PR-B):
+# Layout:
 #
 #   [page_header_card — full width]
 #   [-------- bslib::layout_sidebar --------]
 #   [ sidebar       ] [ main                  ]
 #   [               ] [                       ]
-#   [ filter cards  ] [ coverage notes        ]
-#   [ Update/Reset  ] [ chip row              ]
-#   [               ] [ plot/table sub-tabs   ]
+#   [ ▸ Date Range  ] [ coverage notes        ]
+#   [ ▸ Org Type    ] [ chip row              ]
+#   [ ▸ Geography   ] [ plot/table sub-tabs   ]
+#   [ ▹ Subsector   ] [                       ]
+#   [ ▹ Size        ] [                       ]
+#   [ Update/Reset  ] [                       ]
 #   [---------------] [-----------------------]
 #
-# The sidebar is bslib's standard layout_sidebar which collapses to a
-# toggleable drawer on mobile (handled by bslib's CSS, not us).
+# Sidebar contents come from data_ui() as a bslib::accordion +
+# action-button block; chevrons signal progressive disclosure
+# (Subsector and Size start collapsed).
 
 #' Render the lazy contents of one visualization panel.
 #'
@@ -36,7 +42,7 @@ visualpanel_content <- function(panel_header,
                                 end_year,
                                 parquet_file) {
   choices <- choice_builder(panelid)
-  all_cards <- data_ui(panelid, choices, start_year, end_year)
+  ui_parts <- data_ui(panelid, choices, start_year, end_year)
   ns <- shiny::NS(panelid)
   htmltools::tagList(
     page_header_card(panel_header, panel_desc),
@@ -44,12 +50,9 @@ visualpanel_content <- function(panel_header,
       sidebar = bslib::sidebar(
         title = "Filters",
         width = 320,
-        all_cards[["org_card"]],
-        all_cards[["subsector_card"]],
-        all_cards[["size_card"]],
-        all_cards[["geo_card"]],
-        all_cards[["date_card"]],
-        all_cards[["process_button"]]
+        class = "panel-filter-sidebar",
+        ui_parts[["filter_accordion"]],
+        ui_parts[["process_button"]]
       ),
       coverage_notes_card(parquet_file),
       # Active-filter chips, rendered by data_server() from the inputs
