@@ -54,7 +54,7 @@ keep going (don't bail). Boxes are for tick-marking during the run.
 Pick the **Numbers** panel for the canonical happy-path run.
 
 - [ ] Click Data Visualizations → Numbers. Panel content appears within ~1s (lazy load; first activation pays the cost, subsequent ones are instant).
-- [ ] Panel header reads "Number of Nonprofits" with a descriptive paragraph below it.
+- [ ] Panel header reads "Number of Nonprofits" with a descriptive paragraph below it. A small grey line beneath reads "Data through tax year YYYY · vintage X.X · refreshed YYYY-MM-DD" — confirm the year/vintage looks current.
 - [ ] Coverage notes accordion is collapsed by default. Expand it — bulleted list of documented data gaps appears.
 - [ ] A left **Filters** sidebar (~320px wide) contains an accordion with five sections in this order, top to bottom: **Date Range**, **Organization Type**, **Geography**, **Subsector**, **Organization Size**. Date / Org Type / Geography are expanded by default; Subsector and Size start collapsed (chevron pointing right). The "Filters" header at the top of the sidebar is centered with a blue underline.
 - [ ] Default selections match: Date range = full 1989-present; Organization Type = "501(c)(3) Organizations" + "501(c)(4) - Social Welfare Organizations" + "Other Nonprofits"; Geo = National. Expand Subsector and Size to confirm: all 12 subsectors checked; all 6 size bands checked.
@@ -124,7 +124,7 @@ The chip row appears between the coverage-notes accordion and the plot tabs in t
 For each panel below, just confirm the Overall plot draws without errors and the caption text is present. **You do not need to exhaustively re-run filter tests.**
 
 - [ ] **Numbers** — already covered in §3.
-- [ ] **Finances → Assets** — dollar y-axis with "$" prefix in tooltip.
+- [ ] **Finances → Assets** — y-axis tick labels show abbreviated dollar amounts (e.g. `$1B`, `$500M`), not the full `$1,000,000,000`. Hover tooltip shows the full precision (e.g. `$1,234,567,890`).
 - [ ] **Finances → Revenues** — caption mentions "Other revenue sources" disclaimer.
 - [ ] **Finances → Expenses** — caption mentions "Other expenses" disclaimer.
 - [ ] **Finances → Benefits** — a chart appears with no error message and no "No Data Available" placeholder.
@@ -145,6 +145,7 @@ For each panel below, just confirm the Overall plot draws without errors and the
 - [ ] **Inline validation**: expand Subsector + Size accordion sections, clear every Subsector AND every Size checkbox simultaneously, click UPDATE DATA. **Both** messages appear (one under each section). The pre-fix bug only showed the last error.
 - [ ] **Runtime error modal**: hard to provoke from staging without a code change. Skip unless a developer flags a specific case to test. If the modal does appear during normal use, that *is* a bug to log — title is "Something went wrong" with an expandable Technical detail section.
 - [ ] **Schema contract**: not testable from the UI; this is a developer-only check enforced at app boot (see `test-validate_parquet_schemas.R`). Skip.
+- [ ] **Empty-state message**: on the Numbers panel, narrow the Date Range slider to a single year (e.g. 1989-1989) AND set Geo to a small county. Click UPDATE DATA. The Overall plot shows "No data for this combination of filters." with a sub-line suggesting which filters to widen. (Not the legacy "No Data Available, Select Other Filters and Try Again.")
 
 ## 8. Cross-cutting visual checks (~2 min)
 

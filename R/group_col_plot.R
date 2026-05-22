@@ -34,7 +34,7 @@ group_col_plot <- function(table,
                                   hover_nearest = TRUE,
     ) +
     scale_fill_manual(values = colorpalette(num_colors = num_groups)) +
-    plot_scales +
+    y_scale_for(yvar) +
     labs(
       title = title,
       subtitle = subtitle,

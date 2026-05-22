@@ -50,7 +50,7 @@ group_line_plot <- function(table,
     scale_color_manual(
       values = colorpalette(num_colors = num_groups)
     ) +
-    plot_scales +
+    y_scale_for(yvar) +
     ggplot2::scale_x_continuous(breaks = seq(1990, 2024, 4)) +
     labs(
       title = title,

@@ -60,7 +60,7 @@ multi_year_col_plot <- function(table,
   }
 
   p <- p +
-    plot_scales +
+    y_scale_for(yvar) +
     labs(
       title = title,
       subtitle = subtitle,
