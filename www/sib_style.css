@@ -426,6 +426,20 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
 .panel-filter-sidebar * {
   font-family: 'Lato', sans-serif;
 }
+/* Treat "Filters" as a prominent section header: centered, bold,
+   sized between h5/h6, with bottom border to separate from the
+   accordion content. */
+.panel-filter-sidebar .sidebar-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #0a4c6a;
+  padding: 0.6rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid #1696d2;
+}
 .panel-filter-sidebar .accordion-button {
   font-weight: 700;
   padding: 0.6rem 0.75rem;
@@ -463,18 +477,25 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
   align-items: stretch;
   margin-top: 0.75rem;
 }
-/* Make both buttons share the sidebar width 50/50 and match in
-   height. Without this the bslib input_task_button (UPDATE DATA) is
-   noticeably taller than the plain actionButton (Reset filters). */
-.filter-actions .bslib-input-task-button,
-.filter-actions .btn-reset {
-  flex: 1 1 0;
-  font-family: 'Lato';
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 0.55rem 0.75rem;
-  border-radius: 2px;
-  min-height: 0;
+/* Force both action buttons to share the sidebar width 50/50 and
+   match in height. The bslib input_task_button renders as
+   `<button class="btn btn-primary bslib-task-button">` which inherits
+   Bootstrap's larger default padding; without overriding, it sits
+   noticeably taller than the plain actionButton. Targeting <button>
+   directly catches both. */
+.filter-actions > button {
+  flex: 1 1 0 !important;
+  font-family: 'Lato' !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  padding: 0.55rem 0.5rem !important;
+  border-radius: 2px !important;
+  height: 38px;
+  min-height: 38px;
+  line-height: 1.2 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn-reset {
   color: #1696d2;
