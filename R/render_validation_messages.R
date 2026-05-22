@@ -2,7 +2,7 @@
 # result into UI updates. Called from data_pipeline() on every
 # UPDATE DATA click so stale messages from a prior click are cleared.
 
-#' Render inline validation messages under filter cards.
+#' Render inline validation messages under filter sections.
 #'
 #' For each known filter key, sets `output$validation_<key>` to either
 #' a styled message div (when an error is present) or NULL (clears any

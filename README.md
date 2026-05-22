@@ -90,15 +90,18 @@ shiny::runApp()
 The scripts in `R/` are sourced as a flat namespace by Shiny. Key files:
 
 * `app.R` (root): entry point that calls `app()` from `R/app.R`.
-* `R/app.R`: top-level UI + server. Triggers `ensure_data_local()` and `publish_data_dictionary()` at startup.
-* `R/s3_sync.R`: pulls the current vintage from a publicly readable S3 prefix over HTTPS at startup (no-op when the local manifest matches).
-* `R/visualpanel_args.R`, `R/visualpanel_builder.R`, `R/visualpanel_mapper.R`: per-visualization-tab UI assembly.
-* `R/data_ui.R`, `R/geo_filter_module.R`: filter cards (Organization Type, Subsector, Size, Date, Geography).
+* `R/app.R`: top-level UI + server. Boots `ensure_data_local()` → `validate_parquet_schemas()` → `publish_data_dictionary()` → resolves year ranges → assembles the navbar UI. URL bookmarking enabled.
+* `R/s3_sync.R`: anonymous-HTTPS fetch of the pinned vintage from S3 at startup (no-op when the local manifest matches).
+* `R/visualpanel_args.R`, `R/visualpanel_builder.R`, `R/visualpanel_mapper.R`, `R/visualpanel_content.R`: per-visualization-tab UI assembly. Panels are lazy.
+* `R/data_ui.R`, `R/geo_filter_module.R`: filter sections inside the panel's sidebar accordion (Date, Org Type, Geography, Subsector, Size).
+* `R/filter_chip_labels.R`, `R/render_validation_messages.R`: active-filter chip row + inline validation messages above each plot.
 * `R/coverage_notes_card.R`: surfaces the producer's `coverage_notes` per panel as an inline accordion.
 * `R/data_server.R`, `R/data_server_args.R`, `R/data_pipeline.R`: per-panel server pipeline.
-* `R/dataloader.R`, `R/filter_data.R`, `R/query_builder.R`, `R/summarise_data.R`: arrow-backed querying.
+* `R/dataloader.R`, `R/filter_data.R`, `R/query_builder.R`, `R/summarise_data.R`, `R/query_cache.R`: arrow-backed querying with a 50 MB disk cache.
+* `R/expected_schema.R`, `R/validate_parquet_schemas.R`: schema contract enforced at app boot.
+* `R/manifest_meta.R`, `R/year_range.R`: manifest-driven vintage indicator + per-panel year-range derivation.
 * `R/table_builder*.R`, `R/render_tables.R`, `R/render_outputs.R`: reactable + plot dispatch.
-* `R/plot_*.R`, `R/*_plot.R`, `R/plots_build_*.R`: ggplot2 + ggiraph chart construction.
+* `R/plot_*.R`, `R/*_plot.R`, `R/plots_build_*.R`: ggplot2 + ggiraph chart construction. `plots_build_single` dispatches by year cardinality (≤3 → bars via `multi_year_col_plot` / `group_col_plot`; ≥4 → lines).
 * `R/text_about.R`, `R/visual_text.R`, `R/text_welcome.R`, `R/text_download.R`: copy/text content separated from logic.
 * `R/data_download_dashboard.R`, `R/query_builder_download.R`: "Custom Panel Datasets" download module.
 

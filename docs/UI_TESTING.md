@@ -114,7 +114,7 @@ The chip row appears between the coverage-notes accordion and the plot tabs in t
 - [ ] Uncheck all but 1 subsector. A chip appears: `Subsector: <code>` (e.g. "Subsector: ART"). Codes, not full names — intentional to keep chips short.
 - [ ] Uncheck all but 4 subsectors. The chip collapses to `Subsector: 4 selected` instead of listing them.
 - [ ] Uncheck all but 1 size band. The chip shows the dollar-range label (e.g. "Size: Under $100,000") — **not** the raw integer "Size: 1".
-- [ ] Narrow Organization Type to a single 501(c) sub-type. The chip reads e.g. `Org Type: 501(c)(3) - Public Charities` — verify the labels are recognizable IRS terminology. Very long descriptions (notably 501(c)(12)'s 250-char IRS legalese) are truncated to ~50 chars with an ellipsis to keep the chip on one line; the full label is still in the filter card.
+- [ ] Narrow Organization Type to a single 501(c) sub-type. The chip reads e.g. `Org Type: 501(c)(3) - Public Charities` — verify the labels are recognizable IRS terminology. Very long descriptions (notably 501(c)(12)'s 250-char IRS legalese) are truncated to ~50 chars with an ellipsis to keep the chip on one line; the full label is still visible in the Organization Type accordion section in the sidebar.
 - [ ] Switch geo to a specific state. A chip appears: `State: <state-abbr>`.
 - [ ] Drag the date slider in. A chip appears: `Years: 2010-2020`.
 - [ ] Click Reset filters — all chips disappear.

@@ -1,7 +1,8 @@
 # One of the urbn_* family of Urban-themed Shiny input wrappers
 # (checkboxgroup, radiobuttons, slider, tree, task_button). All apply
 # a `filter__text` wrapper div so the CSS in www/sib_style.css can
-# style the input consistently across filter cards.
+# style the input consistently across filter sections in the sidebar
+# accordion.
 
 #' Urban-themed checkboxGroupInput.
 #'
