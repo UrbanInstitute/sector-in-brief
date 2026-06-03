@@ -41,7 +41,7 @@ finance_header <-
       class = "base",
       htmltools::tags$b("Data Source:"),
       "The Assets, Revenues, Expenses, and Benefits panels use ",
-      htmltools::a(href = "https://lecy.github.io/nccs/datasets/core/", "NCCS's Core Series,"),
+      htmltools::a(href = "https://nccs.urban.org/nccs/datasets/core/", "NCCS's Core Series,"),
       "which contains data processed from the IRS's ",
       htmltools::a(href = "https://www.irs.gov/statistics/soi-tax-stats-annual-extract-of-tax-exempt-organization-financial-data", "Statistics of Income (SOI) extracts"),
       "for Forms 990, 990-EZ and 990-PF for tax years 1989 through 2023. The Government Grants panel uses NCCS's e-file data instead (see that panel for its source). These data do not include 990-N filers and thus exclude small nonprofits with gross receipts less than or equal to $50,000. More information can be found in the About page.",
@@ -65,9 +65,6 @@ benefits_desc <- htmltools::p(
   "Total benefits are the sum of salaries, wages, benefits, pension plan accruals and contributions, and the 401(k) and 403(b) contributions nonprofits pay to and on behalf of employees. It provides a measure of overall spending on nonprofit-sector employees."
 )
 
-# NOTE: the Data Source line below is an interim draft written from the
-# producer's data dictionary (efile Phase 0, Form 990 Part VIII line 1e).
-# Replace with the canonical NCCS e-file dataset citation when available.
 gov_grants_desc <- htmltools::tagList(
   htmltools::p(
     "Government grants capture the dollar value of grants and contributions that nonprofits receive from government sources, reported on line 1e of Part VIII of Form 990. They reflect the role of public funding in supporting the nonprofit sector."
@@ -78,7 +75,8 @@ gov_grants_desc <- htmltools::tagList(
   htmltools::p(
     class = "base",
     htmltools::tags$b("Data Source:"),
-    "NCCS's e-file data, processed from line 1e of Part VIII of e-filed IRS Form 990 for tax years 2021 through 2023.",
+    htmltools::a(href = "https://nccs.urban.org/nccs/datasets/efile/", "NCCS' E-Filer Catalog,"),
+    "which contains data processed from line 1e of Part VIII of e-filed IRS Form 990 for tax years 2021 through 2023.",
     htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
@@ -112,14 +110,12 @@ grants_desc <- htmltools::tagList(
   htmltools::p(
     class = "base",
     htmltools::tags$b("Data Source:"),
-    "NCCS's Core Series, which contains data processed from the IRS's Statistics of Income Extracts for Form 990-PF for tax years 1989 through 2023.",
+    htmltools::a(href = "https://nccs.urban.org/nccs/datasets/core/", "NCCS's Core Series,"),
+    "which contains data processed from the IRS's Statistics of Income Extracts for Form 990-PF for tax years 1989 through 2023.",
     htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 
-# NOTE: the Data Source line below is an interim draft written from the
-# producer's data dictionary (efile Phase 0, Form 990-PF Part IX-B).
-# Replace with the canonical NCCS e-file dataset citation when available.
 pri_desc <- htmltools::tagList(
   htmltools::p(
     "Program-related investments (PRIs) are investments private foundations make primarily to advance their charitable mission rather than to generate income — for example, low-interest loans to nonprofits or equity stakes in mission-aligned enterprises. This metric sums the total PRIs reported by private foundations on Part IX-B of Form 990-PF."
@@ -130,7 +126,8 @@ pri_desc <- htmltools::tagList(
   htmltools::p(
     class = "base",
     htmltools::tags$b("Data Source:"),
-    "NCCS's e-file data, processed from Part IX-B of e-filed IRS Form 990-PF for tax years 2021 through 2023.",
+    htmltools::a(href = "https://nccs.urban.org/nccs/datasets/efile/", "NCCS' E-Filer Catalog,"),
+    "which contains data processed from Part IX-B of e-filed IRS Form 990-PF for tax years 2021 through 2023.",
     htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
@@ -151,7 +148,7 @@ daf_header <- htmltools::tagList(
   htmltools::p(
     class = "base",
     htmltools::tags$b("Data Source:"),
-    htmltools::a(href = "https://lecy.github.io/nccs/datasets/efile/", "NCCS' E-Filer Catalog,"),
+    htmltools::a(href = "https://nccs.urban.org/nccs/datasets/efile/", "NCCS' E-Filer Catalog,"),
     "which contains data processed from Schedule D for e-filed IRS Form 990 in tax year 2021. This panel does not include 990-N data and thus excludes small nonprofits with gross receipts less than or equal to $50,000. ",
     htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
