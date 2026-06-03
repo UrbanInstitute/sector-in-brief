@@ -36,7 +36,7 @@ plot_caption <- function(inputs) {
   caption <- paste(caption, "Subsector(s):", paste(subsector, collapse = ", "), "\n")
   caption <- caption_size(caption, size, asset_size_ls)
   # Private Foundation notes
-  caption <- caption_pf(caption, ctype)
+  caption <- caption_pf(caption, ctype, agg_var)
   # Finance Notes
   caption <- caption_finance(caption, agg_var)
   # Year Notes
