@@ -85,6 +85,7 @@ Pick the **Numbers** panel for the canonical happy-path run.
 - [ ] Switch to "Metro/Micro Area". State auto-preselected; CBSA selectize available with maxItems=5.
 - [ ] Verify state→county cascade: pick a different state, the County options refresh to that state's counties.
 - [ ] Verify state→CBSA cascade: same flow, CBSA options refresh.
+- [ ] **No-data geography note** (NA-drop panels — DAFs, Government Grants, Program-Related Investments): on the PRI panel, set geo level to Census County and select two counties where one has no reported PRIs (e.g. **Loving County** + **Los Angeles County**). Click UPDATE DATA. An amber note appears above the chart: "No reported Program-Related Investments for the following selected areas: Loving County." The chart still draws Los Angeles. Selecting only counties that all have data shows no note.
 
 ### Date Range
 

@@ -530,6 +530,16 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
   padding: 0.25rem 0.6rem;
   border-radius: 1rem;
 }
+.geo-data-note {
+  font-family: 'Lato';
+  font-size: 0.85rem;
+  color: #5c4813;
+  background-color: #fdf3d8;
+  border-left: 3px solid #fdbf11;
+  padding: 0.4rem 0.7rem;
+  margin: 0.25rem 0 0.5rem 0;
+  border-radius: 0.25rem;
+}
 .body {
     font-family: 'Lato';
     font-size: 16px;

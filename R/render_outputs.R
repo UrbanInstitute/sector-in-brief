@@ -44,6 +44,12 @@ render_outputs <- function(plots, tables, output, query, agg_var, year_var, tabl
   output$dl_subsector <- output_downloads$by_subsector
   output$dl_geo <- output_downloads$by_geo
   output$dl_size <- output_downloads$by_asset_size
-  
 
+  # Inline note for explicitly-selected geographies that returned no data
+  # (NA-dropped). renderUI returns NULL → slot clears when nothing missing.
+  note <- missing_geo_note(query, tables, agg_var)
+  output$geo_data_note <- shiny::renderUI({
+    if (is.null(note)) return(NULL)
+    htmltools::div(class = "geo-data-note", note)
+  })
 }

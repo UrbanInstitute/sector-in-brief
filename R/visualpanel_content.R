@@ -72,6 +72,9 @@ visualpanel_content <- function(panel_header,
       # Active-filter chips, rendered by data_server() from the inputs
       # snapshot. Empty when no filter is narrowed from default.
       shiny::uiOutput(ns("filter_chips"), class = "filter-chip-row"),
+      # Note naming any explicitly-selected geographies that returned no
+      # data (rendered by render_outputs via missing_geo_note()).
+      shiny::uiOutput(ns("geo_data_note")),
       plot_ui(panelid)
     )
   )
