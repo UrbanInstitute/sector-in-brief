@@ -100,6 +100,22 @@ geo_filter_ui <- function(id, state_choices) {
       condition = "input.geo_level == 'Census County'",
       ns = shiny::NS(id)
     ),
+    # TODO(county-normalization): TEMPORARY notice. Remove once the raw BMF
+    # county/city standardization ships in nccs-data-bmf and a clean vintage
+    # flows downstream (sector-in-brief-data rebuild -> VINTAGE bump here).
+    # Tracks duplicate county labels (e.g. "Wayne" vs "Wayne County") that
+    # originate in BMF geocoding. See docs/UI_TESTING.md "Known issues".
+    shiny::conditionalPanel(
+      htmltools::p(
+        class = "filter-hint",
+        "Note: a few counties may appear under more than one spelling (for example, ",
+        htmltools::em("“Wayne”"), " and ", htmltools::em("“Wayne County”"),
+        ") because of how filers enter them, so a county's total can be split across those entries. ",
+        "We're standardizing county names in an upcoming data update."
+      ),
+      condition = "input.geo_level == 'Census County'",
+      ns = shiny::NS(id)
+    ),
     shiny::conditionalPanel(
       selectize_wrapper(
         ns = ns,
