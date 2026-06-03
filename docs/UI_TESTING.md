@@ -161,6 +161,7 @@ These are tracked separately and are **not** regressions to log:
 
 - The Geographic Filters card has no "Reset" button next to its label, while some early UI sketches suggested one. Intentional (the geo_level radio acts as the reset).
 - The PF panel's 2016-2018 NA handling shows a dashed line gap; this is by design (`table_builder_pf.R`).
+- **County spelling duplicates (TEMPORARY notice).** At the Census County level, an advisory note appears warning that some counties show under multiple spellings (e.g. "Wayne" vs "Wayne County"), splitting their totals. This originates in raw BMF geocoding and is being fixed upstream in `nccs-data-bmf`. **Remove the notice** (the `TODO(county-normalization)` `conditionalPanel` in `R/geo_filter_module.R`) once the BMF standardization ships and a clean vintage flows downstream (`sector-in-brief-data` rebuild → `VINTAGE` bump). Verify removal: at the County level for a state with previously-duplicated counties, only the canonical "X County" labels appear in the picker.
 
 ## 10. Mobile (deferred)
 
