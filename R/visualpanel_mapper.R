@@ -1,4 +1,4 @@
-# Build the 11 lazy nav_panel shells (one per row of visualpanel_args).
+# Build the 13 lazy nav_panel shells (one per row of visualpanel_args).
 # Called once at app boot. Per-panel content (heavy widgets, filter
 # cards, plot UI) is mounted on demand by visualpanel_content() once
 # the user activates a tab.

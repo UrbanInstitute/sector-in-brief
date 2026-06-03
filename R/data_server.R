@@ -1,5 +1,5 @@
 # Per-panel Shiny module server. One instance is created for each of
-# the 11 visualization panels (driven by data_server_args.R). Wires the
+# the 13 visualization panels (driven by data_server_args.R). Wires the
 # panel's filter UI to data_pipeline() via three observers:
 #
 #   1. A one-shot observer that fires when input$ctype first appears

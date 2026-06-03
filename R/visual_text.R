@@ -1,9 +1,10 @@
-# Per-panel descriptive copy for the 11 visualization panels (intro
+# Per-panel descriptive copy for the 13 visualization panels (intro
 # paragraphs shown above the filters via `visualpanel_content()`).
 # Each variable here is referenced by name in `visualpanel_args`'s
 # `panel_desc` column:
 #   number_of_nonprofits, assets_desc, revenue_desc, expenses_desc,
-#   benefits_desc, grants_desc, daf_*_desc, daf_proportion_desc
+#   benefits_desc, gov_grants_desc, grants_desc, pri_desc, daf_*_desc,
+#   daf_proportion_desc
 number_of_nonprofits <- htmltools::tagList(
   htmltools::p(
     "Understanding the number of nonprofit organizations registered with the IRS provides a sense of the overall size and growth of the sector. NCCS data encompass all tax-exempt ",
@@ -39,10 +40,11 @@ finance_header <-
     htmltools::p(
       class = "base",
       htmltools::tags$b("Data Source:"),
+      "The Assets, Revenues, Expenses, and Benefits panels use ",
       htmltools::a(href = "https://lecy.github.io/nccs/datasets/core/", "NCCS's Core Series,"),
       "which contains data processed from the IRS's ",
       htmltools::a(href = "https://www.irs.gov/statistics/soi-tax-stats-annual-extract-of-tax-exempt-organization-financial-data", "Statistics of Income (SOI) extracts"),
-      "for Forms 990, 990-EZ and 990-PF for tax years 1989 through 2021. This panel does not include 990-N data and thus excludes small nonprofits with gross receipts less than or equal to $50,000. More information can be found in the About page.",
+      "for Forms 990, 990-EZ and 990-PF for tax years 1989 through 2023. The Government Grants panel uses NCCS's e-file data instead (see that panel for its source). These data do not include 990-N filers and thus exclude small nonprofits with gross receipts less than or equal to $50,000. More information can be found in the About page.",
       htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
     )
   )
@@ -63,32 +65,74 @@ benefits_desc <- htmltools::p(
   "Total benefits are the sum of salaries, wages, benefits, pension plan accruals and contributions, and the 401(k) and 403(b) contributions nonprofits pay to and on behalf of employees. It provides a measure of overall spending on nonprofit-sector employees."
 )
 
+# NOTE: the Data Source line below is an interim draft written from the
+# producer's data dictionary (efile Phase 0, Form 990 Part VIII line 1e).
+# Replace with the canonical NCCS e-file dataset citation when available.
+gov_grants_desc <- htmltools::tagList(
+  htmltools::p(
+    "Government grants capture the dollar value of grants and contributions that nonprofits receive from government sources, reported on line 1e of Part VIII of Form 990. They reflect the role of public funding in supporting the nonprofit sector."
+  ),
+  htmltools::p(
+    "Only organizations that file the full Form 990 report this figure; 990-EZ and 990-PF filers do not carry line 1e, and most filers report no government grants in a given year. Coverage begins in tax year 2021, the first year of full nonprofit 990 e-file records from the IRS."
+  ),
+  htmltools::p(
+    class = "base",
+    htmltools::tags$b("Data Source:"),
+    "NCCS's e-file data, processed from line 1e of Part VIII of e-filed IRS Form 990 for tax years 2021 through 2023.",
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
+  )
+)
+
+# Tab-level header shown above BOTH Private Foundation pills (Grants and
+# Program-Related Investments). It must carry only facts shared by both
+# panels — each panel's own data source and coverage caveats live in its
+# `*_desc` (the two draw on different datasets and year ranges).
 pf_header <- htmltools::tagList(
   htmltools::h2("Private Foundation Grantmaking"),
   htmltools::tagList(
     htmltools::p(
-      "Grants by private foundations, which are typically funded by an individual donor or family, are one of several sources of private funding available to public charities. Trends in these foundations’ grantmaking reflect their available resources."
+      "Private foundations, which are typically funded by an individual donor or family, are one of several sources of private funding available to public charities. This section summarizes how private foundations deploy their resources — through the grants they make and through program-related investments."
     ),
     htmltools::p(
       "Other foundations that receive funds from various sources and make grants, such as community foundations, are incorporated as public charities and not counted in private foundation data."
     ),
     htmltools::p(
-      "The IRS has not released tax records for tax years 2016 through 2018. Missing data points from these years are represented with a dotted line."
-    ),
-    htmltools::p(
-      "The chart below shows grantmaking data for all private foundations. Select the nonprofit sizes, geographies, and date range you’re interested in to create a custom chart. Use the tabs above the chart to view your selections broken out by subsector, geography, or size."
+      "Select a metric below, then use the filters to customize the chart by organization type, subsector, size, geography, or date range. Use the tabs above the chart to view your selections broken out by subsector, geography, or size."
     )
+  )
+)
+
+grants_desc <- htmltools::tagList(
+  htmltools::p(
+    "Private foundation grants represent the dollar value of the grants these nonprofits allocate, calculated as the sum of gifts, grants, and contributions issued. It captures overall giving trends among private foundations."
+  ),
+  htmltools::p(
+    "The IRS has not released tax records for tax years 2016 through 2018. Missing data points from these years are represented with a dotted line."
   ),
   htmltools::p(
     class = "base",
     htmltools::tags$b("Data Source:"),
-    "NCCS's Core Series, which contains data processed from the IRS's Statistics of Income Extracts for Form 990-PF for tax years 1989 through 2021.",
+    "NCCS's Core Series, which contains data processed from the IRS's Statistics of Income Extracts for Form 990-PF for tax years 1989 through 2023.",
     htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
   )
 )
 
-grants_desc <- htmltools::p(
-  "Private foundation grants represent the dollar value of the grants these nonprofits allocate, calculated as the sum of gifts, grants, and contributions issued. It captures overall giving trends among private foundations."
+# NOTE: the Data Source line below is an interim draft written from the
+# producer's data dictionary (efile Phase 0, Form 990-PF Part IX-B).
+# Replace with the canonical NCCS e-file dataset citation when available.
+pri_desc <- htmltools::tagList(
+  htmltools::p(
+    "Program-related investments (PRIs) are investments private foundations make primarily to advance their charitable mission rather than to generate income — for example, low-interest loans to nonprofits or equity stakes in mission-aligned enterprises. This metric sums the total PRIs reported by private foundations on Part IX-B of Form 990-PF."
+  ),
+  htmltools::p(
+    "Only 990-PF filers report this figure, and most foundations report no PRIs in a given year. Coverage begins in tax year 2021, the first year of full nonprofit 990 e-file records from the IRS."
+  ),
+  htmltools::p(
+    class = "base",
+    htmltools::tags$b("Data Source:"),
+    "NCCS's e-file data, processed from Part IX-B of e-filed IRS Form 990-PF for tax years 2021 through 2023.",
+    htmltools::a(href = "data_dictionary.csv", "Download data dictionary.")
+  )
 )
 
 daf_header <- htmltools::tagList(

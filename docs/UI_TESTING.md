@@ -85,10 +85,11 @@ Pick the **Numbers** panel for the canonical happy-path run.
 - [ ] Switch to "Metro/Micro Area". State auto-preselected; CBSA selectize available with maxItems=5.
 - [ ] Verify state→county cascade: pick a different state, the County options refresh to that state's counties.
 - [ ] Verify state→CBSA cascade: same flow, CBSA options refresh.
+- [ ] **No-data geography note** (NA-drop panels — DAFs, Government Grants, Program-Related Investments): on the PRI panel, set geo level to Census County and select two counties where one has no reported PRIs (e.g. **Loving County** + **Los Angeles County**). Click UPDATE DATA. An amber note appears above the chart: "No reported Program-Related Investments for the following selected areas: Loving County." The chart still draws Los Angeles. Selecting only counties that all have data shows no note.
 
 ### Date Range
 
-- [ ] Slider bounds match the panel's year coverage (Numbers: 1989-present; DAF panels: 2021-2023; PF: 1989-2023).
+- [ ] Slider bounds match the panel's year coverage (Numbers: 1989-present; DAF panels, Government Grants, and Program-Related Investments: 2021-2023; PF Grants: 1989-2023).
 - [ ] Drag a slider handle slowly: it should snap to **whole years only** — no half-step landing on e.g. "2021.5". Both the displayed value and the chip text update to integer years.
 - [ ] Drag both handles together to a single year and confirm the plot redraws as a single vertical bar (not a line, not a lollipop).
 
@@ -128,7 +129,9 @@ For each panel below, just confirm the Overall plot draws without errors and the
 - [ ] **Finances → Revenues** — caption mentions "Other revenue sources" disclaimer.
 - [ ] **Finances → Expenses** — caption mentions "Other expenses" disclaimer.
 - [ ] **Finances → Benefits** — a chart appears with no error message and no "No Data Available" placeholder.
+- [ ] **Finances → Government Grants** — chart shows **vertical bars, one per year** for 2021-2023 (three bars), with a dollar y-axis (e.g. `$1.2B`). Coverage years are 2021-2023 only (the date slider should not extend back to 1989). Organization Type tree offers the full set (501(c)(3)/501(c)(4)/Other) — this metric is not foundation-restricted. The panel description notes only full Form 990 filers report government grants.
 - [ ] **Private Foundation Grants** — change Organization Type to include "Private Foundations" — the plot should show a dashed line spanning 2016-2018 (a known data gap) rather than dropping to zero or jumping. The caption underneath should mention "The IRS has not released 990 PF tax records for tax years 2016 through 2018."
+- [ ] **Private Foundation Grantmaking → Program-Related Investments** — three-bar year-over-year chart for 2021-2023 with a dollar y-axis. The Organization Type tree is restricted to private foundations (same as the PF Grants panel). Panel description explains PRIs are mission-driven investments reported on Form 990-PF Part IX-B.
 - [ ] **DAFs → Number of DAFs** — chart shows **vertical bars, one bar per year** for 2021-2023 (three bars). Not a line chart. Lines look anemic at 3 data points; bars give a cleaner year-over-year comparison.
 - [ ] **DAFs → DAF Contributions / DAF Grants / DAF Value** — each is also a 3-bar year-over-year chart like Number of DAFs, but the y-axis shows dollar amounts (e.g. `$1,234,567` or `$1.2M`).
 - [ ] **DAFs → DAF Proportion** — percentage y-axis ("Percentage" label, not "$").

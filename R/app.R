@@ -6,7 +6,7 @@
 #   2. validate_parquet_schemas()— hard-stop on producer schema drift
 #   3. publish_data_dictionary() — write www/data_dictionary.csv for downloads
 #   4. resolve_visualpanel_year_ranges() — fill NA year overrides from manifest
-#   5. visualpanel_mapper()      — build 11 LAZY nav_panel shells
+#   5. visualpanel_mapper()      — build 13 LAZY nav_panel shells
 #   6. read.csv(nested_geographies) — geo lookup
 #   7. assemble bslib::page_navbar UI with welcome/about/visualizations/
 #      custom-download tabs
@@ -76,7 +76,8 @@ app <- function(...) {
               visualpanels[["Assets"]],
               visualpanels[["Revenues"]],
               visualpanels[["Expenses"]],
-              visualpanels[["Benefits"]]
+              visualpanels[["Benefits"]],
+              visualpanels[["Government Grants"]]
             )
           ),
           bslib::nav_panel(
@@ -84,7 +85,8 @@ app <- function(...) {
             pf_header,
             bslib::navset_card_pill(
               id = "private_foundation_grants",
-              visualpanels[["Private Foundation Grants"]]
+              visualpanels[["Private Foundation Grants"]],
+              visualpanels[["Program-Related Investments"]]
             )
           ),
           bslib::nav_panel(
@@ -115,7 +117,7 @@ app <- function(...) {
     # Lazy panel UIs: bind a renderUI for each panel's placeholder. Shiny's
     # default suspendWhenHidden = TRUE means each one only fires when its
     # tab becomes visible, so app cold-start no longer pays the cost of
-    # building 11 panels up front (~1.8s).
+    # building 13 panels up front (~1.8s).
     for (i in seq_len(nrow(visualpanel_args))) {
       local({
         row <- visualpanel_args[i, ]
