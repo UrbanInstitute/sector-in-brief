@@ -22,9 +22,9 @@ soi_link <- "https://www.irs.gov/statistics/soi-tax-stats-annual-extract-of-tax-
 tract_link <- "https://www2.census.gov/geo/pdfs/reference/GARM/Ch10GARM.pdf"
 nccs_link <- "https://urbaninstitute.github.io/nccs/"
 unified_bmf_link <- "https://urbaninstitute.github.io/nccs/datasets/bmf/"
-core_link <- "https://lecy.github.io/nccs/datasets/core/"
+core_link <- "https://nccs.urban.org/nccs/datasets/core/"
 daf_link <- "https://www.irs.gov/charities-non-profits/charitable-organizations/donor-advised-funds"
-efile_link <- "https://lecy.github.io/nccs/datasets/efile/"
+efile_link <- "https://nccs.urban.org/nccs/datasets/efile/"
 census_regions_link <- 'https://www2.census.gov/geo/pdfs/maps-data/maps/reference/us_regdiv.pdf'
 census_crosswalks_link <- "https://urbaninstitute.github.io/nccs/datasets/census/"
 geocoder_link <- "https://urban-institute.medium.com/choosing-a-geocoder-for-the-urban-institute-86192f656c5f"
