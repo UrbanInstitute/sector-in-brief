@@ -47,6 +47,21 @@ dataloader <- function(path, cols = NULL) {
       data_select <- dplyr::filter(data_select, !is.na(!!rlang::sym(dollar_col)))
     }
   }
+  # Government grants and program-related investments are single
+  # dollar-metric panels covering every BMF-active cell — most filers
+  # report none, so the metric is NA for the majority of cells. Drop
+  # those (same rationale as the DAF dollar views) so breakdowns don't
+  # render $0 entries for organizations that simply didn't report.
+  na_drop_metric <- if (grepl("government_grants\\.parquet$", path)) {
+    "Total Government Grants"
+  } else if (grepl("program_related_investments\\.parquet$", path)) {
+    "Total Program-Related Investments"
+  } else {
+    NULL
+  }
+  if (!is.null(na_drop_metric) && na_drop_metric %in% cols) {
+    data_select <- dplyr::filter(data_select, !is.na(!!rlang::sym(na_drop_metric)))
+  }
 
   if (in_shiny) shinycssloaders::hidePageSpinner()
   data_select

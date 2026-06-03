@@ -159,7 +159,10 @@ choice_builder <- function(panelid){
       "Above $10 Million" = 6
     )
   )
-  if (panelid %in% c("pf_amount")){
+  # pf_amount (PF grants) and pri (program-related investments) are both
+  # 990-PF-only metrics, so restrict the org-type tree to private
+  # foundations.
+  if (panelid %in% c("pf_amount", "pri")){
     choice_ls$ctype_tree_df <- tibble::tribble(
       ~level1, ~level2,
       "501(c)(3) Organizations", "501(c)(3) - Private Foundations"

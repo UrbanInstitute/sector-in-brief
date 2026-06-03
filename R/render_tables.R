@@ -61,6 +61,8 @@ format_reactable_columns <- function(agg_var) {
     "Number of DAFs" = "",
     "Total Grants" = "$",
     "Total Value" = "$",
+    "Total Government Grants" = "$",
+    "Total Program-Related Investments" = "$",
     "Proportion with DAFs" = ""
   )
   

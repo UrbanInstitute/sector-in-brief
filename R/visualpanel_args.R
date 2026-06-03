@@ -1,4 +1,4 @@
-# Driver tibble for the 11 visualization panels — the UI counterpart
+# Driver tibble for the 13 visualization panels — the UI counterpart
 # to data_server_args.R. Each row defines a navset_card_pill tab in
 # the Data Visualizations section: header text, descriptive copy,
 # panel id (used to namespace the Shiny module + output slots),
@@ -16,6 +16,10 @@
 # not in row counts — the manifest threshold can't detect it.
 # Numbers / finances / pf_grants are NA so the trailing partial year
 # (currently 2024) auto-drops if the producer publishes one.
+# Government Grants / Program-Related Investments are likewise pinned to
+# 2021-2023: the producer only publishes those years (2024 e-file
+# filings are still arriving), and pinning documents the intent rather
+# than relying on the file happening to omit later years.
 visualpanel_args <- tibble::tribble(
   ~title, ~panel_header, ~panel_desc, ~panelid, ~start_year, ~end_year, ~parquet_file,
   "Numbers", "Number of Nonprofits", number_of_nonprofits, "number", NA_integer_, NA_integer_, "number_nonprofits.parquet",
@@ -23,7 +27,9 @@ visualpanel_args <- tibble::tribble(
   "Revenues", "Revenues", revenue_desc, "revenues", NA_integer_, NA_integer_, "finances.parquet",
   "Expenses", "Expenses", expenses_desc, "expenses", NA_integer_, NA_integer_, "finances.parquet",
   "Benefits", "Benefits", benefits_desc, "benefits", NA_integer_, NA_integer_, "finances.parquet",
+  "Government Grants", "Government Grants", gov_grants_desc, "gov_grants", 2021L, 2023L, "government_grants.parquet",
   "Private Foundation Grants", "Grants", grants_desc, "pf_amount", NA_integer_, NA_integer_, "pf_grants.parquet",
+  "Program-Related Investments", "Program-Related Investments", pri_desc, "pri", 2021L, 2023L, "program_related_investments.parquet",
   "Number of DAFs", "Number of DAFs", daf_number_desc, "daf_number", 2021L, 2023L, "daf.parquet",
   "DAF Contributions", "DAF Contributions", daf_contributions_desc,"daf_contributions", 2021L, 2023L, "daf.parquet",
   "DAF Grants", "DAF Grants", daf_grants_desc, "daf_grants", 2021L, 2023L, "daf.parquet",

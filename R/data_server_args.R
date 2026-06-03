@@ -1,4 +1,4 @@
-# Driver list for the 11 visualization panels.
+# Driver list for the 13 visualization panels.
 #
 # Each entry maps a panel title (the navset_card_pill tab) to its
 # runtime configuration: which parquet to read, which columns to
@@ -77,6 +77,17 @@ data_server_args <- list(
     title_prefix = "Total Benefits",
     time_series = TRUE
   ),
+  "Government Grants" = list(
+    path = "data/government_grants.parquet",
+    vars = c(default_vars, "Total Government Grants", "Year"),
+    id = "gov_grants",
+    year_var = "Year",
+    agg_var = "Total Government Grants",
+    ytitle = "Dollars",
+    xtitle = "Year",
+    title_prefix = "Total Government Grants Received",
+    time_series = FALSE
+  ),
   "Private Foundation Grants" = list(
     path = "data/pf_grants.parquet",
     vars = c(default_vars, "Total Contributions", "Year"),
@@ -87,6 +98,17 @@ data_server_args <- list(
     xtitle = "Year",
     title_prefix = "Total Grants Made By Private Foundations",
     time_series = TRUE
+  ),
+  "Program-Related Investments" = list(
+    path = "data/program_related_investments.parquet",
+    vars = c(default_vars, "Total Program-Related Investments", "Year"),
+    id = "pri",
+    year_var = "Year",
+    agg_var = "Total Program-Related Investments",
+    ytitle = "Dollars",
+    xtitle = "Year",
+    title_prefix = "Total Program-Related Investments",
+    time_series = FALSE
   ),
   "Number of DAFs" = list(
     path = "data/daf.parquet",

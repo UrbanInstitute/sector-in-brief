@@ -36,6 +36,14 @@ expected_parquet_schemas <- list(
     .geo_org_schema,
     "Total Contributions" = "double"
   ),
+  "government_grants.parquet" = c(
+    .geo_org_schema,
+    "Total Government Grants" = "double"
+  ),
+  "program_related_investments.parquet" = c(
+    .geo_org_schema,
+    "Total Program-Related Investments" = "double"
+  ),
   "daf.parquet" = c(
     .geo_org_schema,
     "Number of Nonprofits" = "int32",

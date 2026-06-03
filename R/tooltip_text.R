@@ -18,7 +18,9 @@ tooltip_text <- function(table, yvar, xvar, groupby_var = NULL) {
     "Total Benefits",
     "Total Contributions",
     "Total Grants",
-    "Total Value"
+    "Total Value",
+    "Total Government Grants",
+    "Total Program-Related Investments"
   )) {
     yvar_formatted <- scales::dollar(table[[yvar]], prefix = "$")
   } else {

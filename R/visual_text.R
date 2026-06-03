@@ -1,9 +1,10 @@
-# Per-panel descriptive copy for the 11 visualization panels (intro
+# Per-panel descriptive copy for the 13 visualization panels (intro
 # paragraphs shown above the filters via `visualpanel_content()`).
 # Each variable here is referenced by name in `visualpanel_args`'s
 # `panel_desc` column:
 #   number_of_nonprofits, assets_desc, revenue_desc, expenses_desc,
-#   benefits_desc, grants_desc, daf_*_desc, daf_proportion_desc
+#   benefits_desc, gov_grants_desc, grants_desc, pri_desc, daf_*_desc,
+#   daf_proportion_desc
 number_of_nonprofits <- htmltools::tagList(
   htmltools::p(
     "Understanding the number of nonprofit organizations registered with the IRS provides a sense of the overall size and growth of the sector. NCCS data encompass all tax-exempt ",
@@ -63,6 +64,15 @@ benefits_desc <- htmltools::p(
   "Total benefits are the sum of salaries, wages, benefits, pension plan accruals and contributions, and the 401(k) and 403(b) contributions nonprofits pay to and on behalf of employees. It provides a measure of overall spending on nonprofit-sector employees."
 )
 
+gov_grants_desc <- htmltools::tagList(
+  htmltools::p(
+    "Government grants capture the dollar value of grants and contributions that nonprofits receive from government sources, reported on line 1e of Part VIII of Form 990. They reflect the role of public funding in supporting the nonprofit sector."
+  ),
+  htmltools::p(
+    "Only organizations that file the full Form 990 report this figure; 990-EZ and 990-PF filers do not carry line 1e, and most filers report no government grants in a given year. Coverage begins in tax year 2021, the first year of full nonprofit 990 e-file records from the IRS."
+  )
+)
+
 pf_header <- htmltools::tagList(
   htmltools::h2("Private Foundation Grantmaking"),
   htmltools::tagList(
@@ -89,6 +99,15 @@ pf_header <- htmltools::tagList(
 
 grants_desc <- htmltools::p(
   "Private foundation grants represent the dollar value of the grants these nonprofits allocate, calculated as the sum of gifts, grants, and contributions issued. It captures overall giving trends among private foundations."
+)
+
+pri_desc <- htmltools::tagList(
+  htmltools::p(
+    "Program-related investments (PRIs) are investments private foundations make primarily to advance their charitable mission rather than to generate income — for example, low-interest loans to nonprofits or equity stakes in mission-aligned enterprises. This metric sums the total PRIs reported by private foundations on Part IX-B of Form 990-PF."
+  ),
+  htmltools::p(
+    "Only 990-PF filers report this figure, and most foundations report no PRIs in a given year. Coverage begins in tax year 2021, the first year of full nonprofit 990 e-file records from the IRS."
+  )
 )
 
 daf_header <- htmltools::tagList(

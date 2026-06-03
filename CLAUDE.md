@@ -35,7 +35,7 @@ Run from the repo root (an R session with `renv` activated by `.Rprofile`):
 One navbar Shiny app with thematic tabs: Welcome, About, Data Visualizations (Numbers / Finances / PF Grants / DAFs sub-tabs), Custom Panel Datasets. All files in `R/` are sourced as a flat namespace; functions are called by bare name.
 
 - `R/app.R` — top-level UI + server. Boot path: `ensure_data_local()` → `validate_parquet_schemas()` → `publish_data_dictionary()` → `resolve_visualpanel_year_ranges()` → `visualpanel_mapper()` → assemble `page_navbar` UI. URL bookmarking is enabled (`enableBookmarking = "url"`) so filter selections survive refresh and sharing.
-- `R/visualpanel_args.R`, `R/visualpanel_builder.R`, `R/visualpanel_mapper.R`, `R/visualpanel_content.R` — driver tibble + builders for the 11 visualization panels. Panels are lazy: `visualpanel_builder` returns just a `uiOutput` placeholder; `visualpanel_content` mounts the heavy widgets on first tab activation.
+- `R/visualpanel_args.R`, `R/visualpanel_builder.R`, `R/visualpanel_mapper.R`, `R/visualpanel_content.R` — driver tibble + builders for the 13 visualization panels. Panels are lazy: `visualpanel_builder` returns just a `uiOutput` placeholder; `visualpanel_content` mounts the heavy widgets on first tab activation.
 - `R/data_ui.R`, `R/geo_filter_module.R`, `R/bslib_funcs.R` — filter sections inside the panel's `bslib::layout_sidebar`. Each section is wrapped in a `bslib::accordion_panel` (Date / Org Type / Geography open by default; Subsector + Size collapsed). `filter_card_header()` pairs a section title with a hover-info tooltip.
 - `R/coverage_notes_card.R` — renders the producer's `coverage_notes` per panel as an inline accordion above the plots.
 - `R/data_server.R`, `R/data_server_args.R`, `R/data_pipeline.R` — per-panel server pipeline (`format_input → validate_inputs → query_builder → filter_data → summarise_data → plots_build_all → render_outputs`). `data_server` also captures realized defaults on first mount (for the chip helper) and wires the Reset-filters observer.
@@ -67,6 +67,7 @@ Year ranges (from the current vintage):
 | Numbers | 1989-2026 |
 | Finances / PF Grants | 1989-2023 (2024 is partial in the data) |
 | DAFs | 2021-2023 (2020 has 0 holders, 2024 is partial) |
+| Government Grants / Program-Related Investments | 2021-2023 (e-file only; 2024 still arriving) |
 
 Geographic lookup is `data/nested_geographies.csv` — column names are spaces in the CSV but become dots after `read.csv()` (`Census.State`, `Census.County`, `Metro.Micro.Area`).
 

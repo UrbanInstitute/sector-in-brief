@@ -13,7 +13,9 @@
   "Total Benefits",
   "Total Contributions",
   "Total Grants",
-  "Total Value"
+  "Total Value",
+  "Total Government Grants",
+  "Total Program-Related Investments"
 )
 
 #' Return a ggplot y-axis scale tuned to one metric.
