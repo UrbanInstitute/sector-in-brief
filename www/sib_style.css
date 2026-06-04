@@ -142,6 +142,16 @@
         padding: 10px;
     };
 }
+/* The footer credits row holds two columns side by side. On phones the
+   default 50%-width row crams both columns into a narrow centered strip
+   (long citation URL overflowed). Stack them and use the full width. */
+.flex-box__row-align {
+    @media screen and (max-width: 769px) {
+        flex-direction: column;
+        width: 90%;
+        padding: 10px;
+    };
+}
 .center-justify {
     display: flex;
     justify-content: center;
@@ -295,18 +305,8 @@ a#visual_link.action-button.shiny-bound-input, a#download_link.action-button.shi
 /* Header class for Accordion*/
 .accordion .accordion-header {
   font-family: 'Lato';
-  font-size: var(--h3-scale);
   color: #000000;
   font-weight: 700;
-}
-/*Mobile formatting*/
-.text-3xl, .text-3xl-cyan, .content-paragraph,  .accordion .accordion-header, .accordion .accordion-header__sm, .urbn-navbar-title {
-  @media screen and (max-width: 767px) {
-        font-size: var(--base-font-size__sm);
-    };
-  @media screen and (max-width: 992px) {
-        font-size: var(--base-font-size__md);
-    };
 }
 .lg-view{
    display:inline-block;
@@ -377,7 +377,6 @@ a#visual_link.action-button.shiny-bound-input, a#download_link.action-button.shi
 }
 .accordion .accordion-header__sm {
   font-family: 'Lato';
-  font-size: var(--h4-scale);
   color: #000000;
   font-weight: 700;
 }
@@ -407,7 +406,7 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
   font-size: var(--h5-lg);
   background-color: var(--color-gray-shade-lightest);
   color: var(--color-blue);
-  text-transform: none
+  text-transform: none;
   @media screen and (max-width: 769px) {
         font-size: var(--h5-sm);
     };
