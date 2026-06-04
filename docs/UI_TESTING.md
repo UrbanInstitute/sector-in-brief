@@ -166,15 +166,29 @@ These are tracked separately and are **not** regressions to log:
 - The PF panel's 2016-2018 NA handling shows a dashed line gap; this is by design (`table_builder_pf.R`).
 - **County spelling duplicates (TEMPORARY notice).** At the Census County level, an advisory note appears warning that some counties show under multiple spellings (e.g. "Wayne" vs "Wayne County"), splitting their totals. This originates in raw BMF geocoding and is being fixed upstream in `nccs-data-bmf`. **Remove the notice** (the `TODO(county-normalization)` `conditionalPanel` in `R/geo_filter_module.R`) once the BMF standardization ships and a clean vintage flows downstream (`sector-in-brief-data` rebuild → `VINTAGE` bump). Verify removal: at the County level for a state with previously-duplicated counties, only the canonical "X County" labels appear in the picker.
 
-## 10. Mobile (deferred)
+## 10. Mobile / narrow screens (~2 min)
 
-The dashboard is not yet optimized for phone screens. A separate track will address:
-- Filter cards stacking vertically below ~768px
-- Navbar nav-menu collapsing into a hamburger
-- Reactable horizontal scroll on narrow screens
-- Touch-target sizing on radios/checkboxes
+The dashboard is responsive and usable on phones. The primary mobile
+breakpoint is **~769px**. You don't need a physical phone: open the
+staging URL in desktop Chrome, press **F12** for DevTools, click the
+device-toolbar icon (Ctrl+Shift+M), and pick a phone preset (e.g.
+iPhone 12, 390px wide) or drag the viewport narrow. Reload after
+switching so the responsive CSS applies cleanly.
 
-When that track lands, this section will be replaced with mobile-specific checks.
+What "good" looks like at ~390px wide:
+
+- [ ] **Navbar collapses to a hamburger.** The Urban logo + "| NCCS" stays at the top left; the nav links (Welcome / About / Data Visualizations / Custom Panel Datasets) collapse behind a hamburger (☰) button at the top right. Tapping it opens the menu; tapping a destination navigates and closes it.
+- [ ] **No horizontal page scroll.** On every tab, you should never be able to swipe the *whole page* left/right — content fits the viewport width. (A wide data *table* may scroll horizontally inside its own card — that's fine; the page itself must not.)
+- [ ] **Welcome** stacks top-to-bottom: hero title box, intro paragraphs, the two "what's inside" sections, then the footer. The footer credits ("PROJECT CREDITS" and "ABOUT THIS PROJECT") stack **vertically** and use the full column width — the citation URL wraps inside the column rather than running off the right edge. (On desktop these two credit blocks sit side by side; on a phone they stack.)
+- [ ] **About** accordion sections stack full width with comfortable tap targets. Expand **Data Sources**: the IRS-vs-NCCS table is wider than the screen, so it scrolls **horizontally inside its card** (swipe the table left to see the right-hand columns) — the rest of the page stays put.
+- [ ] **Data Visualizations → Numbers**: the panel header, description, and vintage line render full width. The **Filters** sidebar is collapsed to a chevron toggle on the left edge (it does not eat half the screen). Tap it — the filter panel slides in as a full-width overlay (offcanvas) with the Filters header, the accordion sections (Date Range / Organization Type / Geography / Subsector / Organization Size), the year slider, checkboxes/radios, and the **UPDATE DATA** + **Reset filters** buttons all usable. Tap outside or the toggle to dismiss it.
+- [ ] **Plots scale to the viewport** — the chart keeps its 16:9 shape and shrinks to fit; no clipping or fixed-width overflow. The "Visualize Your Results" sub-tab strip (Overall / By Organization Type / …) wraps onto multiple lines rather than overflowing.
+- [ ] **Panel data tables fit.** Open **View Data** under a plot — the two-/three-column summary table fits the screen with working pagination and a full-width **DOWNLOAD TABLE** button.
+- [ ] **Custom Panel Datasets** renders the intro text, the "Ready To Get Started?" card, the **REQUEST DATA** button, and the option accordion (Form Type → Review) all stacked full width.
+
+If any of these fail — especially whole-page horizontal scroll, the
+sidebar not collapsing, or content running off the right edge — log it
+with the viewport width and a screenshot.
 
 ---
 
