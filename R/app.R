@@ -7,7 +7,7 @@
 #   3. publish_data_dictionary() — write www/data_dictionary.csv for downloads
 #   4. resolve_visualpanel_year_ranges() — fill NA year overrides from manifest
 #   5. visualpanel_mapper()      — build 13 LAZY nav_panel shells
-#   6. read.csv(nested_geographies) — geo lookup
+#   6. load_geo_df()             — geo lookup (FIPS-keyed, + CBSA Type)
 #   7. assemble bslib::page_navbar UI with welcome/about/visualizations/
 #      custom-download tabs
 #   8. server() — bind lazy renderUI per panel + per-section observers
@@ -36,7 +36,7 @@ app <- function(...) {
   # visualpanel_args get manifest-derived bounds; integer cells stay).
   visualpanel_args <- resolve_visualpanel_year_ranges(visualpanel_args)
   visualpanels <- visualpanel_mapper(visualpanel_args)
-  geo_df <- read.csv("data/nested_geographies.csv")
+  geo_df <- load_geo_df()
 
   stale_banner <- if (identical(sync_result$status, "stale")) {
     htmltools::div(

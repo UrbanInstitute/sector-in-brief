@@ -23,7 +23,11 @@ missing_geo_note <- function(query, tables, agg_var) {
   if (!geo_level %in% c("Census State", "Census County", "Metro/Micro Area")) {
     return(NULL)
   }
-  selected <- as.character(query$filters[[geo_level]])
+  # County/metro are filtered by code, so the filter-list key is no longer
+  # the name column. query_builder stashes the selection as display names
+  # (query$geo_selected) so the diff is name-vs-name against the by_geo
+  # breakdown axis, which is grouped on the name.
+  selected <- as.character(query$geo_selected)
   if (length(selected) == 0) return(NULL)
 
   geo_tbl <- tables[["by_geo"]]

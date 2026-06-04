@@ -82,10 +82,13 @@ Pick the **Numbers** panel for the canonical happy-path run.
 - [ ] Switch geo level to "Census Region". Region selectize appears (Northeast/South/Midwest/West). State/County/Metro selectizes are hidden.
 - [ ] Switch to "Census State". Up to 5 states selectable (try a 6th — the selectize blocks it).
 - [ ] Switch to "Census County". State + County selectizes appear. With state empty, click UPDATE DATA — message says "Please select at least one county." (The "select a state" path is dead because Shiny auto-preselects the first state.)
-- [ ] Switch to "Metro/Micro Area". State auto-preselected; CBSA selectize available with maxItems=5.
+- [ ] Switch to "Metro/Micro Area". State auto-preselected; an **Area type** radio (All areas / Metropolitan / Micropolitan) appears above the CBSA selectize, which has maxItems=5.
 - [ ] Verify state→county cascade: pick a different state, the County options refresh to that state's counties.
 - [ ] Verify state→CBSA cascade: same flow, CBSA options refresh.
+- [ ] **FIPS-keyed selection / de-duplication** (ADR 0021): county and metro options are selected by their underlying code (County FIPS / CBSA Code), so each county appears **once** with its canonical name. On a state with previously-duplicated labels (e.g. **Michigan**), the County picker shows a single "Wayne County" — no "Wayne" vs "Wayne County" split. Each metro likewise appears once even though it spans several counties.
+- [ ] **Metropolitan vs Micropolitan filter**: at Metro/Micro Area level, toggle the **Area type** radio to "Metropolitan" — the CBSA list shrinks to MSAs; "Micropolitan" shows only μSAs; "All areas" restores the full list. Changing the type clears any in-progress metro selection.
 - [ ] **No-data geography note** (NA-drop panels — DAFs, Government Grants, Program-Related Investments): on the PRI panel, set geo level to Census County and select two counties where one has no reported PRIs (e.g. **Loving County** + **Los Angeles County**). Click UPDATE DATA. An amber note appears above the chart: "No reported Program-Related Investments for the following selected areas: Loving County." The chart still draws Los Angeles. Selecting only counties that all have data shows no note.
+- [ ] **Unassigned-records note** (ADR 0021): some records can't be resolved to a county and the producer leaves their county NA (honest "unassigned"). Set geo level to **Census State** (or County) and select **Connecticut** — CT's post-2022 planning-region labels resolve to NA by design, so a second amber note appears above the chart: "Excluded from the geographic breakdown — records with no assigned county: CT (…)." This is expected, **not** a bug. National/Region views never show this note. At Metro/Micro Area level the note instead reads "records in no metro/micro area (rural or unmapped)".
 
 ### Date Range
 
@@ -164,7 +167,7 @@ These are tracked separately and are **not** regressions to log:
 
 - The Geographic Filters card has no "Reset" button next to its label, while some early UI sketches suggested one. Intentional (the geo_level radio acts as the reset).
 - The PF panel's 2016-2018 NA handling shows a dashed line gap; this is by design (`table_builder_pf.R`).
-- **County spelling duplicates (TEMPORARY notice).** At the Census County level, an advisory note appears warning that some counties show under multiple spellings (e.g. "Wayne" vs "Wayne County"), splitting their totals. This originates in raw BMF geocoding and is being fixed upstream in `nccs-data-bmf`. **Remove the notice** (the `TODO(county-normalization)` `conditionalPanel` in `R/geo_filter_module.R`) once the BMF standardization ships and a clean vintage flows downstream (`sector-in-brief-data` rebuild → `VINTAGE` bump). Verify removal: at the County level for a state with previously-duplicated counties, only the canonical "X County" labels appear in the picker.
+- **County "unassigned" totals.** Some records carry no resolvable county and are excluded from the county/metro breakdown (surfaced by the unassigned-records note, §4). This is the intended ADR 0021 behavior — the canonical county is NA for ambiguous labels — not missing data. (The earlier temporary "county spelling duplicates" notice was removed once FIPS-keyed selection landed in vintage v2026.07.)
 
 ## 10. Mobile / narrow screens (~2 min)
 

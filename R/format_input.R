@@ -26,6 +26,10 @@ format_input <- function(input,
     geo_state_mult = geo_filters$state_mult(),
     geo_county = geo_filters$county(),
     geo_cbsa = geo_filters$cbsa(),
+    # County/metro are selected by code; carry the resolved display
+    # names alongside so chips, captions, and notes read names not codes.
+    geo_county_label = geo_filters$county_label(),
+    geo_cbsa_label = geo_filters$cbsa_label(),
     subsector = input$subsector,
     size = input$size,
     year_range = input$date_range,

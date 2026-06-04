@@ -10,13 +10,16 @@ make_daf_fixture <- function() {
     Size                  = c(1L, 2L, 3L, 4L, 5L, 6L),
     `Census Region`       = rep("Northeast", 6),
     `Census State`        = rep("MA", 6),
-    `Census County`       = c("Suffolk", "Suffolk", "Worcester", "Suffolk", "Suffolk", NA),
+    `Census County`       = c("Suffolk County", "Suffolk County", "Worcester County",
+                              "Suffolk County", "Suffolk County", NA),
+    `County FIPS`         = c("25025", "25025", "25027", "25025", "25025", NA),
     `Metro/Micro Area`    = c("Boston-Cambridge-Newton, MA-NH",
                               "Boston-Cambridge-Newton, MA-NH",
-                              "Worcester, MA",
+                              "Worcester, MA-CT",
                               "Boston-Cambridge-Newton, MA-NH",
                               "Boston-Cambridge-Newton, MA-NH",
                               NA),
+    `CBSA Code`           = c("14460", "14460", "49340", "14460", "14460", NA),
     Year                  = c(2021L, 2022L, 2022L, 2023L, 2024L, 2022L),
     `Number of Nonprofits`= c(100L, 110L, 50L, 120L, 130L, 1000L),
     `Number of DAFs`      = c(3L, 4L, NA, 5L, 6L, NA),
@@ -72,8 +75,8 @@ stage_app_fixtures <- function(.local_envir = parent.frame()) {
   )
 
   writeLines(
-    c('"Census State","Census County","Metro/Micro Area","Census Region"',
-      '"MA","Suffolk","Boston-Cambridge-Newton, MA-NH","Northeast"'),
+    c('"Census State","Census County","County FIPS","Metro/Micro Area","CBSA Code","Census Region"',
+      '"MA","Suffolk County","25025","Boston-Cambridge-Newton, MA-NH","14460","Northeast"'),
     file.path(root, "data", "nested_geographies.csv")
   )
 

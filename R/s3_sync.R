@@ -16,7 +16,7 @@
 
 S3_BUCKET <- "nccsdata"
 S3_PREFIX <- "sector-in-brief"
-VINTAGE   <- "v2026.06"
+VINTAGE   <- "v2026.07"
 
 # Public HTTPS endpoint for a file in the vintage's prefix.
 vintage_url <- function(file) {

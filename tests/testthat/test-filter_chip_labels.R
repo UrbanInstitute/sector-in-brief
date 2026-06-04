@@ -99,11 +99,22 @@ test_that("any geo level other than National produces a chip", {
 test_that("Metro/Micro Area chip drops the 'Census' prefix", {
   out <- filter_chip_labels(
     base_inputs(geo_level = "Metro/Micro Area",
-                geo_cbsa = "Boston-Cambridge-Newton, MA-NH"),
+                geo_cbsa = "14460",
+                geo_cbsa_label = "Boston-Cambridge-Newton, MA-NH"),
     defaults_for()
   )
   expect_false(grepl("Census", out))
   expect_match(out, "^Metro/Micro Area:")
+})
+
+test_that("County chip shows the resolved name, not the FIPS code", {
+  out <- filter_chip_labels(
+    base_inputs(geo_level = "Census County",
+                geo_county = "26163",
+                geo_county_label = "Wayne County"),
+    defaults_for()
+  )
+  expect_match(out, "^County: Wayne County$")
 })
 
 test_that("multiple narrowings produce multiple chips in expected order", {

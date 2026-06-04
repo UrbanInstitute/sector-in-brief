@@ -1,7 +1,12 @@
 # missing_geo_note names user-selected geographies that returned no data.
 
+# missing_geo_note diffs query$geo_selected (display names for the active
+# level) against the by_geo breakdown axis. County/metro are filtered by
+# code, so the selection is carried as names in geo_selected, not under a
+# name-keyed filter entry.
 q <- function(level, selected) {
-  list(geo_level = level, filters = setNames(list(selected), level))
+  list(geo_level = level, geo_selected = selected,
+       filters = setNames(list(selected), level))
 }
 geo_tbl <- function(level, values) {
   tables <- list()

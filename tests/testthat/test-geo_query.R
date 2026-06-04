@@ -1,30 +1,25 @@
 # geo_query translates the active geo level into filter-list predicates.
-# The County branch must ALSO scope to the selected state, because county
-# names are not unique across states (regression: same-named counties in
-# other states inflated totals — see R/geo_query.R).
+# County is filtered on `County FIPS` and Metro/Micro on `CBSA Code`
+# (ADR 0021) — the codes are collision-proof, so a county selection is
+# NOT scoped to a state (same-named counties in other states carry
+# different FIPS and can't be swept in).
 
-test_that("County level scopes to the selected state and county", {
+test_that("County level filters on County FIPS, not the name, and is not state-scoped", {
   fl <- geo_query(list(), "Census County",
                   region = NULL, state_single = "MI", state_mult = NULL,
-                  county = c("Wayne County", "Monroe County"), cbsa = NULL)
-  expect_equal(fl[["Census State"]], "MI")
-  expect_equal(fl[["Census County"]], c("Wayne County", "Monroe County"))
+                  county = c("26163", "26115"), cbsa = NULL)
+  expect_equal(fl[["County FIPS"]], c("26163", "26115"))
+  expect_null(fl[["Census County"]])     # not filtered by name
+  expect_null(fl[["Census State"]])      # no state-scoping crutch
 })
 
-test_that("County level degrades to name-only when no state is selected", {
-  fl <- geo_query(list(), "Census County",
-                  region = NULL, state_single = character(0), state_mult = NULL,
-                  county = c("Wayne County"), cbsa = NULL)
-  expect_null(fl[["Census State"]])
-  expect_equal(fl[["Census County"]], "Wayne County")
-})
-
-test_that("Metro/Micro Area is NOT state-scoped (metros span states)", {
+test_that("Metro/Micro Area filters on CBSA Code, not the name", {
   fl <- geo_query(list(), "Metro/Micro Area",
                   region = NULL, state_single = "MO", state_mult = NULL,
-                  county = NULL, cbsa = c("Kansas City, MO-KS"))
-  expect_null(fl[["Census State"]])
-  expect_equal(fl[["Metro/Micro Area"]], "Kansas City, MO-KS")
+                  county = NULL, cbsa = c("28140"))
+  expect_equal(fl[["CBSA Code"]], "28140")
+  expect_null(fl[["Metro/Micro Area"]])
+  expect_null(fl[["Census State"]])      # metros span states; never scoped
 })
 
 test_that("State level uses multi-select when present, else single", {
@@ -38,6 +33,7 @@ test_that("State level uses multi-select when present, else single", {
 })
 
 test_that("Region level filters on region", {
-  fl <- geo_query(list(), "Census Region", c("Midwest"), NULL, NULL, NULL, NULL)
-  expect_equal(fl[["Census Region"]], "Midwest")
+  fl <- geo_query(list(), "Census Region", c("Northeast", "South"),
+                  NULL, NULL, NULL, NULL)
+  expect_equal(fl[["Census Region"]], c("Northeast", "South"))
 })

@@ -68,3 +68,25 @@ test_that("National geo_level expands to all four Census Regions", {
   expect_setequal(q$filters$`Census Region`,
                   c("Northeast", "Midwest", "South", "West"))
 })
+
+test_that("County selection filters on County FIPS and stashes display names", {
+  q <- query_builder(
+    base_inputs(geo_level = "Census County", geo_state_single = "MI",
+                geo_county = c("26163"), geo_county_label = c("Wayne County")),
+    geo_df = NULL
+  )
+  expect_equal(q$filters[["County FIPS"]], "26163")
+  expect_null(q$filters[["Census County"]])   # not name-filtered
+  expect_equal(q$geo_selected, "Wayne County")
+})
+
+test_that("Metro selection filters on CBSA Code and stashes the metro name", {
+  q <- query_builder(
+    base_inputs(geo_level = "Metro/Micro Area", geo_state_single = "MI",
+                geo_cbsa = c("19820"),
+                geo_cbsa_label = c("Detroit-Warren-Dearborn, MI")),
+    geo_df = NULL
+  )
+  expect_equal(q$filters[["CBSA Code"]], "19820")
+  expect_equal(q$geo_selected, "Detroit-Warren-Dearborn, MI")
+})

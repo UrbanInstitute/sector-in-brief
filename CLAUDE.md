@@ -57,6 +57,7 @@ Producer ships these columns (cutover landed via PR #17, 2026-05):
 
 - `Size` (1-6 expense band; 0 = BMF metadata but no CORE filing; **not** asset-based despite legacy naming)
 - `Metro/Micro Area` (formerly `Census CBSA` — renamed for clarity; can be NA for rural counties)
+- `County FIPS` / `CBSA Code` (v2026.07, ADR 0021) — the collision-proof identity keys the county + metro filters select on. Both **string**, leading zeros significant — never numeric-cast. `Census County` is now the canonical, de-duplicated name and is **NA for ambiguous/unresolved labels** (honest "unassigned" — e.g. Connecticut's post-2022 planning regions resolve to NA by design). The dashboard filters by code, displays/groups by name (`R/geo_query.R`, `R/geo_filter_module.R`).
 - `Year` (tax year as reported on filing; formerly `Tax Year`)
 - DAF panel covers every BMF-active cell (1M+ rows). Dollar metrics are NA for cells with no DAF activity; `dataloader.R` filters those out of dollar-metric DAF views, while DAF Proportion intentionally keeps them as the denominator.
 
@@ -69,7 +70,7 @@ Year ranges (from the current vintage):
 | DAFs | 2021-2023 (2020 has 0 holders, 2024 is partial) |
 | Government Grants / Program-Related Investments | 2021-2023 (e-file only; 2024 still arriving) |
 
-Geographic lookup is `data/nested_geographies.csv` — column names are spaces in the CSV but become dots after `read.csv()` (`Census.State`, `Census.County`, `Metro.Micro.Area`).
+Geographic lookup is `data/nested_geographies.csv`, loaded via `R/load_geo_df.R` (a data-derived allowlist of selectable geographies — NA-county rows dropped). Column names are spaces in the CSV but become dots after `read.csv()` (`Census.State`, `Census.County`, `County.FIPS`, `Metro.Micro.Area`, `CBSA.Code`, `Census.Region`). `load_geo_df()` forces `County.FIPS`/`CBSA.Code` to character (preserving leading zeros) and joins `CBSA.Type` from `data/cbsa_crosswalk.parquet` to drive the Metropolitan-vs-Micropolitan picker filter. The producer also publishes `county_fips_crosswalk.parquet` (carrying a `Resolution` flag) and `cbsa_crosswalk.parquet` (CBSA Type, CSA Code/Title) per ADR 0021.
 
 ## Conventions
 
