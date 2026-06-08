@@ -16,8 +16,9 @@ plot_caption <- function(inputs) {
   region <- inputs$geo_region
   state_single <- inputs$geo_state_single
   state_mult <- inputs$geo_state_mult
-  county <- inputs$geo_county
-  cbsa <- inputs$geo_cbsa
+  # County/metro are selected by code; caption shows their names.
+  county <- inputs$geo_county_label %||% inputs$geo_county
+  cbsa <- inputs$geo_cbsa_label %||% inputs$geo_cbsa
   subsector <- inputs$subsector
   size <- inputs$size
   agg_var <- inputs$agg_var

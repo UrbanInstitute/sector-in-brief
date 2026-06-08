@@ -76,6 +76,13 @@ data_pipeline <- function(input,
                      agg_var = agg_var,
                      year_var = year_var,
                      table_title_prefix = title)
+      # Per-state note for records with no assignable county/metro
+      # (NA geography), excluded from the breakdown above.
+      unassigned <- unassigned_geo_note(data, inputs, query, agg_var)
+      output$geo_unassigned_note <- shiny::renderUI({
+        if (is.null(unassigned)) return(NULL)
+        htmltools::div(class = "geo-data-note", unassigned)
+      })
       setProgress(5, message = "Done!")
     })
   }, error = function(e) {

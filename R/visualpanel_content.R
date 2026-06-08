@@ -75,6 +75,10 @@ visualpanel_content <- function(panel_header,
       # Note naming any explicitly-selected geographies that returned no
       # data (rendered by render_outputs via missing_geo_note()).
       shiny::uiOutput(ns("geo_data_note")),
+      # Note counting records that couldn't be assigned to a county /
+      # metro for the state(s) in view (data_pipeline via
+      # unassigned_geo_note()). Distinct from the no-data note above.
+      shiny::uiOutput(ns("geo_unassigned_note")),
       plot_ui(panelid)
     )
   )

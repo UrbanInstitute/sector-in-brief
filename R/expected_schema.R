@@ -16,7 +16,13 @@
   "Census Region"     = "string",
   "Census State"      = "string",
   "Census County"     = "string",
+  # County FIPS / CBSA Code are the collision-proof identity keys the
+  # county + metro filters select on (ADR 0021). Always string — leading
+  # zeros are significant (state 01 Alabama; 5-char GEOID), a numeric
+  # cast silently corrupts every leading-zero code.
+  "County FIPS"       = "string",
   "Metro/Micro Area"  = "string",
+  "CBSA Code"         = "string",
   "Year"              = "int32"
 )
 

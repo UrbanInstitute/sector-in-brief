@@ -11,6 +11,9 @@
 # `visualpanel_args`.
 
 # Columns every panel loads (org + geo + size dimensions).
+# County FIPS / CBSA Code ride alongside their display names so the
+# county + metro filters can select on the collision-proof code while
+# the breakdown axis still groups by the readable name (ADR 0021).
 default_vars <- c(
   "Organization Type",
   "Subsector",
@@ -18,7 +21,9 @@ default_vars <- c(
   "Census Region",
   "Census State",
   "Census County",
-  "Metro/Micro Area"
+  "County FIPS",
+  "Metro/Micro Area",
+  "CBSA Code"
 )
 
 data_server_args <- list(

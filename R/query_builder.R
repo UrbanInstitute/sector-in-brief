@@ -19,9 +19,12 @@
 #'   panel context resolved to plain values).
 #' @param geo_df Geographic lookup table (unused at present; passed
 #'   through to keep the signature stable across geo_query rewrites).
-#' @return `list(filters, geo_level)`. National view rewrites
-#'   `geo_level` to "Census Region" with all four regions selected so
-#'   the by-geo breakdown shows region totals instead of being empty.
+#' @return `list(filters, geo_level, geo_selected)`. National view
+#'   rewrites `geo_level` to "Census Region" with all four regions
+#'   selected so the by-geo breakdown shows region totals instead of
+#'   being empty. `geo_selected` carries the user's selection as display
+#'   *names* for the active level (county/metro codes resolved to names)
+#'   so `missing_geo_note()` can diff against the named breakdown axis.
 query_builder <- function(inputs, geo_df) {
   ctype <- inputs$ctype
   geo_level <- inputs$geo_level
@@ -35,6 +38,16 @@ query_builder <- function(inputs, geo_df) {
   year_range <- inputs$year_range
   year_var <- inputs$year_var
   time_series <- inputs$time_series
+
+  # The active level's selection expressed as display names — county and
+  # metro are filtered by code but surfaced to the user by name.
+  geo_selected <- switch(
+    geo_level,
+    "Census State"     = if (length(state_mult) > 0) state_mult else state_single,
+    "Census County"    = inputs$geo_county_label,
+    "Metro/Micro Area" = inputs$geo_cbsa_label,
+    NULL
+  )
 
   filter_ls <- list()
   filter_ls <- ctype_query(filter_ls, ctype)
@@ -65,5 +78,5 @@ query_builder <- function(inputs, geo_df) {
   years <- seq(as.integer(year_range[1]), as.integer(year_range[2]))
   filter_ls[[year_var]] <- years
 
-  list(filters = filter_ls, geo_level = geo_level)
+  list(filters = filter_ls, geo_level = geo_level, geo_selected = geo_selected)
 }

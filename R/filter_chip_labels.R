@@ -67,12 +67,14 @@ filter_chip_labels <- function(inputs, defaults) {
   if (!is.null(c1)) chips <- c(chips, c1)
 
   if (!is.null(inputs$geo_level) && inputs$geo_level != "National") {
+    # County/metro are selected by code but shown by name — chip text
+    # uses the resolved label, falling back to the raw selection.
     selection <- switch(
       inputs$geo_level,
       "Census Region"    = inputs$geo_region,
       "Census State"     = inputs$geo_state_mult,
-      "Census County"    = inputs$geo_county,
-      "Metro/Micro Area" = inputs$geo_cbsa,
+      "Census County"    = inputs$geo_county_label %||% inputs$geo_county,
+      "Metro/Micro Area" = inputs$geo_cbsa_label %||% inputs$geo_cbsa,
       NULL
     )
     geo_label <- sub("^Census ", "", inputs$geo_level)
@@ -81,7 +83,8 @@ filter_chip_labels <- function(inputs, defaults) {
       if (length(selection) == 0) {
         geo_label
       } else if (length(selection) <= 3) {
-        sprintf("%s: %s", geo_label, paste(selection, collapse = ", "))
+        sprintf("%s: %s", geo_label,
+                paste(truncate_chip_item(selection), collapse = ", "))
       } else {
         sprintf("%s: %d selected", geo_label, length(selection))
       }
