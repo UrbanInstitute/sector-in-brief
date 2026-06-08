@@ -13,9 +13,10 @@ name: Deploy to production
 # workflow's header.
 #
 # Note: the old prod URL at nccs-urban.shinyapps.io/sector-in-brief/
-# is unaffected by this workflow — it remains the publicly cited URL
-# until the migration to urban-main is announced and external
-# references (e.g. R/text_welcome.R citation, README) are updated.
+# is unaffected by this workflow. The migration to urban-main is now
+# done (external references + R/text_welcome.R citation point at
+# urban-main), so legacy is no longer the cited URL — it is kept live
+# as a short-term fallback and will be decommissioned thereafter.
 
 on:
   push:

@@ -1,6 +1,6 @@
 # Nonprofit Sector In Brief Dashboard
 
-This repository contains the code needed to create the [Nonprofit Sector In Brief Dashboard](https://nccs-urban.shinyapps.io/sector-in-brief/)
+This repository contains the code needed to create the [Nonprofit Sector In Brief Dashboard](https://urban-main.shinyapps.io/sector-in-brief/)
 web application with R Shiny. 
 
 # Overview
@@ -127,11 +127,12 @@ both on the **Xlarge instance (8 GB RAM)**:
 | **Staging** | <https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/> | Auto on push to `main` (`deploy-staging.yml`) |
 | **Production** | <https://urban-main.shinyapps.io/sector-in-brief/> | Auto on push to `prod` (`deploy-prod.yml`) |
 
-There's a separate **legacy** prod URL at
-<https://nccs-urban.shinyapps.io/sector-in-brief/> that remains the
-publicly cited link until the migration to urban-main is announced.
-Update external references and `R/text_welcome.R`'s citation when
-that flip happens.
+The migration to urban-main is complete: external references (the NCCS
+website) and the in-app citation (`R/text_welcome.R`) now point at the
+production URL above. The separate **legacy** prod deployment at
+<https://nccs-urban.shinyapps.io/sector-in-brief/> is **no longer the
+cited URL** but is kept live for a short grace period as a fallback,
+and will be decommissioned thereafter.
 
 ## Promotion model
 

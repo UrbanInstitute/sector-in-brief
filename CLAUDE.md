@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Deploys:
 - Staging (auto on push to `main`): <https://urban-main.shinyapps.io/nccs-sector-in-brief-staging/>
 - Prod new (auto on push to `prod`): <https://urban-main.shinyapps.io/sector-in-brief/>
-- Prod legacy (still the publicly cited URL): <https://nccs-urban.shinyapps.io/sector-in-brief/>
+- Prod legacy (no longer cited; kept live as a short-term fallback, slated for decommission): <https://nccs-urban.shinyapps.io/sector-in-brief/>
 
 See `README.md` for the promotion model and `.github/workflows/deploy-{staging,prod}.yml` for the deploy automation.
 
