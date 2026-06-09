@@ -1,0 +1,26 @@
+name: contracts-guard
+
+# Thin caller of the reusable contract-change guard in nccs-contracts (ADR 0022).
+# The guard logic lives once there; this file passes only this repo's
+# paths_regex. sector-in-brief is a CONSUMER (hybrid: viz reads S3 directly per
+# ADR 0011; the download form goes through the API per ADR 0026), so the
+# contract-relevant surface is how it READS/SYNCS contracted data, the API
+# download path, schema validation, and the vintage pin. Tune as that evolves.
+#
+# The guard verifies ACKNOWLEDGMENT, not correctness: a PR that touches the
+# matched paths must carry an `ADR NNNN` breadcrumb (commit message or PR body)
+# or the `contracts-ack` label, so the nccs-contracts reconcile isn't silently
+# skipped. See nccs-contracts/CONTRIBUTING.md.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  contracts-guard:
+    uses: UrbanInstitute/nccs-contracts/.github/workflows/contracts-guard.yml@main
+    with:
+      paths_regex: '^R/(s3_sync|data_pipeline|data_server_args|query_builder|query_builder_download|validate_parquet_schemas|manifest_meta)\.R$'

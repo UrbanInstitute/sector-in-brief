@@ -89,3 +89,16 @@ Geographic lookup is `data/nested_geographies.csv`, loaded via `R/load_geo_df.R`
 ## Producer repo
 
 Data is produced by `../sector-in-brief-data` (`UrbanInstitute/sector-in-brief-data`). When the columns or coverage notes need to change, the change starts there.
+
+## Contract-change guard (ADR 0022)
+
+A PR that changes how this dashboard **reads/syncs** contracted data, the API
+download path (ADR 0026), schema validation, or the contract vintage pin must
+acknowledge the [`nccs-contracts`](https://github.com/UrbanInstitute/nccs-contracts)
+impact, or CI fails. The `.github/workflows/contracts-guard.yml` caller (a thin
+wrapper over the reusable guard in `nccs-contracts`) fires on PRs that change
+`R/s3_sync.R`, `R/data_pipeline.R`, `R/data_server_args.R`, `R/query_builder*.R`,
+`R/validate_parquet_schemas.R`, or `R/manifest_meta.R`. To pass: add an
+`ADR NNNN` breadcrumb to a commit message or the PR body, **or** add the
+`contracts-ack` label if there's genuinely no contract impact. The guard checks
+*acknowledgment, not correctness*.
