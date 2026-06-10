@@ -48,13 +48,18 @@ geo_names_to_codes <- function(names, states, geo_df, name_col, code_col) {
 #'   fields stay vectors (serialized as JSON arrays even when length 1);
 #'   scalar fields are `jsonlite::unbox`-ed.
 query_builder_download <- function(inputs, geo_df, estimate = FALSE) {
-  # Form-type radio -> API `forms`. 990combined already unions 990 + 990-EZ,
-  # so "both" is a single dataset (selecting it alongside 990/990ez would
+  # Form-type radio -> API `forms`. The radio is single-select and its
+  # values already are the API form codes, so this just validates the
+  # choice and falls back to plain 990 for anything unexpected. 990combined
+  # already unions 990 + 990-EZ, which is why it is its own option rather
+  # than something the user combines with 990/990ez (that would
   # double-count — see openapi.yaml).
   forms <- switch(
     inputs$form_select,
-    "990"   = "990",
-    "990EZ" = "990combined",
+    "990"         = "990",
+    "990ez"       = "990ez",
+    "990combined" = "990combined",
+    "990pf"       = "990pf",
     "990"
   )
 
