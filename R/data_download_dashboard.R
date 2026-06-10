@@ -335,7 +335,7 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "start_data_download", "SUBMIT REQUEST"),
         htmltools::br(),
         htmltools::br(),
-        htmltools::uiOutput(ns("download_result"))
+        shiny::uiOutput(ns("download_result"))
       )
     )
   )
