@@ -31,3 +31,7 @@ data/_manifest.json
 # Data dictionary CSV is regenerated from data/data_dictionary.parquet on boot
 www/data_dictionary.csv
 R/sysdata.rda
+
+# Generated at deploy time from CI secrets (AWS invoke creds for the download
+# form); bundled to shinyapps.io but never committed (see deploy-*.yml)
+.Renviron
