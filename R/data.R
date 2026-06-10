@@ -43,8 +43,8 @@ navbar_title <- htmltools::h4(
 
 form_data <- tibble::tribble(
   ~Option, ~Data_Source, ~Variable_Availability, ~Year_Availability,
-  'Form 990 Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "1,654,300 nonprofits", "All 547 paper-form variables", "2012-2022",
-  'Form 990 + Form 990-EZ Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "2,765,384 nonprofits", "236 variables in the EZ version, which also appear in the Form 990.", "1989-2022"
+  'Form 990 Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "1,654,300 nonprofits", "All 547 paper-form variables", "2012-2023",
+  'Form 990 + Form 990-EZ Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "2,765,384 nonprofits", "236 variables in the EZ version, which also appear in the Form 990.", "1989-2023"
 )
 
 download_table <- reactable::reactable(

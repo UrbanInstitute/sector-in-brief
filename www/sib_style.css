@@ -93,6 +93,56 @@
     justify-content: center;
     background-color: var(--color-white);
 }
+
+/* "Your data is ready" card shown after an export completes. Left-aligned
+   block (NOT bg-box__white, which is a centring flexbox). */
+.download-ready {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-shade-light);
+    border-left: 4px solid var(--color-blue);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-family: var(--font-family);
+}
+.download-ready__title {
+    margin: 0 0 0.25rem;
+    font-weight: var(--font-weight-bold);
+}
+.download-ready__meta {
+    margin: 0 0 1rem;
+    color: var(--color-gray-shade-darker);
+    font-size: var(--h5-lg);
+}
+.download-ready__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+.download-ready__btn {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    color: var(--color-white);
+    background-color: var(--color-blue);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+}
+.download-ready__btn:hover,
+.download-ready__btn:focus {
+    background-color: var(--color-blue-shade-dark);
+    color: var(--color-white);
+    text-decoration: none;
+}
+.download-ready__link {
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+}
+.download-ready__emailed {
+    margin: 0;
+    color: var(--color-gray-shade-darker);
+}
 .bg-box__grey {
     display: flex;
     justify-content: center;

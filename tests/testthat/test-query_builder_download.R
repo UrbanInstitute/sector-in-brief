@@ -49,10 +49,14 @@ test_that("payload carries the new schema fields", {
   expect_null(p$estimate)
 })
 
-test_that("form-type radio maps to API form sets", {
+test_that("form-type radio maps to API form codes", {
   expect_equal(query_builder_download(base_inputs(form_select = "990"), fake_geo_df())$forms, "990")
-  # 990combined already unions 990 + 990-EZ (avoids double-counting)
-  expect_equal(query_builder_download(base_inputs(form_select = "990EZ"), fake_geo_df())$forms, "990combined")
+  expect_equal(query_builder_download(base_inputs(form_select = "990ez"), fake_geo_df())$forms, "990ez")
+  # 990combined already unions 990 + 990-EZ (its own option, not combinable)
+  expect_equal(query_builder_download(base_inputs(form_select = "990combined"), fake_geo_df())$forms, "990combined")
+  expect_equal(query_builder_download(base_inputs(form_select = "990pf"), fake_geo_df())$forms, "990pf")
+  # unknown value falls back to plain 990
+  expect_equal(query_builder_download(base_inputs(form_select = "bogus"), fake_geo_df())$forms, "990")
 })
 
 test_that("estimate flag sets estimate=true", {

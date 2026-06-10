@@ -22,6 +22,18 @@
 #
 # Mounted as the last nav_panel by app.R.
 
+# Last complete tax year offered by the download form. The API exposes no
+# list-years endpoint, so this tracks the producer's CORE coverage
+# (Finances/PF 1989-2023; 2024 is still partial — see CLAUDE.md "Data
+# semantics"). Bump when the API's complete-year coverage advances.
+DOWNLOAD_MAX_TAX_YEAR <- 2023L
+
+# Earliest tax year per form code. 990-EZ data starts in 2012; everything
+# else (incl. the 990+990-EZ union and 990-PF) goes back to 1989.
+download_form_min_year <- function(form) {
+  if (identical(form, "990ez")) 2012L else 1989L
+}
+
 #' Build the Custom Panel Datasets request UI.
 #'
 #' @param id Module id.
@@ -51,9 +63,22 @@ dataRequestUI <- function(id, geo_df) {
           shiny::radioButtons(
             inputId = ns("form_select"),
             label = "Select one option *",
-            choices = list("Form 990 Filers" = "990",
-                           "Form 990 and Form 990-EZ Filers" = "990EZ"),
+            choices = list(
+              "Form 990"                 = "990",
+              "Form 990-EZ"              = "990ez",
+              "Form 990 + 990-EZ (combined)" = "990combined",
+              "Form 990-PF"              = "990pf"
+            ),
+            selected = "990",
             inline = TRUE
+          )
+        ),
+        htmltools::p(
+          class = "filter-hint",
+          htmltools::tags$em(
+            "“Combined” returns Form 990 and Form 990-EZ filers in a ",
+            "single dataset; pick it instead of — not alongside — the ",
+            "individual 990 or 990-EZ options."
           )
         ),
         htmltools::br(),
@@ -156,7 +181,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("start_year"),
               label = htmltools::tags$b("From Tax Year *"),
-              choices = c(1989:2022),
+              choices = c(1989:DOWNLOAD_MAX_TAX_YEAR),
               selected = 2012,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -167,8 +192,8 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("end_year"),
               label = htmltools::tags$b("Through Tax Year *"),
-              choices = c(1989:2022),
-              selected = 2022,
+              choices = c(1989:DOWNLOAD_MAX_TAX_YEAR),
+              selected = DOWNLOAD_MAX_TAX_YEAR,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
             )
@@ -442,37 +467,23 @@ dataRequestServer <- function(id, geo_df) {
     })
 
     # Form type controls the available tax-year range (990-EZ data starts
-    # in 2012). Variables are form-independent now (the API union_by_name
-    # null-fills columns absent from a form), so the variable picker no
-    # longer changes with the form type.
+    # in 2012; the other forms go back to 1989). Variables are
+    # form-independent now (the API union_by_name null-fills columns absent
+    # from a form), so the variable picker no longer changes with the form.
     observeEvent(input$form_select, {
-      if (input$form_select == "990") {
-        shinyWidgets::updatePickerInput(
-          session = session,
-          inputId = "start_year",
-          choices = c(1989:2022),
-          selected = 1989
-        )
-        shinyWidgets::updatePickerInput(
-          session = session,
-          inputId = "end_year",
-          choices = c(1989:2022),
-          selected = 2022
-        )
-      } else {
-        shinyWidgets::updatePickerInput(
-          session = session,
-          inputId = "start_year",
-          choices = c(2012:2022),
-          selected = 2012
-        )
-        shinyWidgets::updatePickerInput(
-          session = session,
-          inputId = "end_year",
-          choices = c(2012:2022),
-          selected = 2022
-        )
-      }
+      years <- download_form_min_year(input$form_select):DOWNLOAD_MAX_TAX_YEAR
+      shinyWidgets::updatePickerInput(
+        session = session,
+        inputId = "start_year",
+        choices = years,
+        selected = min(years)
+      )
+      shinyWidgets::updatePickerInput(
+        session = session,
+        inputId = "end_year",
+        choices = years,
+        selected = max(years)
+      )
     })
 
     # "Select all variables" toggles the picker between the full catalog
@@ -536,27 +547,39 @@ dataRequestServer <- function(id, geo_df) {
       dict_url <- res$data_dictionary$url %||%
         download_link(res$download_path, kind = "dictionary", config = cfg)
       emailed <- !is.null(res$email) && identical(res$email$status, "sent")
+      # Left-aligned card with its own class; `bg-box__white` is a
+      # centring flexbox and squashes a multi-element block, so it is not
+      # used here.
       htmltools::div(
-        class = "bg-box__white",
-        htmltools::h4("Your data is ready"),
-        htmltools::p(sprintf(
-          "%s rows · %s (%s)",
-          format(res$row_count %||% 0, big.mark = ","),
-          human_bytes(res$result$bytes),
-          toupper(res$result$format %||% input$format_select)
-        )),
-        htmltools::tags$ul(
-          htmltools::tags$li(
-            htmltools::a("Download your data", href = durable, target = "_blank")
+        class = "download-ready",
+        htmltools::h4("Your data is ready", class = "download-ready__title"),
+        htmltools::p(
+          class = "download-ready__meta",
+          sprintf(
+            "%s rows · %s · %s",
+            format(res$row_count %||% 0, big.mark = ","),
+            human_bytes(res$result$bytes),
+            toupper(res$result$format %||% input$format_select)
+          )
+        ),
+        htmltools::div(
+          class = "download-ready__links",
+          htmltools::a(
+            "Download your data",
+            href = durable, target = "_blank",
+            class = "download-ready__btn"
           ),
           if (!is.null(dict_url)) {
-            htmltools::tags$li(
-              htmltools::a("Download the data dictionary", href = dict_url, target = "_blank")
+            htmltools::a(
+              "Download the data dictionary",
+              href = dict_url, target = "_blank",
+              class = "download-ready__link"
             )
           }
         ),
         if (emailed) {
           htmltools::p(
+            class = "download-ready__emailed",
             htmltools::tags$em(
               sprintf("We've also emailed this link to %s.", res$email$to)
             )
