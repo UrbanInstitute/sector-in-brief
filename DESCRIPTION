@@ -29,6 +29,7 @@ Imports:
     htmlwidgets,
     httr,
     jsonlite,
+    paws.compute,
     purrr,
     reactable,
     rlang,

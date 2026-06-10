@@ -27,31 +27,12 @@ download_date_para <- htmltools::p(
     )
 
 download_fields_para <- htmltools::p(
-  "Each variable comes from the individual parts of a Form 990. Form 990-EZ has 5 parts and the full Form 990 has 10. To learn more about the variable choices, view the ",
-  htmltools::a(href = "https://www.irs.gov/pub/irs-pdf/f990.pdf", "2023 Form 990 and Form 990-EZ:")
-)
-
-var_choices_990 <- list(
-  "Program Service Accomplishments: Information on the major programs and services" = "03",
-  "Required Schedules: Schedules required by the IRS" = "04",
-  "Statements: Tax-compliance statements reported to the IRS" = "05",
-  "Governance: Information on the board of directors and governance structure" = "06",
-  "Compensation: Compensation for key individuals reported to the IRS" = "07",
-  "Revenue Statement: A breakdown of revenue sourced reported to the IRS" = "08",
-  "Functional Expenses: An accounting of all expenses reported to the IRS." = "09",
-  "Balance Sheet: An accounting of asssets and liabilities." = "10",
-  "Public Charity Status: Information on the organization's public charity status" = "00",
-  "Reporting: Information on how the nonprofit reports its financial statements" = "12",
-  "Lobbying: information on lobbying activities" = "04",
-  "Reconciliation: Reconciliation of net assets" = "11"
-)
-
-var_choices_990ez <- list(
-  "Program Service Accomplishments: Information on the major programs and services" = "03",
-  "Required Schedules: Schedules required by the IRS" = "04",
-  "Statements: Tax compliance statements reported to the IRS" = "05",
-  "Governance: Information on the board of directors and governance structure" = "06",
-  "Balance Sheet: An accounting of asssets and liabilities." = "10",
-  "Public Charity Status: Information on the organization's public charity status" = "00"
+  "Choose the variables (columns) to include in your extract, grouped by",
+  "identification, classification, geography, and finances. Every record",
+  "includes the organization's EIN. To learn more about the underlying",
+  "fields, view the ",
+  htmltools::a(href = "https://www.irs.gov/pub/irs-pdf/f990.pdf", "Form 990 and Form 990-EZ"),
+  ". The selectable columns are defined by the dashboard's column catalog",
+  "(R/download_columns.R)."
 )
 

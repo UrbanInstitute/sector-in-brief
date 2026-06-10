@@ -151,11 +151,21 @@ Data is **not** bundled into the deploy artifact — the runtime pulls
 the pinned vintage from S3 at boot per `R/s3_sync.R` (ADR 0011). The
 bucket prefix is publicly readable, so the sync uses
 `aws s3 sync --no-sign-request` and **no AWS credentials are needed**
-anywhere (not locally, not on shinyapps.io, not in CI).
+for the data path (not locally, not on shinyapps.io, not in CI).
 
 CI auth for the deploy step uses two repo Actions secrets shared by
 both workflows: `SHINYAPPS_TOKEN`, `SHINYAPPS_SECRET`. Generate from
 the urban-main shinyapps.io account: Tokens → Add Token.
+
+The **Custom Panel Datasets download form** is the one exception to
+"no AWS credentials": it calls the modernized `sector-in-brief-api`
+(ADR 0026), whose `POST /data` is IAM-authed, so the Shiny *server*
+signs with a dedicated invoke-only IAM user. Set its key as the repo
+Actions secrets `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`; the
+deploy workflows forward them to shinyapps.io as encrypted env vars
+(rsconnect `envVars`). The endpoint is config-driven via `SIB_API_*`
+env vars (`R/download_api_config.R`); see
+`../sector-in-brief-api/docs/deploy.md` for creating the IAM user.
 
 Bump `VINTAGE` in `R/s3_sync.R` when the producer
 (`sector-in-brief-data`) publishes a new build, then merge to `main`

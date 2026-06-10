@@ -9,8 +9,14 @@ name: Deploy to production
 # or a PR from main into prod. There is no auto-promotion from main.
 #
 # Setup is identical to deploy-staging.yml (same shinyapps.io account,
-# same token pair). No AWS credentials needed — see the staging
-# workflow's header.
+# same token pair, same AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY repo
+# secrets for the download form — see that workflow's header).
+#
+# Cutover note (ADR 0008 / 0026): prod intentionally keeps pointing at
+# the STAGING download API (the SIB_API_* env vars are left at their
+# code defaults) until the deliberate shadow → switch → monitor cutover.
+# To flip the pointer, add SIB_API_FUNCTION_NAME / SIB_API_DOWNLOAD_URL
+# to the env + envVars below; nothing in R/ changes.
 #
 # Note: the old prod URL at nccs-urban.shinyapps.io/sector-in-brief/
 # is unaffected by this workflow — it remains the publicly cited URL
@@ -46,6 +52,11 @@ jobs:
         env:
           SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
           SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
+          # Forwarded to the running app via envVars below so the download
+          # form can sign POST /data (ADR 0026).
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
         run: |
           Rscript -e '
             rsconnect::setAccountInfo(
@@ -60,6 +71,13 @@ jobs:
               appName     = "sector-in-brief",
               account     = "urban-main",
               forceUpdate = TRUE,
+              # Upload the AWS keys as encrypted server-side env vars so
+              # the download form can invoke the IAM-authed API at runtime.
+              envVars = c(
+                "AWS_ACCESS_KEY_ID",
+                "AWS_SECRET_ACCESS_KEY",
+                "AWS_REGION"
+              ),
               appFiles = c(
                 "app.R",
                 "DESCRIPTION",
