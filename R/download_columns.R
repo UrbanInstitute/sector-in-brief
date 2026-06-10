@@ -35,6 +35,11 @@ download_column_catalog <- function() {
     # --- Classification ---
     "nteev2",              "NTEE-V2 code",                 "Classification", TRUE,
     "nteev2_subsector",    "Subsector (NTEE major group)", "Classification", TRUE,
+    # Plain-English label for the subsector code above. API-derived to the
+    # dashboard's canonical table_builder_subsector.R labels (overrides bmf's
+    # raw column; EDU/HEL "(minus …)", UNU/unmapped/NULL -> Other; exactly 12
+    # distinct values). Added by the API in response to our handoff.
+    "nteev2_subsector_definition", "Subsector (plain-English label)", "Classification", TRUE,
     "org_type",            "Organization type (501(c))",   "Classification", TRUE,
     "ntee_common_code",    "NTEE common code",             "Classification", FALSE,
     # --- Geography ---
