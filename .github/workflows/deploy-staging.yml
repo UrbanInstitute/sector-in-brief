@@ -19,8 +19,11 @@ name: Deploy to staging
 # The data sync (R/s3_sync.R) still needs NO AWS credentials — it pulls
 # the parquet over anonymous HTTPS from a publicly readable prefix. The
 # AWS keys above are used ONLY by the download form's server-side call to
-# the IAM-authed POST /data endpoint; they are forwarded to shinyapps.io
-# as encrypted env vars via rsconnect's `envVars` below.
+# the IAM-authed POST /data endpoint; they reach the running app via a
+# generated `.Renviron` in the bundle (see below). shinyapps.io does NOT
+# support rsconnect's `envVars` (Connect-only), so we cannot push them as
+# server-side env vars; the `.Renviron` is written from these secrets at
+# deploy time and never committed (gitignored).
 #
 # After that, every push to main triggers a deploy. Concurrent runs
 # are cancelled so a fast-follow merge doesn't queue stale builds.
@@ -54,8 +57,8 @@ jobs:
         env:
           SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
           SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
-          # Forwarded to the running app on shinyapps.io via envVars below
-          # so the download form can sign POST /data (ADR 0026).
+          # Read into the generated .Renviron below so the download form
+          # can sign POST /data at runtime (ADR 0026).
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
@@ -66,6 +69,16 @@ jobs:
               token  = Sys.getenv("SHINYAPPS_TOKEN"),
               secret = Sys.getenv("SHINYAPPS_SECRET")
             )
+            # shinyapps.io does not support rsconnect envVars (Connect-only),
+            # so ship the invoke creds as a bundled .Renviron: R reads it at
+            # session startup (before .Rprofile/renv) and paws.compute picks
+            # the keys up from the environment. Generated here from the CI
+            # secrets; gitignored, never committed.
+            writeLines(c(
+              paste0("AWS_ACCESS_KEY_ID=",     Sys.getenv("AWS_ACCESS_KEY_ID")),
+              paste0("AWS_SECRET_ACCESS_KEY=", Sys.getenv("AWS_SECRET_ACCESS_KEY")),
+              paste0("AWS_REGION=",            Sys.getenv("AWS_REGION"))
+            ), ".Renviron")
             # data/ is gitignored and re-pulled from S3 at app boot
             # (see R/s3_sync.R), so we exclude it from the bundle to
             # keep upload size small. renv/ holds the local library
@@ -77,19 +90,12 @@ jobs:
               appName     = "nccs-sector-in-brief-staging",
               account     = "urban-main",
               forceUpdate = TRUE,
-              # Upload the AWS keys as encrypted server-side env vars so
-              # the download form can invoke the IAM-authed API at runtime
-              # (rsconnect reads the values from this runner env).
-              envVars = c(
-                "AWS_ACCESS_KEY_ID",
-                "AWS_SECRET_ACCESS_KEY",
-                "AWS_REGION"
-              ),
               appFiles = c(
                 "app.R",
                 "DESCRIPTION",
                 "renv.lock",
                 ".Rprofile",
+                ".Renviron",
                 "renv/activate.R",
                 "renv/settings.json",
                 list.files("R",   full.names = TRUE, recursive = TRUE),
