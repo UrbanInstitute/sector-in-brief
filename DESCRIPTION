@@ -10,9 +10,9 @@ Description: Shiny dashboard for the Urban Institute's National Center for
     nonprofit sector -- number of organizations, finances, private-foundation
     grantmaking, and donor-advised funds -- with geographic and subsector
     filtering. Deployed via shinyapps.io at
-    https://nccs-urban.shinyapps.io/sector-in-brief/.
+    https://urban-main.shinyapps.io/sector-in-brief/.
 License: MIT + file LICENSE
-URL: https://nccs-urban.shinyapps.io/sector-in-brief/
+URL: https://urban-main.shinyapps.io/sector-in-brief/
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.0.0
