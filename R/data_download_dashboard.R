@@ -1,14 +1,24 @@
 # Custom Panel Datasets module. This is the dashboard's "secondary"
 # tab — instead of visualizing aggregated data, it lets users
-# request a custom-cut row-level extract of 990 filings delivered to
-# their email.
+# request a custom-cut row-level extract of 990 filings, delivered as
+# a download link (and emailed as a durable receipt).
 #
 # Two halves:
-#   - dataRequestUI()    — the multi-step form (form type, variables,
-#                           filters, email, confirm)
-#   - dataRequestServer()— validates the form, POSTs a JSON request
-#                           (see query_builder_download.R) to the
-#                           NCCS data-extract API, shows confirmation
+#   - dataRequestUI()    — the multi-step form (form type, org/subsector,
+#                           geography, dates, variables/format, contact,
+#                           review)
+#   - dataRequestServer()— validates the form, builds the request
+#                           (query_builder_download.R), calls the
+#                           modernized API (download_api_call.R) for a
+#                           size estimate and then the export, and shows
+#                           the download links (ADR 0008 / 0026)
+#
+# Delivery is pattern B (ADR 0026 §1): the API materializes the result to
+# S3 and returns presigned + durable links; the bytes never flow through
+# Shiny. Geography filters by collision-proof code (FIPS / CBSA code).
+# The asset-size filter is intentionally gone — the API has no range
+# filter for it (deferred), and dropping it removes the legacy
+# `asset_select` wiring bug.
 #
 # Mounted as the last nav_panel by app.R.
 
@@ -20,7 +30,6 @@
 dataRequestUI <- function(id, geo_df) {
   ns <- shiny::NS(id)
   choices <- choice_builder("download")
-  size <- names(choices$size)
   subsector <- choices$subsector
   bslib::card(
     bslib::card_title("Ready To Get Started?", class = "bg-light-gray"),
@@ -42,7 +51,7 @@ dataRequestUI <- function(id, geo_df) {
           shiny::radioButtons(
             inputId = ns("form_select"),
             label = "Select one option *",
-            choices = list("Form 990 Filers" = "990", 
+            choices = list("Form 990 Filers" = "990",
                            "Form 990 and Form 990-EZ Filers" = "990EZ"),
             inline = TRUE
           )
@@ -51,8 +60,8 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_type", "NEXT")
       ),
       bslib::accordion_panel(
-        title = accordion_title("Option 2: Organization, Subsector, and Size"),
-        value = "Option 2: Organization, Subsector, and Size",
+        title = accordion_title("Option 2: Organization and Subsector"),
+        value = "Option 2: Organization and Subsector",
         htmltools::br(),
         bslib::layout_column_wrap(
           htmltools::div(
@@ -83,35 +92,13 @@ dataRequestUI <- function(id, geo_df) {
                 htmltools::tagList(
                   htmltools::p("12 general categories of the",
                                htmltools::a(
-                                 "National Taxonomy of Exempt Entities (NTEE)", 
+                                 "National Taxonomy of Exempt Entities (NTEE)",
                                  href = ntee_link
                                ),
                                "code system.")
                 )
               ),
               choices = subsector,
-              multiple = TRUE,
-              options = list(`actions-box` = TRUE)
-            )
-          ),
-          htmltools::div(
-            class = "picker-urbn",
-            shinyWidgets::pickerInput(
-              inputId = ns("size_select"),
-              label = htmltools::tagList(
-                htmltools::tags$b("Organization Size *"),
-                htmltools::p(
-                  "Total assets from the IRS Business Master File grouped in five categories."
-                )
-              ),
-              choices = list(
-                "Under $100,000" = "1",
-                "$100,000 - $499,999" = "2",
-                "$500,000 - $999,999" = "3",
-                "$1,000,000 - $4,999,999" = "4",
-                "$5,000,000 - $9,999,999" = "5",
-                "Above $10,000,000" = "6"
-              ),
               multiple = TRUE,
               options = list(`actions-box` = TRUE)
             )
@@ -126,11 +113,11 @@ dataRequestUI <- function(id, geo_df) {
         download_geo_para,
         htmltools::br(),
         bslib::layout_column_wrap(
-          urban_virtualselect(ns, 
-                              "region_select", 
-                              htmltools::tags$b("Optional - Select Region(s)"), 
+          urban_virtualselect(ns,
+                              "region_select",
+                              htmltools::tags$b("Optional - Select Region(s)"),
                               c("Northeast", "Midwest", "South", "West")),
-          urban_virtualselect(ns, 
+          urban_virtualselect(ns,
                               "geo_select",
                               htmltools::tags$b("Select State(s)*"),
                               state_choices),
@@ -191,28 +178,38 @@ dataRequestUI <- function(id, geo_df) {
         urban_button(ns, "next_data", "NEXT")
       ),
       bslib::accordion_panel(
-        title = accordion_title("Option 5: Variables"),
-        value = "Option 5: Variables",
+        title = accordion_title("Option 5: Variables and Format"),
+        value = "Option 5: Variables and Format",
         download_fields_para,
-        htmltools::br(),
         htmltools::br(),
         htmltools::div(
           class = "switch-urbn",
-          bslib::input_switch(ns("all_data"), "All Data", TRUE)
+          bslib::input_switch(ns("all_data"), "Select all variables", FALSE)
         ),
         bslib::layout_column_wrap(
-          htmltools::div(),
           htmltools::div(
-            class = "urbn-checkbox",
-            shiny::checkboxGroupInput(
+            class = "picker-urbn",
+            shinyWidgets::pickerInput(
               inputId = ns("data_select"),
-              label = NULL,
-              choices = var_choices_990,
-              inline = FALSE,
-              width = "100%"
+              label = htmltools::tags$b("Variables"),
+              choices = download_column_choices(),
+              selected = download_column_defaults(),
+              multiple = TRUE,
+              options = list(`actions-box` = TRUE,
+                             `live-search` = TRUE,
+                             `selected-text-format` = "count > 3")
             )
           ),
-          htmltools::div()
+          htmltools::div(
+            class = "btn-radio-urbn",
+            shiny::radioButtons(
+              inputId = ns("format_select"),
+              label = htmltools::tags$b("File Format"),
+              choices = list("CSV" = "csv", "Parquet" = "parquet"),
+              selected = "csv",
+              inline = TRUE
+            )
+          )
         ),
         htmltools::br(),
         urban_button(ns, "next_user", "NEXT")
@@ -264,7 +261,7 @@ dataRequestUI <- function(id, geo_df) {
         title = accordion_title("Review Your Request"),
         value = "Review Your Request",
         htmltools::p(
-          "If you need to make any changes before submitting your request, 
+          "If you need to make any changes before submitting your request,
           navigate back to the appropriate section using the drop-down menus above."
         ),
         htmltools::br(),
@@ -281,13 +278,6 @@ dataRequestUI <- function(id, geo_df) {
             htmltools::h4("Organization Type", class = "center-justify"),
             htmltools::div(
               shiny::textOutput(ns("selected_org")),
-              class = "center-justify"
-            )
-          ),
-          htmltools::tagList(
-            htmltools::h4("Organization Size", class = "center-justify"),
-            htmltools::div(
-              shiny::textOutput(ns("selected_size")),
               class = "center-justify"
             )
           ),
@@ -332,10 +322,20 @@ dataRequestUI <- function(id, geo_df) {
               shiny::textOutput(ns("selected_variables")),
               class = "center-justify"
             )
+          ),
+          htmltools::tagList(
+            htmltools::h4("Format", class = "center-justify"),
+            htmltools::div(
+              shiny::textOutput(ns("selected_format")),
+              class = "center-justify"
+            )
           )
         ),
         htmltools::br(),
-        urban_button(ns, "start_data_download", "SUBMIT REQUEST")
+        urban_button(ns, "start_data_download", "SUBMIT REQUEST"),
+        htmltools::br(),
+        htmltools::br(),
+        htmltools::uiOutput(ns("download_result"))
       )
     )
   )
@@ -344,20 +344,31 @@ dataRequestUI <- function(id, geo_df) {
 # Server function for the module
 #' Server half of the Custom Panel Datasets module.
 #'
-#' Cascades state → county/CBSA choices, validates the form, packages
-#' the user's selections via `query_builder_download()`, POSTs to the
-#' NCCS data-extract API, and shows confirmation (or error).
+#' Cascades state → county/CBSA choices, validates the form, builds the
+#' request via `query_builder_download()`, calls the modernized API
+#' (`download_api_call()`) for a size estimate and then the export, and
+#' renders the download links (`download_link()`).
 #'
 #' @param id Module id (must match the UI half).
 #' @param geo_df Nested geographies lookup.
 dataRequestServer <- function(id, geo_df) {
   moduleServer(id, function(input, output, session) {
+    cfg <- download_api_config()
+    # Warn before committing to a large export (ADR 0026 §6). The size
+    # distribution is bimodal — most queries are trivial, a long tail is
+    # huge — so we warn only on the tail.
+    WARN_BYTES <- 50 * 1024^2
+    WARN_ROWS <- 250000L
+
+    dl_result <- shiny::reactiveVal(NULL)
+    req_full <- shiny::reactiveVal(NULL)
+
     # Update the open panel
     observeEvent(input$start_form, {
       bslib::accordion_panel_set(id = "accordion", value = "Option 1: Form Type")
     })
     observeEvent(input$next_type, {
-      bslib::accordion_panel_set(id = "accordion", value = "Option 2: Organization, Subsector, and Size")
+      bslib::accordion_panel_set(id = "accordion", value = "Option 2: Organization and Subsector")
     })
     observeEvent(input$next_geo, {
       if (length(input$org_select) == 0){
@@ -365,13 +376,6 @@ dataRequestServer <- function(id, geo_df) {
           session = session,
           title = "Error",
           text = "Please select at least one organization type",
-          type = "error"
-        )
-      } else if (length(input$size_select) == 0){
-        sendSweetAlert(
-          session = session,
-          title = "Error",
-          text = "Please select at least one size",
           type = "error"
         )
       } else if (length(input$subsector_select) == 0){
@@ -398,7 +402,7 @@ dataRequestServer <- function(id, geo_df) {
       }
     })
     observeEvent(input$next_data, {
-      bslib::accordion_panel_set(id = "accordion", value = "Option 5: Variables")
+      bslib::accordion_panel_set(id = "accordion", value = "Option 5: Variables and Format")
     })
     observeEvent(input$next_user, {
       bslib::accordion_panel_set(id = "accordion", value = "Contact Information")
@@ -422,7 +426,7 @@ dataRequestServer <- function(id, geo_df) {
         bslib::accordion_panel_set(id = "accordion", value = "Review Your Request")
       }
     })
-    
+
     # Update CBSA/County Inputs
     observeEvent(input$geo_select, {
       if (length(input$geo_select) > 0) {
@@ -436,16 +440,13 @@ dataRequestServer <- function(id, geo_df) {
         )
       }
     })
-    
-    # Change variable selection based on form type
+
+    # Form type controls the available tax-year range (990-EZ data starts
+    # in 2012). Variables are form-independent now (the API union_by_name
+    # null-fills columns absent from a form), so the variable picker no
+    # longer changes with the form type.
     observeEvent(input$form_select, {
       if (input$form_select == "990") {
-        shiny::updateCheckboxGroupInput(
-          session = session,
-          inputId = "data_select",
-          choices = var_choices_990,
-          selected = var_choices_990
-        )
         shinyWidgets::updatePickerInput(
           session = session,
           inputId = "start_year",
@@ -459,12 +460,6 @@ dataRequestServer <- function(id, geo_df) {
           selected = 2022
         )
       } else {
-        shiny::updateCheckboxGroupInput(
-          session = session,
-          inputId = "data_select",
-          choices = var_choices_990ez,
-          selected = var_choices_990ez
-        )
         shinyWidgets::updatePickerInput(
           session = session,
           inputId = "start_year",
@@ -479,41 +474,26 @@ dataRequestServer <- function(id, geo_df) {
         )
       }
     })
-    
-    # Button to select all variables
+
+    # "Select all variables" toggles the picker between the full catalog
+    # and the curated default set.
     observeEvent(input$all_data, {
-      if (input$all_data & input$form_select == "990") {
-        shiny::updateCheckboxGroupInput(
-          session = session,
-          inputId = "data_select",
-          selected = var_choices_990
-        )
-      } else if (input$all_data & input$form_select == "990EZ") {
-        shiny::updateCheckboxGroupInput(
-          session = session,
-          inputId = "data_select",
-          selected = var_choices_990ez
-        )
-      }
+      shinyWidgets::updatePickerInput(
+        session = session,
+        inputId = "data_select",
+        selected = if (isTRUE(input$all_data)) {
+          download_column_catalog()$api_name
+        } else {
+          download_column_defaults()
+        }
+      )
     })
-    
+
     output$selected_form <- renderText({
       input$form_select
     })
     output$selected_org <- renderText({
       paste(input$org_select, collapse = ", ")
-    })
-    output$selected_size <- renderText({
-      size_translate_list <- list(
-        "1" = "Under $100,000",
-        "2" = "$100,000 - $499,999",
-        "3" = "$500,000 - $999,999",
-        "4" = "$1,000,000 - $4,999,999",
-        "5" = "$5,000,000 - $9,999,999",
-        "6" = "Above $10,000,000"
-      )
-      size_translate <- size_translate_list[input$size_select]
-      paste(unlist(size_translate), collapse = ", ")
     })
     output$selected_subsector <- renderText({
       paste(input$subsector_select, collapse = ", ")
@@ -539,33 +519,132 @@ dataRequestServer <- function(id, geo_df) {
       paste(input$start_year, input$end_year, sep = " - ")
     })
     output$selected_variables <- renderText({
-      if (input$all_data) {
-        "All Data"
+      paste(length(input$data_select), "variables selected")
+    })
+    output$selected_format <- renderText({
+      toupper(input$format_select)
+    })
+
+    # Render the download links once an export completes (ADR 0026 §1/§3:
+    # link, never bytes; plus the "we've also emailed this" receipt).
+    output$download_result <- renderUI({
+      res <- dl_result()
+      if (is.null(res)) {
+        return(NULL)
+      }
+      durable <- res$download_url %||% download_link(res$download_path, config = cfg)
+      dict_url <- res$data_dictionary$url %||%
+        download_link(res$download_path, kind = "dictionary", config = cfg)
+      emailed <- !is.null(res$email) && identical(res$email$status, "sent")
+      htmltools::div(
+        class = "bg-box__white",
+        htmltools::h4("Your data is ready"),
+        htmltools::p(sprintf(
+          "%s rows · %s (%s)",
+          format(res$row_count %||% 0, big.mark = ","),
+          human_bytes(res$result$bytes),
+          toupper(res$result$format %||% input$format_select)
+        )),
+        htmltools::tags$ul(
+          htmltools::tags$li(
+            htmltools::a("Download your data", href = durable, target = "_blank")
+          ),
+          if (!is.null(dict_url)) {
+            htmltools::tags$li(
+              htmltools::a("Download the data dictionary", href = dict_url, target = "_blank")
+            )
+          }
+        ),
+        if (emailed) {
+          htmltools::p(
+            htmltools::tags$em(
+              sprintf("We've also emailed this link to %s.", res$email$to)
+            )
+          )
+        }
+      )
+    })
+
+    # Submit: size estimate -> warn-on-large -> export. The API runs the
+    # query and materializes to S3; we only ever move the small JSON and
+    # show the links it returns (pattern B).
+    shinyWidgets::useSweetAlert()
+
+    run_export <- function(payload) {
+      shiny::showModal(shiny::modalDialog(
+        htmltools::p("Preparing your export… this can take a moment for large requests."),
+        title = "Working", footer = NULL, easyClose = FALSE
+      ))
+      res <- download_api_call(payload, cfg)
+      shiny::removeModal()
+      if (!isTRUE(res$ok)) {
+        sendSweetAlert(
+          session = session,
+          title = "Something went wrong",
+          text = res$error %||% "The export could not be completed.",
+          type = "error"
+        )
+        return(invisible(NULL))
+      }
+      dl_result(res)
+    }
+
+    observeEvent(input$start_data_download, {
+      if (length(input$data_select) == 0) {
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "Please select at least one variable",
+          type = "error"
+        )
+        return()
+      }
+      dl_result(NULL)
+      full_payload <- query_builder_download(input, geo_df, estimate = FALSE)
+      req_full(full_payload)
+
+      shiny::showModal(shiny::modalDialog(
+        htmltools::p("Estimating the size of your export…"),
+        title = "Working", footer = NULL, easyClose = FALSE
+      ))
+      est <- download_api_call(
+        query_builder_download(input, geo_df, estimate = TRUE), cfg
+      )
+      shiny::removeModal()
+
+      if (!isTRUE(est$ok)) {
+        sendSweetAlert(
+          session = session,
+          title = "Something went wrong",
+          text = est$error %||% "Could not estimate the export size.",
+          type = "error"
+        )
+        return()
+      }
+
+      rows <- est$row_count %||% 0
+      bytes <- est$estimated_bytes %||% 0
+      if (bytes > WARN_BYTES || rows > WARN_ROWS) {
+        shinyWidgets::confirmSweetAlert(
+          session = session,
+          inputId = "confirm_large",
+          title = "Large export",
+          text = sprintf(
+            "This export is about %s rows (~%s). Large downloads can take longer to prepare. Continue?",
+            format(rows, big.mark = ","), human_bytes(bytes)
+          ),
+          type = "warning",
+          btn_labels = c("Cancel", "Download anyway")
+        )
       } else {
-        var_length <- length(input$data_select)
-        paste(var_length, "variables selected")
+        run_export(full_payload)
       }
     })
-    
-    # Create the query
 
-    shinyWidgets::useSweetAlert()
-    observeEvent(input$start_data_download, {
-      request <- query_builder_download(input)
-      sendSweetAlert(
-        session = session,
-        title = "Success",
-        text = "Your data request has been submitted successfully. A link to a .csv file containing your requested data and an accompanying data dictionary will be sent to your email within the next hour.",
-        type = "success"
-      )
-      response <- httr::POST(
-        url = "https://qf8i5d1vg2.execute-api.us-east-1.amazonaws.com/stg/data/",
-        body = request,
-        encode = "json",
-        httr::add_headers(
-          "Content-Type" = "application/json"
-        )
-      )
+    observeEvent(input$confirm_large, {
+      if (isTRUE(input$confirm_large)) {
+        run_export(req_full())
+      }
     })
  })
 }
