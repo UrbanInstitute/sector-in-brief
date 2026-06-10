@@ -31,6 +31,11 @@ download_column_catalog <- function() {
   tibble::tribble(
     ~api_name,             ~label,                         ~group,           ~default,
     # --- Identification ---
+    # `tax_years` in the request only selects which year-partitions to read;
+    # this column echoes the year into each output row (essential for
+    # multi-year exports). Harmonized name confirmed in the core dictionary;
+    # not to be confused with `extract_year` (the SOI processing year).
+    "tax_year",            "Tax year",                     "Identification", TRUE,
     "org_name_display",    "Organization name",            "Identification", TRUE,
     # --- Classification ---
     "nteev2",              "NTEE-V2 code",                 "Classification", TRUE,
