@@ -13,13 +13,18 @@
 # Column-name provenance: identity / geography / classification names are
 # fixed by openapi.yaml + docs/dashboard-integration-handoff.md (the geo
 # names are crosswalk-derived per ADR 0021/0023). The FINANCIAL set is
-# seeded with the names documented in the contract; expand it only after
-# confirming the exact names against a staging response's
-# `data_dictionary` (an unknown name 400s the whole request). See the
-# TODO marker below.
+# form-specific: 990/990-EZ/990-combined share the 990 totals, but 990-PF
+# has an ENTIRELY DIFFERENT Part I schema (no total_revenue/total_expenses/
+# total_net_assets_eoy — the API 400s on those for a 990-PF query). All
+# names confirmed against the live core dictionaries (an unknown name 400s
+# the whole request).
 
 #' Curated catalog of columns offered in the download form.
 #'
+#' @param form Selected form code (`"990"`, `"990ez"`, `"990combined"`, or
+#'   `"990pf"`). Only the Financials block differs by form — 990-PF reports
+#'   its own Part I line items, so requesting the 990 totals against a
+#'   990-PF query is rejected by the API.
 #' @return A tibble with one row per selectable column:
 #'   * `api_name` — new parquet column name sent to the API.
 #'   * `label` — human-facing label shown in the picker.
@@ -27,8 +32,8 @@
 #'   * `default` — pre-selected (user-deselectable) when TRUE.
 #'   `ein` is intentionally absent: the API force-includes it, so it is
 #'   never user-facing.
-download_column_catalog <- function() {
-  tibble::tribble(
+download_column_catalog <- function(form = "990") {
+  base <- tibble::tribble(
     ~api_name,             ~label,                         ~group,           ~default,
     # --- Identification ---
     # `tax_years` in the request only selects which year-partitions to read;
@@ -37,7 +42,7 @@ download_column_catalog <- function() {
     # not to be confused with `extract_year` (the SOI processing year).
     "tax_year",            "Tax year",                     "Identification", TRUE,
     "org_name_display",    "Organization name",            "Identification", TRUE,
-    # --- Classification ---
+    # --- Classification --- (BMF/derived; form-independent)
     "nteev2",              "NTEE-V2 code",                 "Classification", TRUE,
     "nteev2_subsector",    "Subsector (NTEE major group)", "Classification", TRUE,
     # Plain-English label for the subsector code above. API-derived to the
@@ -47,22 +52,52 @@ download_column_catalog <- function() {
     "nteev2_subsector_definition", "Subsector (plain-English label)", "Classification", TRUE,
     "org_type",            "Organization type (501(c))",   "Classification", TRUE,
     "ntee_common_code",    "NTEE common code",             "Classification", FALSE,
-    # --- Geography ---
+    # --- Geography --- (crosswalk-derived; form-independent)
     "geo_state_abbr",      "State",                        "Geography",      TRUE,
     "geo_county_canonical","County (canonical name)",      "Geography",      TRUE,
     "geo_county_fips",     "County FIPS",                  "Geography",      FALSE,
     "cbsa_title",          "Metro/Micro area",             "Geography",      FALSE,
     "cbsa_code",           "CBSA code",                    "Geography",      FALSE,
-    "census_region",       "Census region",                "Geography",      TRUE,
-    # --- Financials ---
-    # Names are core harmonized_names confirmed against the live staging
-    # schema (dev/smoke_raw.R per-column probe, 2026-06-09).
-    "total_revenue",       "Total revenue",                "Financials",     TRUE,
-    "total_expenses",      "Total functional expenses",    "Financials",     TRUE,
-    "total_assets_eoy",    "Total assets (end of year)",   "Financials",     TRUE,
-    "total_liabilities_eoy","Total liabilities (end of year)", "Financials",  FALSE,
-    "total_net_assets_eoy","Total net assets (end of year)", "Financials",   FALSE
+    "census_region",       "Census region",                "Geography",      TRUE
   )
+  rbind(base, download_financials_catalog(form))
+}
+
+#' Form-specific Financials block for the download catalog.
+#'
+#' 990/990-EZ/990-combined share the harmonized 990 totals. 990-PF has a
+#' separate Part I schema, so it gets its own set (the `*_col_a` columns are
+#' the "revenue and expenses per books" column; total_revenue/total_expenses/
+#' total_net_assets_eoy simply do not exist for 990-PF). All names verified
+#' against the live core dictionaries.
+#'
+#' @param form Selected form code.
+#' @return A catalog tibble (same columns as `download_column_catalog`).
+download_financials_catalog <- function(form = "990") {
+  if (identical(form, "990pf")) {
+    tibble::tribble(
+      ~api_name,                         ~label,                                    ~group,       ~default,
+      "total_revenue_col_a",             "Total revenue (per books)",               "Financials", TRUE,
+      "total_expenses_col_a",            "Total expenses (per books)",              "Financials", TRUE,
+      "net_investment_income",           "Net investment income",                   "Financials", TRUE,
+      "qualifying_distributions_curr_yr","Qualifying distributions (current year)", "Financials", TRUE,
+      "total_assets_eoy",                "Total assets (end of year, book value)",  "Financials", TRUE,
+      "fair_mkt_value_total_assets_eoy", "Total assets (fair market value)",        "Financials", FALSE,
+      "total_liabilities_eoy",           "Total liabilities (end of year)",         "Financials", FALSE,
+      "contributions_received",          "Contributions received",                  "Financials", FALSE,
+      "contributions_paid",              "Contributions and grants paid",           "Financials", FALSE,
+      "distributable_amount",            "Distributable amount",                    "Financials", FALSE
+    )
+  } else {
+    tibble::tribble(
+      ~api_name,              ~label,                            ~group,       ~default,
+      "total_revenue",        "Total revenue",                   "Financials", TRUE,
+      "total_expenses",       "Total functional expenses",       "Financials", TRUE,
+      "total_assets_eoy",     "Total assets (end of year)",      "Financials", TRUE,
+      "total_liabilities_eoy","Total liabilities (end of year)", "Financials", FALSE,
+      "total_net_assets_eoy", "Total net assets (end of year)",  "Financials", FALSE
+    )
+  }
 }
 
 #' Picker choices grouped for `shinyWidgets::pickerInput` (label -> name).

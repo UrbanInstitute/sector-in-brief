@@ -73,14 +73,6 @@ dataRequestUI <- function(id, geo_df) {
             inline = TRUE
           )
         ),
-        htmltools::p(
-          class = "filter-hint",
-          htmltools::tags$em(
-            "“Combined” returns Form 990 and Form 990-EZ filers in a ",
-            "single dataset; pick it instead of — not alongside — the ",
-            "individual 990 or 990-EZ options."
-          )
-        ),
         htmltools::br(),
         urban_button(ns, "next_type", "NEXT")
       ),
@@ -466,36 +458,60 @@ dataRequestServer <- function(id, geo_df) {
       }
     })
 
-    # Form type controls the available tax-year range (990-EZ data starts
-    # in 2012; the other forms go back to 1989). Variables are
-    # form-independent now (the API union_by_name null-fills columns absent
-    # from a form), so the variable picker no longer changes with the form.
+    # Form type drives three things:
+    #  (1) the tax-year range (990-EZ data starts in 2012; others from 1989);
+    #  (2) the variable catalog — 990-PF has a different Part I financial
+    #      schema, so the Financials block changes with the form (requesting
+    #      the 990 totals against a 990-PF query is rejected by the API);
+    #  (3) Organization Type — only private foundations file a 990-PF, so the
+    #      picker is constrained to that single value for 990-PF.
     observeEvent(input$form_select, {
       years <- download_form_min_year(input$form_select):DOWNLOAD_MAX_TAX_YEAR
       shinyWidgets::updatePickerInput(
-        session = session,
-        inputId = "start_year",
-        choices = years,
-        selected = min(years)
+        session = session, inputId = "start_year",
+        choices = years, selected = min(years)
       )
       shinyWidgets::updatePickerInput(
-        session = session,
-        inputId = "end_year",
-        choices = years,
-        selected = max(years)
+        session = session, inputId = "end_year",
+        choices = years, selected = max(years)
       )
+
+      catalog <- download_column_catalog(input$form_select)
+      shinyWidgets::updatePickerInput(
+        session = session, inputId = "data_select",
+        choices = download_column_choices(catalog),
+        selected = if (isTRUE(input$all_data)) {
+          catalog$api_name
+        } else {
+          download_column_defaults(catalog)
+        }
+      )
+
+      if (identical(input$form_select, "990pf")) {
+        shinyWidgets::updatePickerInput(
+          session = session, inputId = "org_select",
+          choices = ctype_id["501(c)(3) - Private Foundations"],
+          selected = "501(c)(3) Private Foundations"
+        )
+      } else {
+        shinyWidgets::updatePickerInput(
+          session = session, inputId = "org_select",
+          choices = ctype_id
+        )
+      }
     })
 
     # "Select all variables" toggles the picker between the full catalog
-    # and the curated default set.
+    # and the curated default set — for the currently selected form.
     observeEvent(input$all_data, {
+      catalog <- download_column_catalog(input$form_select)
       shinyWidgets::updatePickerInput(
         session = session,
         inputId = "data_select",
         selected = if (isTRUE(input$all_data)) {
-          download_column_catalog()$api_name
+          catalog$api_name
         } else {
-          download_column_defaults()
+          download_column_defaults(catalog)
         }
       )
     })

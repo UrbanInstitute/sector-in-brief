@@ -42,9 +42,11 @@ navbar_title <- htmltools::h4(
 )
 
 form_data <- tibble::tribble(
-  ~Option, ~Data_Source, ~Variable_Availability, ~Year_Availability,
-  'Form 990 Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "1,654,300 nonprofits", "All 547 paper-form variables", "2012-2023",
-  'Form 990 + Form 990-EZ Filers [<a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv">data dictionary link</a>]', "2,765,384 nonprofits", "236 variables in the EZ version, which also appear in the Form 990.", "1989-2023"
+  ~Option, ~Variable_Availability, ~Year_Availability, ~Notes,
+  "Form 990", "Full Form 990 financials plus identity, geography, and NTEE classification.", "1989-2023", "",
+  "Form 990-EZ", "Form 990-EZ filers; the EZ variables also appear in Form 990.", "2012-2023", "",
+  "Form 990 + 990-EZ (combined)", "990 and 990-EZ filers unioned into a single dataset.", "1989-2023", "Choose instead of — not alongside — the individual 990 or 990-EZ options (selecting both would double-count).",
+  "Form 990-PF", "Form 990-PF Part I line items (revenue/expenses per books, net investment income, qualifying distributions, assets).", "1989-2023", "Private foundations only."
 )
 
 download_table <- reactable::reactable(
@@ -66,21 +68,21 @@ download_table <- reactable::reactable(
   ),
   columns = list(
     Option = colDef(
-      width = 150,
+      width = 180,
       name = "Form Type",
       html = TRUE
     ),
-    Data_Source = reactable::colDef(
-      width = 250,
-      name = "Number of Nonprofits"
-    ),
     Variable_Availability = colDef(
-      width = 250,
+      minWidth = 240,
       name = "Variables"
     ),
     Year_Availability = colDef(
-      width = 150,
+      width = 110,
       name = "Years"
+    ),
+    Notes = colDef(
+      minWidth = 220,
+      name = "Notes"
     )
   ),
   striped = TRUE,
