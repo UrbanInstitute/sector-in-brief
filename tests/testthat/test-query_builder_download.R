@@ -108,6 +108,22 @@ test_that("column catalog: defaults are a subset of all api_names, ein excluded"
   expect_true(all(c("Geography", "Financials") %in% names(ch)))
 })
 
+test_that("column catalog is form-aware: 990-PF gets its own financials", {
+  std <- download_column_catalog("990")
+  pf  <- download_column_catalog("990pf")
+  # 990 totals that do NOT exist in the 990-PF schema must be absent for PF
+  absent_for_pf <- c("total_revenue", "total_expenses", "total_net_assets_eoy")
+  expect_true(all(absent_for_pf %in% std$api_name))
+  expect_false(any(absent_for_pf %in% pf$api_name))
+  # PF-specific Part I fields present + default
+  expect_true(all(c("total_revenue_col_a", "net_investment_income",
+                    "qualifying_distributions_curr_yr") %in% pf$api_name))
+  expect_true("net_investment_income" %in% download_column_defaults(pf))
+  # shared base columns identical across forms
+  base <- c("tax_year", "org_type", "nteev2_subsector_definition", "geo_state_abbr")
+  expect_true(all(base %in% std$api_name) && all(base %in% pf$api_name))
+})
+
 test_that("human_bytes formats short-scale sizes", {
   expect_equal(human_bytes(0), "0 B")
   expect_equal(human_bytes(2.91 * 1024^2), "2.9 MB")
