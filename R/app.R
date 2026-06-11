@@ -164,22 +164,32 @@ app <- function(...) {
       shiny::updateTabsetPanel(session, "tabs", selected = download_link_page)
     })
 
-    # Exclude high-frequency / non-state inputs from the URL. Click
-    # counters add noise and would push the URL past most clients'
-    # length budgets after enough interaction.
-    shiny::setBookmarkExclude(c(
-      "visual_link", "download_link", "data_download-start_form"
-    ))
-
-    # Auto-bookmark on input change. reactiveValuesToList() touches
-    # every input so the observer re-runs whenever any changes;
-    # doBookmark() → onBookmarked() → updateQueryString() pushes the
-    # current state into the URL bar.
+    # Auto-bookmark on input change. reactiveValuesToList() touches every
+    # input so the observer re-runs whenever any changes; doBookmark() →
+    # onBookmarked() → updateQueryString() pushes the current state into
+    # the URL bar.
+    #
+    # Bookmarking exists to make the *visualization* filter selections
+    # shareable. The Custom Panel Datasets download wizard
+    # (`data_download-*` namespace) is a transient, single-session flow,
+    # not shareable state — and it registers heavy inputs (the geography
+    # tree, the variable-picker list, and a string of step click-counters).
+    # Serialized into the URL on every change those bloat the bookmark; the
+    # leading suspect for the post-export disconnect is an oversized URL /
+    # WS frame after walking the wizard. So exclude the whole download
+    # namespace by prefix (recomputed each fire to catch newly-registered
+    # inputs), alongside the static high-frequency nav-link excludes.
     shiny::observe({
-      shiny::reactiveValuesToList(input)
+      input_names <- names(shiny::reactiveValuesToList(input))
+      download_inputs <- grep("^data_download-", input_names, value = TRUE)
+      shiny::setBookmarkExclude(c("visual_link", "download_link",
+                                  download_inputs))
       session$doBookmark()
     })
     shiny::onBookmarked(function(url) {
+      # Log URL length so the staging logs are a measurement even if the
+      # disconnect persists (is the bookmark URL actually oversized?).
+      message("[bookmark] URL length: ", nchar(url), " chars")
       shiny::updateQueryString(url)
     })
   }
