@@ -187,9 +187,6 @@ app <- function(...) {
       session$doBookmark()
     })
     shiny::onBookmarked(function(url) {
-      # Log URL length so the staging logs are a measurement even if the
-      # disconnect persists (is the bookmark URL actually oversized?).
-      message("[bookmark] URL length: ", nchar(url), " chars")
       shiny::updateQueryString(url)
     })
   }
