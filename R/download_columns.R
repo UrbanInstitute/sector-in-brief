@@ -24,7 +24,10 @@
 #' @param form Selected form code (`"990"`, `"990ez"`, `"990combined"`, or
 #'   `"990pf"`). Only the Financials block differs by form — 990-PF reports
 #'   its own Part I line items, so requesting the 990 totals against a
-#'   990-PF query is rejected by the API.
+#'   990-PF query is rejected by the API. Ignored when `source = "bmf"`.
+#' @param source Query mode (ADR 0029): `"core"` (default, filing-level —
+#'   the form-aware catalog below) or `"bmf"` (org-level registry — no
+#'   financials, no tax year; see `download_bmf_catalog()`).
 #' @return A tibble with one row per selectable column:
 #'   * `api_name` — new parquet column name sent to the API.
 #'   * `label` — human-facing label shown in the picker.
@@ -32,7 +35,10 @@
 #'   * `default` — pre-selected (user-deselectable) when TRUE.
 #'   `ein` is intentionally absent: the API force-includes it, so it is
 #'   never user-facing.
-download_column_catalog <- function(form = "990") {
+download_column_catalog <- function(form = "990", source = "core") {
+  if (identical(source, "bmf")) {
+    return(download_bmf_catalog())
+  }
   base <- tibble::tribble(
     ~api_name,             ~label,                         ~group,           ~default,
     # --- Identification ---
@@ -106,6 +112,46 @@ download_financials_catalog <- function(form = "990") {
       "total_net_assets_eoy", "Total net assets (end of year)",  "Financials", FALSE
     )
   }
+}
+
+#' Org-level (BMF) column catalog (ADR 0029, `source = "bmf"`).
+#'
+#' The BMF registry is one row per EIN for every registered nonprofit
+#' (including non-filers), so it has NO financials and NO tax-year column —
+#' the Financials block and `tax_year` are absent. The crosswalk-derived
+#' geography + classification columns are the same as core mode. Defaults
+#' are the dashboard's pick (the API forces only `ein`): organization name,
+#' state, org type, and subsector. `first_year_in_bmf`/`last_year_in_bmf`
+#' (the registry lifespan) are default-on because the API force-appends them
+#' whenever the `active_years` filter is applied (filter provenance) — so
+#' the picker reflects what actually comes back.
+#'
+#' @return A catalog tibble (same columns as `download_column_catalog`).
+download_bmf_catalog <- function() {
+  tibble::tribble(
+    ~api_name,             ~label,                         ~group,             ~default,
+    # --- Identification --- (no tax_year: the registry has no filing year)
+    "org_name_display",    "Organization name",            "Identification",   TRUE,
+    # --- Registry coverage --- (org lifespan; force-appended by the API
+    # when active_years is applied, so surfaced default-on)
+    "first_year_in_bmf",   "First year in registry",       "Registry coverage", TRUE,
+    "last_year_in_bmf",    "Last year in registry",        "Registry coverage", TRUE,
+    # --- Classification ---
+    "nteev2",              "NTEE-V2 code",                 "Classification",   FALSE,
+    "nteev2_subsector",    "Subsector (NTEE major group)", "Classification",   TRUE,
+    "nteev2_subsector_definition", "Subsector (plain-English label)", "Classification", TRUE,
+    "org_type",            "Organization type (501(c))",   "Classification",   TRUE,
+    "ntee_common_code",    "NTEE common code",             "Classification",   FALSE,
+    # --- Geography ---
+    "geo_state_abbr",      "State",                        "Geography",        TRUE,
+    "geo_county_canonical","County (canonical name)",      "Geography",        FALSE,
+    "geo_county_fips",     "County FIPS",                  "Geography",        FALSE,
+    "cbsa_title",          "Metro/Micro area",             "Geography",        FALSE,
+    "cbsa_code",           "CBSA code",                    "Geography",        FALSE,
+    "census_region",       "Census region",                "Geography",        FALSE,
+    "geo_lat",             "Latitude (WGS 84)",            "Geography",        FALSE,
+    "geo_lon",             "Longitude (WGS 84)",           "Geography",        FALSE
+  )
 }
 
 #' Picker choices grouped for `shinyWidgets::pickerInput` (label -> name).

@@ -26,6 +26,34 @@ download_date_para <- htmltools::p(
       "Tax years are the periods nonprofits use to calculate their financial statements. They span January to December like a typical calendar year but lag calendar years by two years, on average. Note: If you select 2022 data, the dataset will be incomplete because the IRS is still releasing full tax records for that year."
     )
 
+# Query-mode (ADR 0029) chooser copy. CORE = filing-level 990 data; BMF =
+# the org-level IRS Business Master File registry (incl. non-filers), with
+# no financials. Rich (HTML) radio labels so the trade-off is legible.
+bmf_link <- "https://nccs.urban.org/nccs/datasets/bmf/"
+download_source_label <- htmltools::tags$b("What kind of data do you want? *")
+download_source_corename <- htmltools::HTML(
+  "<b>990 filings</b> &mdash; financial and operational data reported by organizations that filed a Form 990, 990-EZ, or 990-PF in the tax years you choose."
+)
+download_source_bmfname <- htmltools::HTML(paste0(
+  "<b>BMF</b> &mdash; the IRS Business Master File: every registered nonprofit ",
+  "(including organizations that have never filed a 990), <b>kept current ",
+  "through 2026</b>. Names and demographics &mdash; location, subsector, ",
+  "organization type &mdash; but <b>no financials</b>. Best for current ",
+  "questions like how many nonprofits are in a state and how they are ",
+  "distributed by location or subsector. <a href=\"", bmf_link,
+  "\" target=\"_blank\" rel=\"noopener\">Learn more about the BMF</a>."
+))
+# BMF date step: active_years is a lifespan-overlap filter, NOT a tax year.
+# The registry is current (through 2026) — unlike CORE's ~2-year filing lag —
+# which is the point of BMF for "how many are active now" questions.
+download_active_para <- htmltools::p(
+  "Select the period during which an organization was active in the IRS ",
+  "registry, which is current through 2026. This returns organizations active ",
+  "at any point in the range (based on their first and last year in the ",
+  "Business Master File); for a current snapshot, choose the most recent year. ",
+  "It is not a tax-filing year, and the registry carries no financial data."
+)
+
 download_fields_para <- htmltools::p(
   "Choose the variables (columns) to include in your extract, grouped by",
   "identification, classification, geography, and finances. Every record",
