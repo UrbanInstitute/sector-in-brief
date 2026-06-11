@@ -28,6 +28,12 @@
 # semantics"). Bump when the API's complete-year coverage advances.
 DOWNLOAD_MAX_TAX_YEAR <- 2023L
 
+# Latest "active" year offered in BMF (org-registry) mode. The BMF registry
+# is kept current — unlike CORE's ~2-year filing lag — so its active_years
+# range extends past DOWNLOAD_MAX_TAX_YEAR to the registry's current vintage.
+# Bump as the registry advances.
+BMF_MAX_ACTIVE_YEAR <- 2026L
+
 # Earliest tax year per form code. 990-EZ data starts in 2012; everything
 # else (incl. the 990+990-EZ union and 990-PF) goes back to 1989.
 download_form_min_year <- function(form) {
@@ -46,6 +52,19 @@ dataRequestUI <- function(id, geo_df) {
   bslib::card(
     bslib::card_title("Ready To Get Started?", class = "bg-light-gray"),
     urban_button(ns, "start_form", "REQUEST DATA"),
+    # Query mode (ADR 0029): filing-level 990 data (CORE) vs the org-level
+    # BMF registry incl. non-filers (no financials). Drives which steps and
+    # columns show below; the server reshapes the form on change.
+    htmltools::div(
+      class = "btn-radio-urbn__lg download-source-toggle",
+      shiny::radioButtons(
+        inputId = ns("source_select"),
+        label = download_source_label,
+        choiceNames = list(download_source_corename, download_source_bmfname),
+        choiceValues = c("core", "bmf"),
+        selected = "core"
+      )
+    ),
     bslib::accordion(
       id = ns("accordion"),
       open = FALSE,
@@ -53,24 +72,40 @@ dataRequestUI <- function(id, geo_df) {
         title = accordion_title("Option 1: Form Type"),
         value = "Option 1: Form Type",
         htmltools::br(),
-        htmltools::div(
-          class = "bg-box__white",
-          download_table
+        # Form type applies only to filing-level (CORE) data. The BMF
+        # registry has no filing-form concept, so hide the picker and
+        # explain why when that mode is selected.
+        shiny::conditionalPanel(
+          condition = "input.source_select != 'bmf'",
+          ns = ns,
+          htmltools::div(
+            class = "bg-box__white",
+            download_table
+          ),
+          htmltools::br(),
+          htmltools::div(
+            class = "btn-radio-urbn__lg",
+            shiny::radioButtons(
+              inputId = ns("form_select"),
+              label = "Select one option *",
+              choices = list(
+                "Form 990"                 = "990",
+                "Form 990-EZ"              = "990ez",
+                "Form 990 + 990-EZ (combined)" = "990combined",
+                "Form 990-PF"              = "990pf"
+              ),
+              selected = "990",
+              inline = TRUE
+            )
+          )
         ),
-        htmltools::br(),
-        htmltools::div(
-          class = "btn-radio-urbn__lg",
-          shiny::radioButtons(
-            inputId = ns("form_select"),
-            label = "Select one option *",
-            choices = list(
-              "Form 990"                 = "990",
-              "Form 990-EZ"              = "990ez",
-              "Form 990 + 990-EZ (combined)" = "990combined",
-              "Form 990-PF"              = "990pf"
-            ),
-            selected = "990",
-            inline = TRUE
+        shiny::conditionalPanel(
+          condition = "input.source_select == 'bmf'",
+          ns = ns,
+          htmltools::p(
+            "Form type doesn't apply to the BMF registry — it lists every",
+            "registered nonprofit regardless of which 990 (if any) they filed.",
+            "Continue to the next section."
           )
         ),
         htmltools::br(),
@@ -165,7 +200,16 @@ dataRequestUI <- function(id, geo_df) {
       bslib::accordion_panel(
         title = accordion_title("Option 4: Date Range"),
         value = "Option 4: Date Range",
-        download_date_para,
+        # CORE filters by tax (filing) year; BMF by registry-lifespan
+        # overlap ("active during"). Different question, different copy.
+        shiny::conditionalPanel(
+          condition = "input.source_select != 'bmf'", ns = ns,
+          download_date_para
+        ),
+        shiny::conditionalPanel(
+          condition = "input.source_select == 'bmf'", ns = ns,
+          download_active_para
+        ),
         htmltools::br(),
         bslib::layout_column_wrap(
           htmltools::div(
@@ -458,36 +502,40 @@ dataRequestServer <- function(id, geo_df) {
       }
     })
 
-    # Form type drives three things:
-    #  (1) the tax-year range (990-EZ data starts in 2012; others from 1989);
-    #  (2) the variable catalog — 990-PF has a different Part I financial
-    #      schema, so the Financials block changes with the form (requesting
-    #      the 990 totals against a 990-PF query is rejected by the API);
-    #  (3) Organization Type — only private foundations file a 990-PF, so the
-    #      picker is constrained to that single value for 990-PF.
-    observeEvent(input$form_select, {
-      years <- download_form_min_year(input$form_select):DOWNLOAD_MAX_TAX_YEAR
+    current_source <- function() input$source_select %||% "core"
+
+    # The year field is a tax-filing-year range in CORE mode and an "active
+    # during" registry-lifespan range in BMF mode (ADR 0029). BMF has no
+    # per-form floor and runs to the current registry vintage
+    # (BMF_MAX_ACTIVE_YEAR, past CORE's ~2-year filing lag); CORE's floor is
+    # form-driven (990-EZ starts 2012) and tops out at DOWNLOAD_MAX_TAX_YEAR.
+    # BMF defaults to the single most-recent year (a current snapshot — the
+    # "how many are active now" question); CORE defaults to its full span.
+    refresh_year_range <- function() {
+      bmf <- identical(current_source(), "bmf")
+      years <- if (bmf) {
+        1989:BMF_MAX_ACTIVE_YEAR
+      } else {
+        download_form_min_year(input$form_select):DOWNLOAD_MAX_TAX_YEAR
+      }
       shinyWidgets::updatePickerInput(
         session = session, inputId = "start_year",
-        choices = years, selected = min(years)
+        label = if (bmf) "Active From Year *" else "From Tax Year *",
+        choices = years, selected = if (bmf) max(years) else min(years)
       )
       shinyWidgets::updatePickerInput(
         session = session, inputId = "end_year",
+        label = if (bmf) "Active Through Year *" else "Through Tax Year *",
         choices = years, selected = max(years)
       )
+    }
 
-      catalog <- download_column_catalog(input$form_select)
-      shinyWidgets::updatePickerInput(
-        session = session, inputId = "data_select",
-        choices = download_column_choices(catalog),
-        selected = if (isTRUE(input$all_data)) {
-          catalog$api_name
-        } else {
-          download_column_defaults(catalog)
-        }
-      )
-
-      if (identical(input$form_select, "990pf")) {
+    # Organization Type: only private foundations file a 990-PF, so the CORE
+    # 990-PF picker is constrained to that single value. Every other CORE
+    # form and all of BMF (which has no form concept) offers the full set.
+    refresh_org_choices <- function() {
+      if (identical(current_source(), "core") &&
+          identical(input$form_select, "990pf")) {
         shinyWidgets::updatePickerInput(
           session = session, inputId = "org_select",
           choices = ctype_id["501(c)(3) - Private Foundations"],
@@ -499,25 +547,46 @@ dataRequestServer <- function(id, geo_df) {
           choices = ctype_id
         )
       }
-    })
+    }
 
-    # "Select all variables" toggles the picker between the full catalog
-    # and the curated default set — for the currently selected form.
-    observeEvent(input$all_data, {
-      catalog <- download_column_catalog(input$form_select)
+    # Variable catalog is mode- and form-aware: BMF drops the Financials
+    # block and tax_year (no filings) and adds the registry-lifespan cols;
+    # CORE's Financials block changes with the form (990-PF Part I differs).
+    refresh_variables <- function() {
+      catalog <- download_column_catalog(input$form_select %||% "990",
+                                         current_source())
       shinyWidgets::updatePickerInput(
-        session = session,
-        inputId = "data_select",
+        session = session, inputId = "data_select",
+        choices = download_column_choices(catalog),
         selected = if (isTRUE(input$all_data)) {
           catalog$api_name
         } else {
           download_column_defaults(catalog)
         }
       )
+    }
+
+    # Switching query mode or form rebuilds the year range, org-type
+    # choices, and variable catalog together.
+    observeEvent(input$source_select, {
+      refresh_year_range(); refresh_org_choices(); refresh_variables()
+    })
+    observeEvent(input$form_select, {
+      refresh_year_range(); refresh_org_choices(); refresh_variables()
+    })
+
+    # "Select all variables" toggles between the full catalog and the
+    # curated default set — for the current mode + form.
+    observeEvent(input$all_data, {
+      refresh_variables()
     })
 
     output$selected_form <- renderText({
-      input$form_select
+      if (identical(current_source(), "bmf")) {
+        "BMF registry (all registered nonprofits)"
+      } else {
+        input$form_select
+      }
     })
     output$selected_org <- renderText({
       paste(input$org_select, collapse = ", ")

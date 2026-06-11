@@ -38,7 +38,10 @@ geo_names_to_codes <- function(names, states, geo_df, name_col, code_col) {
 
 #' Build the export request body from the form's inputs.
 #'
-#' @param inputs Form inputs gathered by `dataRequestServer()`.
+#' @param inputs Form inputs gathered by `dataRequestServer()`. `source_select`
+#'   picks the query mode (ADR 0029): `"core"` (default) sends `tax_years` +
+#'   `forms`; `"bmf"` sends `source:"bmf"` + `active_years` (registry-lifespan
+#'   overlap) and omits `tax_years`/`forms`, which the API rejects in that mode.
 #' @param geo_df Nested-geographies lookup, used to translate county/metro
 #'   names to FIPS/CBSA codes.
 #' @param estimate When TRUE, sets `"estimate": true` so the API returns a
@@ -48,27 +51,20 @@ geo_names_to_codes <- function(names, states, geo_df, name_col, code_col) {
 #'   fields stay vectors (serialized as JSON arrays even when length 1);
 #'   scalar fields are `jsonlite::unbox`-ed.
 query_builder_download <- function(inputs, geo_df, estimate = FALSE) {
-  # Form-type radio -> API `forms`. The radio is single-select and its
-  # values already are the API form codes, so this just validates the
-  # choice and falls back to plain 990 for anything unexpected. 990combined
-  # already unions 990 + 990-EZ, which is why it is its own option rather
-  # than something the user combines with 990/990ez (that would
-  # double-count — see openapi.yaml).
-  forms <- switch(
-    inputs$form_select,
-    "990"         = "990",
-    "990ez"       = "990ez",
-    "990combined" = "990combined",
-    "990pf"       = "990pf",
-    "990"
-  )
+  # Query mode (ADR 0029): "core" (default, filing-level, filtered by
+  # tax_years + forms) or "bmf" (org-level registry, filtered by
+  # active_years; tax_years/forms rejected). The mode reshapes the year
+  # field and the column catalog and is the only structural fork here.
+  src <- inputs$source_select %||% "core"
 
   # Columns: the catalog picker returns new api_names directly; fall back
-  # to the curated defaults if somehow empty. `ein` is force-included by
-  # the API, so we never send it.
+  # to the (mode- and form-aware) curated defaults if somehow empty. `ein`
+  # is force-included by the API, so we never send it.
   columns <- inputs$data_select
   if (length(columns) == 0) {
-    columns <- download_column_defaults()
+    columns <- download_column_defaults(
+      download_column_catalog(inputs$form_select %||% "990", src)
+    )
   }
 
   # Filters: WHERE col IN (...). Omit empty selections entirely (an empty
@@ -105,12 +101,35 @@ query_builder_download <- function(inputs, geo_df, estimate = FALSE) {
     filters[["cbsa_code"]] <- cbsa_codes
   }
 
-  payload <- list(
-    tax_years = as.integer(unique(inputs$start_year:inputs$end_year)),
-    forms     = forms,
-    columns   = columns,
-    format    = jsonlite::unbox(inputs$format_select %||% "csv")
-  )
+  # Mode-specific fields. BMF: source + active_years (lifespan-overlap; the
+  # API uses only the endpoints, so send [start, end] — see ADR 0029); no
+  # tax_years/forms (the API rejects them). CORE: tax_years partitions +
+  # the form-type radio mapped to API form codes (990combined already unions
+  # 990 + 990-EZ, hence its own option; the fallback covers an unexpected
+  # value). The year pickers are start<=end-guarded upstream.
+  if (identical(src, "bmf")) {
+    payload <- list(
+      source       = jsonlite::unbox("bmf"),
+      active_years = as.integer(c(inputs$start_year, inputs$end_year)),
+      columns      = columns,
+      format       = jsonlite::unbox(inputs$format_select %||% "csv")
+    )
+  } else {
+    forms <- switch(
+      inputs$form_select,
+      "990"         = "990",
+      "990ez"       = "990ez",
+      "990combined" = "990combined",
+      "990pf"       = "990pf",
+      "990"
+    )
+    payload <- list(
+      tax_years = as.integer(unique(inputs$start_year:inputs$end_year)),
+      forms     = forms,
+      columns   = columns,
+      format    = jsonlite::unbox(inputs$format_select %||% "csv")
+    )
+  }
   if (length(filters) > 0) {
     payload$filters <- filters
   }
