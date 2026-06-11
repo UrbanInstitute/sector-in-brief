@@ -638,6 +638,17 @@ dataRequestServer <- function(id, geo_df) {
         )
         return()
       }
+      # Guard the year range: the pickers don't constrain each other, and an
+      # inverted range would otherwise build a descending tax_years list.
+      if (as.integer(input$start_year) > as.integer(input$end_year)) {
+        sendSweetAlert(
+          session = session,
+          title = "Error",
+          text = "\"From Tax Year\" must be on or before \"Through Tax Year\".",
+          type = "error"
+        )
+        return()
+      }
       dl_result(NULL)
       full_payload <- query_builder_download(input, geo_df, estimate = FALSE)
       req_full(full_payload)
