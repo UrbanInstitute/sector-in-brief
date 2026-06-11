@@ -628,6 +628,26 @@ dataRequestServer <- function(id, geo_df) {
       if (is.null(res)) {
         return(NULL)
       }
+      # Async giant export (ADR 0030): the API accepted the job (202) and a
+      # Fargate worker is materializing it; there is no download link yet.
+      # The worker emails the durable link on completion, and the form
+      # already requires an email, so this is email-and-wait — surface that
+      # and let the user leave the page (no link shown; the durable URL 202s
+      # until ready).
+      if (isTRUE(res$pending)) {
+        return(htmltools::div(
+          class = "download-ready",
+          htmltools::h4("Your export is on its way",
+                        class = "download-ready__title"),
+          htmltools::p(
+            class = "download-ready__meta",
+            sprintf(
+              "This is a large export (~%s), so we're preparing it in the background. We'll email a download link to %s when it's ready — usually a few minutes. You can safely leave this page.",
+              human_bytes(res$estimated_bytes), input$email
+            )
+          )
+        ))
+      }
       durable <- res$download_url %||% download_link(res$download_path, config = cfg)
       dict_url <- res$data_dictionary$url %||%
         download_link(res$download_path, kind = "dictionary", config = cfg)
