@@ -53,12 +53,20 @@ download_column_catalog <- function(form = "990") {
     "org_type",            "Organization type (501(c))",   "Classification", TRUE,
     "ntee_common_code",    "NTEE common code",             "Classification", FALSE,
     # --- Geography --- (crosswalk-derived; form-independent)
+    # State / canonical county / CBSA name / region default ON: the
+    # human-readable named geographies most exports want. FIPS + CBSA code
+    # are opt-in join keys. geo_lat/geo_lon are the geocoder's WGS-84
+    # point coordinates — opt-in only: ~40% are NA (geocoder unmatched)
+    # and point coords are specialist GIS data, not wanted in a typical
+    # finance/classification pull.
     "geo_state_abbr",      "State",                        "Geography",      TRUE,
     "geo_county_canonical","County (canonical name)",      "Geography",      TRUE,
     "geo_county_fips",     "County FIPS",                  "Geography",      FALSE,
-    "cbsa_title",          "Metro/Micro area",             "Geography",      FALSE,
+    "cbsa_title",          "Metro/Micro area",             "Geography",      TRUE,
     "cbsa_code",           "CBSA code",                    "Geography",      FALSE,
-    "census_region",       "Census region",                "Geography",      TRUE
+    "census_region",       "Census region",                "Geography",      TRUE,
+    "geo_lat",             "Latitude (WGS 84)",            "Geography",      FALSE,
+    "geo_lon",             "Longitude (WGS 84)",           "Geography",      FALSE
   )
   rbind(base, download_financials_catalog(form))
 }

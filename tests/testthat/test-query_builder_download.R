@@ -108,6 +108,17 @@ test_that("column catalog: defaults are a subset of all api_names, ein excluded"
   expect_true(all(c("Geography", "Financials") %in% names(ch)))
 })
 
+test_that("geography defaults: named units default ON, lat/lon opt-in", {
+  cat <- download_column_catalog()
+  defaults <- download_column_defaults(cat)
+  # Human-readable named geographies are pre-selected.
+  expect_true(all(c("geo_state_abbr", "geo_county_canonical", "cbsa_title",
+                    "census_region") %in% defaults))
+  # Point coordinates are offered but NOT pre-selected (~40% NA, specialist).
+  expect_true(all(c("geo_lat", "geo_lon") %in% cat$api_name))
+  expect_false(any(c("geo_lat", "geo_lon") %in% defaults))
+})
+
 test_that("column catalog is form-aware: 990-PF gets its own financials", {
   std <- download_column_catalog("990")
   pf  <- download_column_catalog("990pf")
