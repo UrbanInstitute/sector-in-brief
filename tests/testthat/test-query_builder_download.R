@@ -108,6 +108,47 @@ test_that("column catalog: defaults are a subset of all api_names, ein excluded"
   expect_true(all(c("Geography", "Financials") %in% names(ch)))
 })
 
+test_that("BMF mode sends source + active_years, not tax_years/forms", {
+  p <- query_builder_download(
+    base_inputs(source_select = "bmf", start_year = 2015, end_year = 2018,
+                data_select = c("org_name_display", "org_type")),
+    fake_geo_df()
+  )
+  expect_equal(as.character(p$source), "bmf")
+  # active_years is the lifespan-overlap span endpoints (ADR 0029)
+  expect_equal(p$active_years, c(2015L, 2018L))
+  expect_type(p$active_years, "integer")
+  # tax_years / forms are rejected by the API in BMF mode -> never sent
+  expect_null(p$tax_years)
+  expect_null(p$forms)
+  # shared filters still apply
+  expect_equal(p$filters$org_type, "501(c)(3) Public Charities")
+  expect_equal(p$filters$geo_state_abbr, "CA")
+})
+
+test_that("BMF empty columns fall back to BMF defaults (no financials)", {
+  p <- query_builder_download(
+    base_inputs(source_select = "bmf", data_select = character(0)),
+    fake_geo_df()
+  )
+  expect_equal(p$columns, download_column_defaults(download_column_catalog(source = "bmf")))
+  expect_false("total_revenue" %in% p$columns)
+})
+
+test_that("BMF catalog: no financials, lifespan cols present + default", {
+  bmf <- download_column_catalog(source = "bmf")
+  expect_false("Financials" %in% bmf$group)
+  expect_false("tax_year" %in% bmf$api_name)
+  # registry lifespan cols present and default-on (API force-appends them)
+  expect_true(all(c("first_year_in_bmf", "last_year_in_bmf") %in% bmf$api_name))
+  defaults <- download_column_defaults(bmf)
+  expect_true(all(c("first_year_in_bmf", "last_year_in_bmf", "org_name_display",
+                    "geo_state_abbr", "org_type", "nteev2_subsector",
+                    "nteev2_subsector_definition") %in% defaults))
+  # no financial column survives into BMF
+  expect_false(any(c("total_revenue", "total_expenses", "total_assets_eoy") %in% bmf$api_name))
+})
+
 test_that("geography defaults: named units default ON, lat/lon opt-in", {
   cat <- download_column_catalog()
   defaults <- download_column_defaults(cat)

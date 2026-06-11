@@ -28,6 +28,12 @@
 download_api_call <- function(payload, config = download_api_config()) {
   body <- jsonlite::toJSON(payload, auto_unbox = FALSE, na = "null")
 
+  # NB: the pinned paws.compute (0.10.0) rejects a `timeout` config key
+  # ("invalid name: timeout"), so we can't bound the invoke read-timeout to
+  # the Lambda's 900s ceiling here (the API session's suggested guard). paws
+  # defaults to no timeout, which matches prior behaviour; the estimate→warn
+  # step is the practical guard against giant exports. Revisit if a paws
+  # upgrade exposes a supported timeout option.
   client <- paws.compute::lambda(config = list(region = config$region))
   invoked <- tryCatch(
     client$invoke(
@@ -74,8 +80,11 @@ download_api_call <- function(payload, config = download_api_config()) {
       error = function(e) parsed$body
     )
     if (!is.numeric(status) || status >= 400) {
+      # The API returns {error: <code>, detail: <human reason>}. The detail
+      # is the actionable part ("tax_years must be a non-empty list"), so
+      # prefer it; fall back to the code, then a generic message.
       msg <- if (is.list(body_obj)) {
-        body_obj$error %||% body_obj$detail %||% "Validation error."
+        body_obj$detail %||% body_obj$error %||% "Validation error."
       } else {
         as.character(body_obj)
       }
@@ -85,8 +94,8 @@ download_api_call <- function(payload, config = download_api_config()) {
   }
 
   # A bare error object (no envelope).
-  if (!is.null(parsed$error)) {
-    return(list(ok = FALSE, error = parsed$error))
+  if (!is.null(parsed$error) || !is.null(parsed$detail)) {
+    return(list(ok = FALSE, error = parsed$detail %||% parsed$error))
   }
 
   c(list(ok = TRUE), parsed)
