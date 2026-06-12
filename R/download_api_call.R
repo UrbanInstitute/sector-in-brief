@@ -20,11 +20,14 @@
 #'
 #' @param payload Request body list from `query_builder_download()`.
 #' @param config Endpoint config from `download_api_config()`.
-#' @return A list with `ok` (logical). On success: `ok = TRUE` plus the
-#'   parsed response fields (`job_id`, `row_count`, `result`,
-#'   `data_dictionary`, `download_path`, `download_url`, `email`, and —
-#'   for estimate calls — `estimate`, `estimated_bytes`). On failure:
-#'   `ok = FALSE` and `error` (a human-readable message).
+#' @return A list with `ok` (logical). On a synchronous success: `ok = TRUE`
+#'   plus the parsed response fields (`job_id`, `row_count`, `result`,
+#'   `data_dictionary`, `download_path`, `download_url`, `email`, and — for
+#'   estimate calls — `estimate`, `estimated_bytes`). On an async giant
+#'   export (ADR 0030, HTTP 202): `ok = TRUE`, `pending = TRUE`, plus
+#'   `job_id`, `status`, `download_path`/`download_url`, and
+#'   `estimated_bytes` (no `result` yet — the worker emails the link). On
+#'   failure: `ok = FALSE` and `error` (a human-readable message).
 download_api_call <- function(payload, config = download_api_config()) {
   body <- jsonlite::toJSON(payload, auto_unbox = FALSE, na = "null")
 
@@ -49,7 +52,17 @@ download_api_call <- function(payload, config = download_api_config()) {
     return(list(ok = FALSE, error = invoked$.invoke_error))
   }
 
-  raw <- rawToChar(invoked$Payload)
+  classify_export_response(invoked$FunctionError, rawToChar(invoked$Payload))
+}
+
+#' Classify the raw Lambda invoke response into the `download_api_call`
+#' contract. Pure (no AWS) so the three response shapes are unit-testable.
+#'
+#' @param function_error The invoke's `FunctionError` (character(0) on
+#'   success — a thrown Python handler sets it).
+#' @param raw The response `Payload` as a JSON string.
+#' @return The same list `download_api_call` returns (see its `@return`).
+classify_export_response <- function(function_error, raw) {
   parsed <- tryCatch(
     jsonlite::fromJSON(raw, simplifyVector = FALSE),
     error = function(e) NULL
@@ -63,7 +76,7 @@ download_api_call <- function(payload, config = download_api_config()) {
   # raw payload so the cause is never silently swallowed. NB: paws returns
   # FunctionError as character(0) on success (not NULL), so guard on
   # length + nzchar — `!is.null()` alone is true for character(0).
-  if (length(invoked$FunctionError) > 0 && nzchar(invoked$FunctionError)) {
+  if (length(function_error) > 0 && nzchar(function_error)) {
     msg <- parsed$errorMessage %||% parsed$error %||% parsed$detail %||% raw
     if (!is.null(parsed$errorType)) {
       msg <- paste0(parsed$errorType, ": ", msg)
@@ -90,12 +103,25 @@ download_api_call <- function(payload, config = download_api_config()) {
       }
       return(list(ok = FALSE, error = msg))
     }
+    # Async giant-export (ADR 0030): a request whose estimate exceeds the
+    # server's threshold is handed to a Fargate worker and accepted with
+    # 202 — `status:"pending"`, a job_id + durable link, but no `result`
+    # yet. The worker emails the durable link on completion. Tag it so the
+    # caller shows the "we'll email you" message instead of a download card.
+    if (is.numeric(status) && status == 202) {
+      return(c(list(ok = TRUE, pending = TRUE), body_obj))
+    }
     parsed <- body_obj
   }
 
   # A bare error object (no envelope).
   if (!is.null(parsed$error) || !is.null(parsed$detail)) {
     return(list(ok = FALSE, error = parsed$detail %||% parsed$error))
+  }
+
+  # A bare pending object (no envelope) — same async case as the 202 above.
+  if (identical(parsed$status, "pending")) {
+    return(c(list(ok = TRUE, pending = TRUE), parsed))
   }
 
   c(list(ok = TRUE), parsed)
