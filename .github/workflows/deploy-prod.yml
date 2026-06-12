@@ -31,10 +31,13 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Queue rather than cancel: cancelling a GitHub job does not cancel the
-  # shinyapps.io server-side deploy task it started, so a fast-follow run
-  # would hit "HTTP 409: 1 task already in progress". See deploy-staging.yml.
-  group: prod-deploy
+  # SHARED group with deploy-staging.yml: both deploy to the same shinyapps.io
+  # account, and two simultaneous deploy sessions 403 each other (a merge-to-
+  # main staging deploy overlapping the main->prod promote 403'd the cutover).
+  # Sharing serialises staging + prod account-wide. Queue rather than cancel:
+  # cancelling a GitHub job does not cancel the shinyapps server-side deploy
+  # task, so cancelling would also risk an "HTTP 409: 1 task already in progress".
+  group: shinyapps-deploy
   cancel-in-progress: false
 
 jobs:
