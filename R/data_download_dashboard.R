@@ -353,6 +353,13 @@ dataRequestUI <- function(id, geo_df) {
             )
           ),
           htmltools::tagList(
+            htmltools::h4("Region(s)", class = "center-justify"),
+            htmltools::div(
+              shiny::textOutput(ns("selected_region")),
+              class = "center-justify"
+            )
+          ),
+          htmltools::tagList(
             htmltools::h4("State(s)", class = "center-justify"),
             htmltools::div(
               shiny::textOutput(ns("selected_state")),
@@ -597,6 +604,10 @@ dataRequestServer <- function(id, geo_df) {
     })
     output$selected_subsector <- renderText({
       paste(input$subsector_select, collapse = ", ")
+    })
+    output$selected_region <- renderText({
+      if (length(input$region_select) == 0) "All Regions"
+      else paste(input$region_select, collapse = ", ")
     })
     output$selected_state <- renderText({
       paste(input$geo_select, collapse = ", ")
