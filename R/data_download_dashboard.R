@@ -182,7 +182,10 @@ dataRequestUI <- function(id, geo_df) {
               ns,
               "county_select",
               label = htmltools::tags$b("Optional - Select County(s)"),
-              choices = unique(geo_df[["Census.County"]])
+              # FIPS-valued, "County, ST"-labelled so same-named counties
+              # across states are distinguishable (county_fips_choices.R).
+              # Repopulated per selected state by the cascade observer.
+              choices = county_fips_choices(geo_df)
             ),
             ns = ns
           ),
@@ -503,7 +506,7 @@ dataRequestServer <- function(id, geo_df) {
       if (length(input$geo_select) > 0) {
         shinyWidgets::updateVirtualSelect(
           inputId = "county_select",
-          choices = unique(geo_df[["Census.County"]][geo_df[["Census.State"]] %in% input$geo_select])
+          choices = county_fips_choices(geo_df, input$geo_select)
         )
         shinyWidgets::updateVirtualSelect(
           inputId = "cbsa_select",
@@ -614,10 +617,14 @@ dataRequestServer <- function(id, geo_df) {
     })
     output$selected_county <- renderText({
       if (length(input$county_select) == 0) {
-        "All Counties"
-      } else {
-      paste(input$county_select, collapse = ", ")
+        return("All Counties")
       }
+      # county_select now holds FIPS codes; map back to "County, ST" labels
+      # for the human-readable summary (fall back to the code if unmatched).
+      choices <- county_fips_choices(geo_df, input$geo_select)
+      labels <- names(choices)[match(input$county_select, choices)]
+      labels[is.na(labels)] <- input$county_select[is.na(labels)]
+      paste(labels, collapse = ", ")
     })
     output$selected_cbsa <- renderText({
       if (length(input$cbsa_select) == 0) {
