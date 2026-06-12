@@ -51,10 +51,11 @@ dataRequestUI <- function(id, geo_df) {
   subsector <- choices$subsector
   bslib::card(
     bslib::card_title("Ready To Get Started?", class = "bg-light-gray"),
-    urban_button(ns, "start_form", "REQUEST DATA"),
     # Query mode (ADR 0029): filing-level 990 data (CORE) vs the org-level
     # BMF registry incl. non-filers (no financials). Drives which steps and
-    # columns show below; the server reshapes the form on change.
+    # columns show below; the server reshapes the form on change. The chooser
+    # comes first so it reads top-to-bottom (pick the data kind, then start);
+    # the REQUEST DATA button follows it, matching the other steps' layout.
     htmltools::div(
       class = "btn-radio-urbn__lg download-source-toggle",
       shiny::radioButtons(
@@ -65,6 +66,8 @@ dataRequestUI <- function(id, geo_df) {
         selected = "core"
       )
     ),
+    htmltools::br(),
+    urban_button(ns, "start_form", "REQUEST DATA"),
     bslib::accordion(
       id = ns("accordion"),
       open = FALSE,
@@ -350,6 +353,13 @@ dataRequestUI <- function(id, geo_df) {
             )
           ),
           htmltools::tagList(
+            htmltools::h4("Region(s)", class = "center-justify"),
+            htmltools::div(
+              shiny::textOutput(ns("selected_region")),
+              class = "center-justify"
+            )
+          ),
+          htmltools::tagList(
             htmltools::h4("State(s)", class = "center-justify"),
             htmltools::div(
               shiny::textOutput(ns("selected_state")),
@@ -534,19 +544,20 @@ dataRequestServer <- function(id, geo_df) {
     # 990-PF picker is constrained to that single value. Every other CORE
     # form and all of BMF (which has no form concept) offers the full set.
     refresh_org_choices <- function() {
-      if (identical(current_source(), "core") &&
-          identical(input$form_select, "990pf")) {
-        shinyWidgets::updatePickerInput(
-          session = session, inputId = "org_select",
-          choices = ctype_id["501(c)(3) - Private Foundations"],
-          selected = "501(c)(3) Private Foundations"
-        )
-      } else {
-        shinyWidgets::updatePickerInput(
-          session = session, inputId = "org_select",
-          choices = ctype_id
-        )
-      }
+      # updatePickerInput replaces the whole control, so the original
+      # pickerInput's `options`/`choicesOpt` (the size=5 scroll cap + the
+      # wrap-at-100 content formatter) must be re-passed every time — omitting
+      # them lets the full 30-row list render unbounded and cover the screen.
+      pf <- identical(current_source(), "core") &&
+        identical(input$form_select, "990pf")
+      choices <- if (pf) ctype_id["501(c)(3) - Private Foundations"] else ctype_id
+      shinyWidgets::updatePickerInput(
+        session = session, inputId = "org_select",
+        choices = choices,
+        selected = if (pf) "501(c)(3) Private Foundations" else NULL,
+        options = list(`actions-box` = TRUE, size = 5),
+        choicesOpt = list(content = choice_formatter(choices, 100))
+      )
     }
 
     # Variable catalog is mode- and form-aware: BMF drops the Financials
@@ -593,6 +604,10 @@ dataRequestServer <- function(id, geo_df) {
     })
     output$selected_subsector <- renderText({
       paste(input$subsector_select, collapse = ", ")
+    })
+    output$selected_region <- renderText({
+      if (length(input$region_select) == 0) "All Regions"
+      else paste(input$region_select, collapse = ", ")
     })
     output$selected_state <- renderText({
       paste(input$geo_select, collapse = ", ")
@@ -709,7 +724,7 @@ dataRequestServer <- function(id, geo_df) {
         sendSweetAlert(
           session = session,
           title = "Something went wrong",
-          text = res$error %||% "The export could not be completed.",
+          text = friendly_api_error(res$error),
           type = "error"
         )
         return(invisible(NULL))
@@ -718,22 +733,20 @@ dataRequestServer <- function(id, geo_df) {
     }
 
     observeEvent(input$start_data_download, {
-      if (length(input$data_select) == 0) {
+      # Single completeness gate (ADR 0026). The per-step NEXT validations
+      # only fire when the user clicks through in order; jumping straight to
+      # Review via the accordion bypasses them, so re-check everything here —
+      # listing every problem at once so it can be fixed in one pass.
+      problems <- validate_download_request(input)
+      if (length(problems) > 0) {
         sendSweetAlert(
           session = session,
-          title = "Error",
-          text = "Please select at least one variable",
-          type = "error"
-        )
-        return()
-      }
-      # Guard the year range: the pickers don't constrain each other, and an
-      # inverted range would otherwise build a descending tax_years list.
-      if (as.integer(input$start_year) > as.integer(input$end_year)) {
-        sendSweetAlert(
-          session = session,
-          title = "Error",
-          text = "\"From Tax Year\" must be on or before \"Through Tax Year\".",
+          title = "Please complete your request",
+          text = htmltools::tags$ul(
+            style = "text-align: left;",
+            lapply(problems, htmltools::tags$li)
+          ),
+          html = TRUE,
           type = "error"
         )
         return()
@@ -755,7 +768,7 @@ dataRequestServer <- function(id, geo_df) {
         sendSweetAlert(
           session = session,
           title = "Something went wrong",
-          text = est$error %||% "Could not estimate the export size.",
+          text = friendly_api_error(est$error),
           type = "error"
         )
         return()

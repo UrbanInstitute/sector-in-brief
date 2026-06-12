@@ -778,6 +778,21 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
         font-size: var(--h5-sm);
     };
 }
+/* Query-mode chooser (990 filings vs BMF). The rich HTML radio labels are
+   full paragraphs; without a width cap + breathing room the flex-centred
+   text runs edge-to-edge and is hard to read. Constrain the column and add
+   padding / line-height. */
+.download-source-toggle {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.download-source-toggle .radio,
+.download-source-toggle .shiny-options-group label {
+  text-align: left;
+  line-height: 1.5;
+  padding: 0.35rem 0;
+}
 .picker-urbn {
   display: flex;
   justify-content: center;
