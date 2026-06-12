@@ -31,6 +31,14 @@
 download_api_call <- function(payload, config = download_api_config()) {
   body <- jsonlite::toJSON(payload, auto_unbox = FALSE, na = "null")
 
+  # TEMP diagnostic (ADR 0030 handoff): log the outgoing request body so a
+  # "<col> IN ()" parser error reported from the UI can be traced to either
+  # the dashboard payload or the API. The dashboard provably serializes a
+  # selected single state as `["AZ"]` (see test-validate_download_request),
+  # so this confirms whether staging sends the same. Remove once the API's
+  # empty-filter handling is resolved.
+  message("[download][diag] request: ", body)
+
   # NB: the pinned paws.compute (0.10.0) rejects a `timeout` config key
   # ("invalid name: timeout"), so we can't bound the invoke read-timeout to
   # the Lambda's 900s ceiling here (the API session's suggested guard). paws
@@ -53,6 +61,30 @@ download_api_call <- function(payload, config = download_api_config()) {
   }
 
   classify_export_response(invoked$FunctionError, rawToChar(invoked$Payload))
+}
+
+#' Map a raw API error into a user-facing message.
+#'
+#' The API can surface low-level engine errors (e.g. a DuckDB "Parser Error"
+#' from an empty `IN ()`) that mean nothing to a user and leak query
+#' internals. Replace those with a friendly, actionable message; pass through
+#' messages that are already human (the API's `detail` validation strings).
+#' Pure / testable.
+#'
+#' @param err The `error` string from `download_api_call()`.
+#' @return A user-facing message string.
+friendly_api_error <- function(err) {
+  if (is.null(err) || !nzchar(err)) {
+    return("The export could not be completed. Please try again.")
+  }
+  if (grepl("parser error|syntax error|\\bSQL\\b|IN \\(\\)", err,
+            ignore.case = TRUE)) {
+    return(paste(
+      "We couldn't process that request. Please check your selections",
+      "(organization type, subsector, state, and variables) and try again."
+    ))
+  }
+  err
 }
 
 #' Classify the raw Lambda invoke response into the `download_api_call`
