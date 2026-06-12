@@ -70,7 +70,7 @@ dataRequestUI <- function(id, geo_df) {
     # comes first so it reads top-to-bottom (pick the data kind, then start);
     # the REQUEST DATA button follows it, matching the other steps' layout.
     htmltools::div(
-      class = "btn-radio-urbn__lg download-source-toggle",
+      class = "download-source-toggle",
       shiny::radioButtons(
         inputId = ns("source_select"),
         label = download_source_label,

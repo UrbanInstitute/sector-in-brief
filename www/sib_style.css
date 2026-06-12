@@ -778,51 +778,94 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
         font-size: var(--h5-sm);
     };
 }
-/* Query-mode chooser (990 filings vs BMF). The rich HTML radio labels are
-   full paragraphs. The div ALSO carries btn-radio-urbn__lg, which is
-   display:flex + justify-content:center + text-align:justify — that
-   shrink-wraps and centres the radio group, so a max-width/padding alone has
-   no visible effect (the card is narrower than the cap). Cancel the
-   flex/justify here and give the descriptions real horizontal breathing room
-   so they don't run edge-to-edge. */
+/* Query-mode chooser — two selectable cards (990 filings vs BMF). The div no
+   longer carries btn-radio-urbn__lg (that forced bold text + flex-centring,
+   which made the whole description render bold and shrink-wrapped); this block
+   is self-contained. Cards sit side by side and wrap/stack on narrow screens;
+   the selected card is highlighted via :has(input:checked). Title is bold, the
+   description normal weight. */
 .download-source-toggle {
   display: block;
-  /* The card-body is a bslib flex column; on a flex item `margin: 0 auto`
-     makes it SHRINK-WRAP to its content (a narrow column) instead of filling,
-     so the padding below just squeezed an already-narrow block. An explicit
-     width: 100% gives a definite cross size so the div fills the card (capped
-     for line length), and the padding then reads as real left/right margins. */
   width: 100%;
   box-sizing: border-box;
-  max-width: 820px;
+  max-width: 840px;
   margin: 0 auto;
-  padding: 1.25rem 2rem;
+  padding: 1rem 1.5rem 1.5rem;
   text-align: left;
+  font-weight: var(--font-weight-normal);
 }
 .download-source-toggle .control-label {
   display: block;
   margin-bottom: 0.75rem;
+  font-weight: var(--font-weight-bold);
 }
-/* Make the radio group and each option's label fill the toggle's width.
-   Without this an inner element shrink-wraps to its content, so even though
-   the outer div is now full-width (#79) the description renders as a narrow
-   column pinned to the left of it. Forcing display:block + width:100% down
-   the chain lets the text use the full available width. */
-.download-source-toggle .shiny-input-radiogroup,
-.download-source-toggle .shiny-options-group,
-.download-source-toggle .radio,
+/* The radio group shrink-wraps in the bslib flex card-body unless given an
+   explicit width, which would leave the flex options-group (and the two cards)
+   crammed into a narrow column. Force both to fill the toggle. */
+.download-source-toggle .shiny-input-radiogroup {
+  width: 100%;
+}
+.download-source-toggle .shiny-options-group {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  align-items: stretch;   /* equal-height cards */
+}
+/* Stack only on genuinely narrow screens; side by side otherwise. */
+@media screen and (max-width: 600px) {
+  .download-source-toggle .shiny-options-group {
+    flex-direction: column;
+  }
+}
+.download-source-toggle .radio {
+  flex: 1 1 0;            /* equal halves, side by side... */
+  min-width: 0;          /* ...and allowed to shrink instead of wrapping */
+  margin: 0;
+  border: 1px solid var(--color-gray);
+  border-radius: 6px;
+  background-color: var(--color-white);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.download-source-toggle .radio:hover {
+  border-color: var(--color-blue-shade-light);
+}
+.download-source-toggle .radio:has(input:checked) {
+  border-color: var(--color-blue);
+  background-color: var(--color-blue-shade-lightest);
+}
 .download-source-toggle .radio label {
   display: block;
   width: 100%;
-}
-.download-source-toggle .radio {
-  margin-bottom: 0.5rem;
-}
-.download-source-toggle .radio label,
-.download-source-toggle .shiny-options-group label {
+  margin: 0;
+  padding: 1rem 1.25rem 1rem 2.5rem;
+  position: relative;
+  cursor: pointer;
   text-align: left;
-  line-height: 1.6;
-  padding: 0.4rem 0 0.4rem 0.4rem;
+  font-weight: var(--font-weight-normal);
+  line-height: 1.5;
+}
+.download-source-toggle .radio input[type="radio"] {
+  position: absolute;
+  left: 1rem;
+  top: 1.2rem;
+  margin: 0;
+}
+.download-source-toggle .ds-title {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--h6-lg);
+  color: var(--color-black);
+}
+.download-source-toggle .ds-desc {
+  display: block;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--text-base);
+  color: var(--color-gray-shade-darkest);
+}
+.download-source-toggle .ds-desc a {
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
 }
 .picker-urbn {
   display: flex;
