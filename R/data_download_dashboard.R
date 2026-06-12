@@ -509,6 +509,21 @@ dataRequestServer <- function(id, geo_df) {
       }
     })
 
+    # Region scopes the State picker. The API ANDs census_region with the
+    # state filter (intersection), so a region + a state outside it resolves
+    # to an empty state set and the API 500s on `geo_state_abbr IN ()`
+    # (sector-in-brief-api#13). Restrict the State choices to the selected
+    # region(s) so that combination is unselectable; drop any already-selected
+    # states that fall outside the new region. ignoreNULL = FALSE so clearing
+    # the region restores all states.
+    observeEvent(input$region_select, {
+      allowed <- region_state_choices(geo_df, input$region_select, state_choices)
+      keep <- intersect(input$geo_select, unlist(allowed, use.names = FALSE))
+      shinyWidgets::updateVirtualSelect(
+        inputId = "geo_select", choices = allowed, selected = keep
+      )
+    }, ignoreNULL = FALSE, ignoreInit = TRUE)
+
     # Update CBSA/County Inputs
     observeEvent(input$geo_select, {
       if (length(input$geo_select) > 0) {
