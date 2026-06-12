@@ -25,8 +25,13 @@ name: Deploy to staging
 # server-side env vars; the `.Renviron` is written from these secrets at
 # deploy time and never committed (gitignored).
 #
-# After that, every push to main triggers a deploy. Concurrent runs
-# are cancelled so a fast-follow merge doesn't queue stale builds.
+# After that, every push to main triggers a deploy. Concurrent runs QUEUE
+# rather than cancel: cancelling the GitHub job does NOT cancel the
+# shinyapps.io server-side deploy task it started, so a fast-follow merge
+# whose job cancels the previous one would then hit "HTTP 409: 1 task already
+# in progress" and fail. Serialising the runs (cancel-in-progress: false)
+# lets each deploy finish before the next starts. Deploys are full-snapshot
+# and idempotent, so the only cost is a couple of redundant builds.
 
 on:
   push:
@@ -35,7 +40,7 @@ on:
 
 concurrency:
   group: staging-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
