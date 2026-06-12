@@ -32,6 +32,12 @@ name: Deploy to staging
 # in progress" and fail. Serialising the runs (cancel-in-progress: false)
 # lets each deploy finish before the next starts. Deploys are full-snapshot
 # and idempotent, so the only cost is a couple of redundant builds.
+#
+# The concurrency group is SHARED with deploy-prod.yml (group: shinyapps-deploy)
+# because both deploy to the same shinyapps.io account: two simultaneous deploy
+# sessions on one account 403 each other (bit the prod cutover when a merge-to-
+# main staging deploy overlapped the main->prod promote). Sharing the group
+# serialises staging + prod account-wide.
 
 on:
   push:
@@ -39,7 +45,7 @@ on:
   workflow_dispatch:  # allow manual re-deploys from the Actions tab
 
 concurrency:
-  group: staging-deploy
+  group: shinyapps-deploy
   cancel-in-progress: false
 
 jobs:
