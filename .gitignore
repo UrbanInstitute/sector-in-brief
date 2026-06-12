@@ -25,6 +25,9 @@ recording.log
 *.log
 bench/
 
+# Local probe / smoke scripts for the download API (scratch, never committed)
+dev/
+
 # Data files synced from S3 at app startup (per ADR 0011)
 data/*.parquet
 data/_manifest.json
