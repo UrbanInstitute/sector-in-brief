@@ -15,13 +15,13 @@
 
 #' Translate selected geography labels to the API's code-keyed filters.
 #'
-#' County and metro pickers show readable names but the API filters by
-#' the stable codes (`geo_county_fips`, `cbsa_code`). The translation is
-#' scoped to the selected states so a shared county/metro name does not
-#' pull in codes from other states.
+#' The metro picker shows readable names but the API filters by the stable
+#' `cbsa_code`. The translation is scoped to the selected states so a shared
+#' metro name does not pull in codes from other states. (The county picker is
+#' now FIPS-valued directly — see `county_fips_choices()` — so it no longer
+#' needs this; metro/CBSA remain name-keyed.)
 #'
-#' @param names Selected display names (county canonical names or
-#'   Metro/Micro area names).
+#' @param names Selected display names (Metro/Micro area names).
 #' @param states Selected state abbreviations (`geo_select`).
 #' @param geo_df Nested-geographies lookup (`load_geo_df()`).
 #' @param name_col,code_col Lookup columns in `geo_df` (dotted names).
@@ -86,12 +86,10 @@ query_builder_download <- function(inputs, geo_df, estimate = FALSE) {
   if (length(inputs$region_select) > 0) {
     filters[["census_region"]] <- inputs$region_select
   }
-  county_fips <- geo_names_to_codes(
-    inputs$county_select, inputs$geo_select, geo_df,
-    "Census.County", "County.FIPS"
-  )
-  if (!is.null(county_fips)) {
-    filters[["geo_county_fips"]] <- county_fips
+  # County picker is FIPS-valued (county_fips_choices.R) — collision-proof, so
+  # the selected codes go straight to the filter, no name->code translation.
+  if (length(inputs$county_select) > 0) {
+    filters[["geo_county_fips"]] <- as.character(inputs$county_select)
   }
   cbsa_codes <- geo_names_to_codes(
     inputs$cbsa_select, inputs$geo_select, geo_df,
