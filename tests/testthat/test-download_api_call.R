@@ -68,3 +68,32 @@ test_that("bare pending object (no envelope) is treated as async", {
   expect_true(isTRUE(r$pending))
   expect_equal(r$job_id, "xyz")
 })
+
+# API contract update (sector-in-brief-api#13 / dashboard#77): empty filter
+# lists and contradictory region∩state now return an explanatory 400 instead
+# of a DuckDB parser 500. The form must surface those actionable messages
+# verbatim, while still masking any raw engine error behind friendly text.
+test_that("new 400 validation messages surface verbatim to the user", {
+  r <- classify_export_response(character(0), mk_envelope(400, list(
+    error = "filter(s) with no values: ['geo_state_abbr']; omit the key to leave a column unfiltered"
+  )))
+  expect_false(isTRUE(r$ok))
+  # passes through friendly_api_error unchanged (it's already human + actionable)
+  expect_identical(friendly_api_error(r$error), r$error)
+  expect_match(friendly_api_error(r$error), "omit the key")
+})
+
+test_that("region/state non-overlap 400 surfaces verbatim", {
+  r <- classify_export_response(character(0), mk_envelope(400, list(
+    error = "census_region and geo_state_abbr filters don't overlap (Northeast vs ['AZ'])"
+  )))
+  expect_match(friendly_api_error(r$error), "don't overlap")
+})
+
+test_that("raw engine parser errors are still masked (defense-in-depth)", {
+  r <- classify_export_response("Handled",
+    '{"errorMessage":"Parser Error: syntax error at or near \\")\\" ... IN ()"}')
+  expect_false(isTRUE(r$ok))
+  expect_match(friendly_api_error(r$error), "check your selections")
+  expect_false(grepl("Parser Error", friendly_api_error(r$error)))
+})
