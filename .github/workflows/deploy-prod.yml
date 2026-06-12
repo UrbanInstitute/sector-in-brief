@@ -30,8 +30,11 @@ on:
   workflow_dispatch:
 
 concurrency:
+  # Queue rather than cancel: cancelling a GitHub job does not cancel the
+  # shinyapps.io server-side deploy task it started, so a fast-follow run
+  # would hit "HTTP 409: 1 task already in progress". See deploy-staging.yml.
   group: prod-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
