@@ -779,19 +779,31 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
     };
 }
 /* Query-mode chooser (990 filings vs BMF). The rich HTML radio labels are
-   full paragraphs; without a width cap + breathing room the flex-centred
-   text runs edge-to-edge and is hard to read. Constrain the column and add
-   padding / line-height. */
+   full paragraphs. The div ALSO carries btn-radio-urbn__lg, which is
+   display:flex + justify-content:center + text-align:justify — that
+   shrink-wraps and centres the radio group, so a max-width/padding alone has
+   no visible effect (the card is narrower than the cap). Cancel the
+   flex/justify here and give the descriptions real horizontal breathing room
+   so they don't run edge-to-edge. */
 .download-source-toggle {
-  max-width: 720px;
+  display: block;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 1.25rem 2rem;
+  text-align: left;
 }
-.download-source-toggle .radio,
+.download-source-toggle .control-label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.download-source-toggle .radio {
+  margin-bottom: 0.5rem;
+}
+.download-source-toggle .radio label,
 .download-source-toggle .shiny-options-group label {
   text-align: left;
-  line-height: 1.5;
-  padding: 0.35rem 0;
+  line-height: 1.6;
+  padding: 0.4rem 0 0.4rem 0.4rem;
 }
 .picker-urbn {
   display: flex;
