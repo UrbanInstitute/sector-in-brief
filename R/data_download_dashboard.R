@@ -22,16 +22,19 @@
 #
 # Mounted as the last nav_panel by app.R.
 
-# Tax-year range offered by the download form's CORE (filing-level) mode. The
-# API exposes no list-years endpoint, so these track the producer's row-level
-# CORE coverage in s3://nccsdata/processed/core/{year}/{form}/. Verified by
-# probing the bucket: every form (990 / 990ez / 990pf / 990combined) is
-# materialized for 2012-2024 only — pre-2012 990s were not e-filed, so there
-# are NO processed/core partitions for them and the API 404s if asked (it
-# builds an explicit read_parquet path list with no existence check — see
-# sector-in-brief-api#14). 2024 is still partial, so the offered max stays
-# 2023. Bump MIN/MAX as the row-level coverage advances.
-DOWNLOAD_MIN_TAX_YEAR <- 2012L
+# Tax-year range offered by the download form's CORE (filing-level) mode.
+# Coverage is FORM-SPECIFIC because the contracted CORE data is split across
+# producer tiers, and the API routes by form (canonical contract — see
+# sector-in-brief #77 / sector-in-brief-api #19):
+#   - 990combined & 990pf -> processed_merged/core/  (reconciled, 1989-2024)
+#   - 990 & 990ez         -> processed/core/         (modern standalone, 2012+)
+# So combined/pf reach back to 1989 while the standalone forms start at 2012.
+# (An earlier flat 2012 floor came from probing only processed/core/, which is
+# 2012+ — it wrongly hid the merged tier's pre-2012 990combined/990pf.) 2024 is
+# still partial, so the offered max stays 2023. The API returns a clear 400 for
+# a genuinely out-of-range (year, form) as a backstop. Bump as coverage grows.
+DOWNLOAD_MERGED_MIN_TAX_YEAR <- 1989L  # 990combined / 990pf (processed_merged/)
+DOWNLOAD_CORE_MIN_TAX_YEAR   <- 2012L  # standalone 990 / 990ez (processed/core/)
 DOWNLOAD_MAX_TAX_YEAR <- 2023L
 
 # Latest "active" year offered in BMF (org-registry) mode. The BMF registry
@@ -40,12 +43,14 @@ DOWNLOAD_MAX_TAX_YEAR <- 2023L
 # Bump as the registry advances.
 BMF_MAX_ACTIVE_YEAR <- 2026L
 
-# Earliest tax year offered per CORE form. The row-level e-file archive starts
-# in 2012 for ALL forms (probe above), so the floor is uniform — the prior
-# 990-only 1989 floor offered years with no downloadable partitions. Kept as a
-# function so a future per-form divergence has a seam.
+# Earliest tax year offered per CORE form. 990combined/990pf are reconciled back
+# to 1989 in processed_merged/; standalone 990/990ez exist only from 2012.
 download_form_min_year <- function(form) {
-  DOWNLOAD_MIN_TAX_YEAR
+  if (form %in% c("990combined", "990pf")) {
+    DOWNLOAD_MERGED_MIN_TAX_YEAR
+  } else {
+    DOWNLOAD_CORE_MIN_TAX_YEAR
+  }
 }
 
 #' Build the Custom Panel Datasets request UI.
@@ -231,7 +236,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("start_year"),
               label = htmltools::tags$b("From Tax Year *"),
-              choices = c(DOWNLOAD_MIN_TAX_YEAR:DOWNLOAD_MAX_TAX_YEAR),
+              choices = c(DOWNLOAD_CORE_MIN_TAX_YEAR:DOWNLOAD_MAX_TAX_YEAR),
               selected = 2012,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -242,7 +247,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("end_year"),
               label = htmltools::tags$b("Through Tax Year *"),
-              choices = c(DOWNLOAD_MIN_TAX_YEAR:DOWNLOAD_MAX_TAX_YEAR),
+              choices = c(DOWNLOAD_CORE_MIN_TAX_YEAR:DOWNLOAD_MAX_TAX_YEAR),
               selected = DOWNLOAD_MAX_TAX_YEAR,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -544,7 +549,8 @@ dataRequestServer <- function(id, geo_df) {
     # during" registry-lifespan range in BMF mode (ADR 0029). BMF has no
     # per-form floor and runs to the current registry vintage
     # (BMF_MAX_ACTIVE_YEAR, past CORE's ~2-year filing lag); CORE's floor is
-    # form-driven (990-EZ starts 2012) and tops out at DOWNLOAD_MAX_TAX_YEAR.
+    # form-driven (combined/pf reach 1989, standalone 990/990ez start 2012 —
+    # download_form_min_year) and tops out at DOWNLOAD_MAX_TAX_YEAR.
     # BMF defaults to the single most-recent year (a current snapshot — the
     # "how many are active now" question); CORE defaults to its full span.
     refresh_year_range <- function() {
