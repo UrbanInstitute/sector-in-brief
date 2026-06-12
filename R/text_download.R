@@ -31,17 +31,21 @@ download_date_para <- htmltools::p(
 # no financials. Rich (HTML) radio labels so the trade-off is legible.
 bmf_link <- "https://nccs.urban.org/nccs/datasets/bmf/"
 download_source_label <- htmltools::tags$b("What kind of data do you want? *")
-download_source_corename <- htmltools::HTML(
-  "<b>990 filings</b> &mdash; financial and operational data reported by organizations that filed a Form 990, 990-EZ, or 990-PF in the tax years you choose."
-)
+# Card content: a bold title (.ds-title) + a normal-weight description
+# (.ds-desc), styled by .download-source-toggle in www/sib_style.css. Copy is
+# kept tight so the two cards read at a glance.
+download_source_corename <- htmltools::HTML(paste0(
+  '<span class="ds-title">990 filings</span>',
+  '<span class="ds-desc">Financial and operational data reported by ',
+  'organizations that filed a Form 990, 990-EZ, or 990-PF.</span>'
+))
 download_source_bmfname <- htmltools::HTML(paste0(
-  "<b>BMF</b> &mdash; the IRS Business Master File: every registered nonprofit ",
-  "(including organizations that have never filed a 990), <b>kept current ",
-  "through 2026</b>. Names and demographics &mdash; location, subsector, ",
-  "organization type &mdash; but <b>no financials</b>. Best for current ",
-  "questions like how many nonprofits are in a state and how they are ",
-  "distributed by location or subsector. <a href=\"", bmf_link,
-  "\" target=\"_blank\" rel=\"noopener\">Learn more about the BMF</a>."
+  '<span class="ds-title">BMF registry</span>',
+  '<span class="ds-desc">Every registered nonprofit, including those that ',
+  'have never filed a 990 &mdash; kept current through 2026. Names and ',
+  'demographics (location, subsector, organization type), but ',
+  '<b>no financials</b>. <a href="', bmf_link,
+  '" target="_blank" rel="noopener">Learn more about the BMF</a>.</span>'
 ))
 # BMF date step: active_years is a lifespan-overlap filter, NOT a tax year.
 # The registry is current (through 2026) — unlike CORE's ~2-year filing lag —
