@@ -22,10 +22,16 @@
 #
 # Mounted as the last nav_panel by app.R.
 
-# Last complete tax year offered by the download form. The API exposes no
-# list-years endpoint, so this tracks the producer's CORE coverage
-# (Finances/PF 1989-2023; 2024 is still partial — see CLAUDE.md "Data
-# semantics"). Bump when the API's complete-year coverage advances.
+# Tax-year range offered by the download form's CORE (filing-level) mode. The
+# API exposes no list-years endpoint, so these track the producer's row-level
+# CORE coverage in s3://nccsdata/processed/core/{year}/{form}/. Verified by
+# probing the bucket: every form (990 / 990ez / 990pf / 990combined) is
+# materialized for 2012-2024 only — pre-2012 990s were not e-filed, so there
+# are NO processed/core partitions for them and the API 404s if asked (it
+# builds an explicit read_parquet path list with no existence check — see
+# sector-in-brief-api#14). 2024 is still partial, so the offered max stays
+# 2023. Bump MIN/MAX as the row-level coverage advances.
+DOWNLOAD_MIN_TAX_YEAR <- 2012L
 DOWNLOAD_MAX_TAX_YEAR <- 2023L
 
 # Latest "active" year offered in BMF (org-registry) mode. The BMF registry
@@ -34,10 +40,12 @@ DOWNLOAD_MAX_TAX_YEAR <- 2023L
 # Bump as the registry advances.
 BMF_MAX_ACTIVE_YEAR <- 2026L
 
-# Earliest tax year per form code. 990-EZ data starts in 2012; everything
-# else (incl. the 990+990-EZ union and 990-PF) goes back to 1989.
+# Earliest tax year offered per CORE form. The row-level e-file archive starts
+# in 2012 for ALL forms (probe above), so the floor is uniform — the prior
+# 990-only 1989 floor offered years with no downloadable partitions. Kept as a
+# function so a future per-form divergence has a seam.
 download_form_min_year <- function(form) {
-  if (identical(form, "990ez")) 2012L else 1989L
+  DOWNLOAD_MIN_TAX_YEAR
 }
 
 #' Build the Custom Panel Datasets request UI.
@@ -223,7 +231,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("start_year"),
               label = htmltools::tags$b("From Tax Year *"),
-              choices = c(1989:DOWNLOAD_MAX_TAX_YEAR),
+              choices = c(DOWNLOAD_MIN_TAX_YEAR:DOWNLOAD_MAX_TAX_YEAR),
               selected = 2012,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
@@ -234,7 +242,7 @@ dataRequestUI <- function(id, geo_df) {
             shinyWidgets::pickerInput(
               inputId = ns("end_year"),
               label = htmltools::tags$b("Through Tax Year *"),
-              choices = c(1989:DOWNLOAD_MAX_TAX_YEAR),
+              choices = c(DOWNLOAD_MIN_TAX_YEAR:DOWNLOAD_MAX_TAX_YEAR),
               selected = DOWNLOAD_MAX_TAX_YEAR,
               multiple = FALSE,
               options = list(`actions-box` = TRUE)
