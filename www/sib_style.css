@@ -803,6 +803,18 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
   display: block;
   margin-bottom: 0.75rem;
 }
+/* Make the radio group and each option's label fill the toggle's width.
+   Without this an inner element shrink-wraps to its content, so even though
+   the outer div is now full-width (#79) the description renders as a narrow
+   column pinned to the left of it. Forcing display:block + width:100% down
+   the chain lets the text use the full available width. */
+.download-source-toggle .shiny-input-radiogroup,
+.download-source-toggle .shiny-options-group,
+.download-source-toggle .radio,
+.download-source-toggle .radio label {
+  display: block;
+  width: 100%;
+}
 .download-source-toggle .radio {
   margin-bottom: 0.5rem;
 }
