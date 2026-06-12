@@ -75,23 +75,43 @@ test_that("filters use new column names and omit empty selections", {
   expect_null(p$filters$cbsa_code)
 })
 
-test_that("county/metro filter by code, scoped to the selected states", {
+test_that("county passes FIPS straight through; metro filters by code", {
+  # county_select is now FIPS-valued (county_fips_choices); metro stays name-keyed.
   inp <- base_inputs(
     geo_select    = c("CA"),
-    county_select = c("Los Angeles", "Orange"),
+    county_select = c("06037", "06059"),
     cbsa_select   = c("Los Angeles-Long Beach-Anaheim, CA")
   )
   p <- query_builder_download(inp, fake_geo_df())
   expect_equal(sort(p$filters$geo_county_fips), c("06037", "06059"))
+  expect_type(p$filters$geo_county_fips, "character")
   expect_equal(p$filters$cbsa_code, "31080")
 })
 
-test_that("shared county names don't leak across states", {
-  # "Baltimore" exists in MD only here; selecting NY must not pull it in.
-  inp <- base_inputs(geo_select = "NY", county_select = "Baltimore")
-  codes <- geo_names_to_codes(inp$county_select, inp$geo_select,
-                              fake_geo_df(), "Census.County", "County.FIPS")
+test_that("shared metro names don't leak across states (geo_names_to_codes)", {
+  # Metro/CBSA still routes through geo_names_to_codes, scoped to the states.
+  inp <- base_inputs(geo_select = "NY",
+                     cbsa_select = "Baltimore-Columbia-Towson, MD")
+  codes <- geo_names_to_codes(inp$cbsa_select, inp$geo_select,
+                              fake_geo_df(), "Metro.Micro.Area", "CBSA.Code")
   expect_null(codes)
+})
+
+test_that("county_fips_choices: FIPS values, 'County, ST' labels, state-scoped", {
+  geo <- fake_geo_df()
+  all <- county_fips_choices(geo)
+  # value is FIPS, name is the disambiguating label
+  expect_equal(unname(all[["Los Angeles, CA"]]), "06037")
+  expect_true(all(grepl(", [A-Z]{2}$", names(all))))
+  # the two MD "Baltimore" counties are distinct FIPS, both present
+  expect_setequal(
+    unname(county_fips_choices(geo, "MD")),
+    c("24005", "24510")
+  )
+  # scoping to NY excludes CA/MD
+  expect_equal(unname(county_fips_choices(geo, "NY")), "36047")
+  # no match -> empty
+  expect_length(county_fips_choices(geo, "ZZ"), 0)
 })
 
 test_that("empty columns fall back to curated defaults", {
