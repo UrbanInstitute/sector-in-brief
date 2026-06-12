@@ -12,11 +12,12 @@ name: Deploy to production
 # same token pair, same AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY repo
 # secrets for the download form — see that workflow's header).
 #
-# Cutover note (ADR 0008 / 0026): prod intentionally keeps pointing at
-# the STAGING download API (the SIB_API_* env vars are left at their
-# code defaults) until the deliberate shadow → switch → monitor cutover.
-# To flip the pointer, add SIB_API_FUNCTION_NAME / SIB_API_DOWNLOAD_URL
-# to the env + the generated .Renviron below; nothing in R/ changes.
+# Cutover (ADR 0008 / 0026): prod now points at the PROD download API
+# (query-prod) via the SIB_API_* values written into the .Renviron below.
+# download_api_config() defaults to the STAGING stack, so these MUST be set
+# here or prod would silently call query-stg and hand users staging download
+# links. Nothing in R/ changes — it's env-driven. (prod ≡ staging Lambda code:
+# byte-identical CodeSha256, both built from sector-in-brief-api main.)
 #
 # Note: the old prod URL at nccs-urban.shinyapps.io/sector-in-brief/
 # is unaffected by this workflow. The migration to urban-main is now
@@ -74,7 +75,14 @@ jobs:
             writeLines(c(
               paste0("AWS_ACCESS_KEY_ID=",     Sys.getenv("AWS_ACCESS_KEY_ID")),
               paste0("AWS_SECRET_ACCESS_KEY=", Sys.getenv("AWS_SECRET_ACCESS_KEY")),
-              paste0("AWS_REGION=",            Sys.getenv("AWS_REGION"))
+              paste0("AWS_REGION=",            Sys.getenv("AWS_REGION")),
+              # Point the download form at the PROD sector-in-brief-api
+              # (query-prod). Not secrets — Lambda name + Function URLs; the
+              # POST /data invoke is IAM-signed with the same creds, the
+              # download URL is the public durable-link base for emailed links.
+              "SIB_API_FUNCTION_NAME=sector-in-brief-api-query-prod",
+              "SIB_API_DATA_URL=https://qswu3c4w3xi2y5thpr6uhix6ku0jpgwh.lambda-url.us-east-1.on.aws/",
+              "SIB_API_DOWNLOAD_URL=https://w6gpdtsy72ua2onypvarfnsjvi0atdkv.lambda-url.us-east-1.on.aws/"
             ), ".Renviron")
             # data/ and renv library excluded for the same reasons as
             # the staging workflow — see deploy-staging.yml comments.
