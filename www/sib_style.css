@@ -787,7 +787,14 @@ div.card-header.bslib-navs-card-title  > ul > li > a.nav-link.active {
    so they don't run edge-to-edge. */
 .download-source-toggle {
   display: block;
-  max-width: 760px;
+  /* The card-body is a bslib flex column; on a flex item `margin: 0 auto`
+     makes it SHRINK-WRAP to its content (a narrow column) instead of filling,
+     so the padding below just squeezed an already-narrow block. An explicit
+     width: 100% gives a definite cross size so the div fills the card (capped
+     for line length), and the padding then reads as real left/right margins. */
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 820px;
   margin: 0 auto;
   padding: 1.25rem 2rem;
   text-align: left;
