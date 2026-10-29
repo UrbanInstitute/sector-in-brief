@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -28,6 +28,11 @@ jobs:
       #     libxml2-dev, etc.) via r-lib/actions/setup-r-dependencies
       #     under the hood — this is what fixed the source-build failures
       #     when CI was wired manually.
+      # systemfonts, textshaping and ragg compile from source when no
+      # binary matches the runner, and need these headers to do so.
+      - name: Install system libraries for font packages
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev libpng-dev
+
       - name: Set up renv
         uses: r-lib/actions/setup-renv@v2
 
