@@ -1,0 +1,10 @@
+citHeader("To cite the Sector in Brief dashboard in publications use:")
+
+bibentry(
+  bibtype = "Manual",
+  title   = "Sector in Brief: a dashboard of the US nonprofit sector",
+  author  = person("Thiyaghessan", "Poongundranar"),
+  year    = "2026",
+  note    = "R package",
+  url     = "https://github.com/UrbanInstitute/sector-in-brief"
+)
