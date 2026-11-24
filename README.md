@@ -1,5 +1,7 @@
 # Nonprofit Sector In Brief Dashboard
 
+Maintained by Thiyaghessan Poongundranar, National Center for Charitable Statistics, Urban Institute, since July 2024.
+
 This repository contains the code needed to create the [Nonprofit Sector In Brief Dashboard](https://urban-main.shinyapps.io/sector-in-brief/)
 web application with R Shiny. 
 
